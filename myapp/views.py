@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
 from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.forms import ModelForm
 from django.db.models import Q
-from .forms import RecursoForm
+from .forms import RecursoForm, PerfilForm
+from django.contrib import messages
+
 
 from django.contrib.auth import logout as auth_logout
 
@@ -81,12 +83,17 @@ def listar_notificaciones(request):
 @login_required
 def proyecto_list(request):
     query = request.GET.get('q')
+    filter_by = request.GET.get('filter_by')
     if query:
         proyectos = Proyecto.objects.filter(
             Q(nombre__icontains=query) | Q(descripcion__icontains=query)
         )
     else:
         proyectos = Proyecto.objects.all()
+
+    if filter_by:
+        proyectos = proyectos.filter(creador=request.user)
+    
     return render(request, 'myapp/proyecto_list.html', {'proyectos': proyectos})
 
 class ProyectoForm(ModelForm):
@@ -102,7 +109,10 @@ def proyecto_create(request):
             proyecto = form.save(commit=False)
             proyecto.creador = request.user
             proyecto.save()
+            messages.success(request, 'Proyecto creado exitosamente')
             return redirect('proyecto_list')
+        else:
+            messages.error(request, 'Error al crear el proyecto')
     else:
         form = ProyectoForm()
     return render(request, 'myapp/proyecto_form.html', {'form': form})
@@ -126,9 +136,11 @@ def proyecto_detail(request, pk):
     return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto, 'form': form})
 
 #Edits proyect
+
+@permission_required('myapp.can_edit_proyecto', raise_exception=True)
 @login_required
 def proyecto_edit(request, pk):
-    proyecto = Proyecto.objects.get(pk=pk)
+    proyecto = get_object_or_404(Proyecto, pk=pk)
     if request.method == 'POST':
         form = ProyectoForm(request.POST, instance=proyecto)
         if form.is_valid():
@@ -138,9 +150,10 @@ def proyecto_edit(request, pk):
         form = ProyectoForm(instance=proyecto)
     return render(request, 'myapp/proyecto_form.html', {'form': form})
 
+@permission_required('myapp.can_delete_proyecto', raise_exception=True)
 @login_required
 def proyecto_delete(request, pk):
-    proyecto = Proyecto.objects.get(pk=pk)
+    proyecto = get_object_or_404(Proyecto, pk=pk)
     if request.method == 'POST':
         proyecto.delete()
         return redirect('proyecto_list')
@@ -171,12 +184,12 @@ def ver_perfil(request):
 @login_required
 def editar_perfil(request):
     if request.method == 'POST':
-        form = UserChangeForm(request.POST, instance=request.user)
+        form = PerfilForm(request.POST, request.FILES, instance=request.user.perfil)
         if form.is_valid():
             form.save()
             return redirect('ver_perfil')
     else:
-        form = UserChangeForm(instance=request.user)
+        form = PerfilForm(instance=request.user.perfil)
     return render(request, 'myapp/editar_perfil.html', {'form': form})
 
 # Modulo de Login/Registro

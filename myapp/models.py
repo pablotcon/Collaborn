@@ -7,7 +7,12 @@ class Proyecto(models.Model):
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     creador = models.ForeignKey(User, on_delete=models.CASCADE)
-
+    class Meta:
+        permissions = [
+            ("can_edit_proyecto", "Can edit project"),
+            ("can_delete_proyecto", "Can delete project"),
+        ]
+        
 class Postulacion(models.Model):
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -39,3 +44,12 @@ class Recurso(models.Model):
 
     def __str__(self):
         return self.titulo
+
+class Perfil(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    bio = models.TextField(blank=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True)
+    location = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return self.user.username
