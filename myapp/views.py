@@ -7,6 +7,8 @@ from django.forms import ModelForm
 from django.db.models import Q
 from .forms import RecursoForm
 
+from django.contrib.auth import logout as auth_logout
+
 # Modulo Recursos
 @login_required
 def subir_recurso(request):
@@ -125,16 +127,6 @@ def editar_perfil(request):
     return render(request, 'myapp/editar_perfil.html', {'form': form})
 
 # Modulo de Login/Registro
-def register(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('login')
-    else:
-        form = UserCreationForm()
-    return render(request, 'myapp/register.html', {'form': form})
-
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -146,10 +138,22 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'myapp/login.html', {'form': form})
 
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+    else:
+        form = UserCreationForm()
+    return render(request, 'myapp/register.html', {'form': form})
+
+@login_required
 def logout_view(request):
     if request.method == 'POST':
         logout(request)
         return redirect('login')
+    return render(request, 'myapp/logout.html')
 
 def index(request):
     return render(request, 'myapp/index.html')

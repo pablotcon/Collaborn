@@ -1,0 +1,14 @@
+<!-- myapp/templates/myapp/logout.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cerrar Sesión</title>
+</head>
+<body>
+    <h1>¿Estás seguro que deseas cerrar sesión?</h1>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Cerrar Sesión</button>
+    </form>
+</body>
+</html>

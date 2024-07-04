@@ -1,12 +1,23 @@
+<!-- myapp/templates/myapp/base.html -->
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{% block title %}Collaborize{% endblock %}</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'myapp/style.css' %}">
+    <title>{% block title %}Mi Proyecto{% endblock %}</title>
 </head>
 <body>
-    <div class="container">
+    {% if user.is_authenticated %}
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{% url 'index' %}">Inicio</a></li>
+                <li><a href="{% url 'ver_perfil' %}">Perfil</a></li>
+                <li><a href="{% url 'logout' %}">Cerrar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+    {% endif %}
+    <main>
         {% block content %}{% endblock %}
-    </div>
+    </main>
 </body>
 </html>
