@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mensajes Recibidos</title>
+</head>
+<body>
+    <h2>Mensajes Recibidos</h2>
+    <ul>
+        {% for mensaje in mensajes %}
+            <li>
+                <strong>{{ mensaje.emisor.username }}:</strong> {{ mensaje.contenido }} - {{ mensaje.fecha_envio }}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

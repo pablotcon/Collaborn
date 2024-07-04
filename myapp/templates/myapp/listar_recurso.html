@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recursos</title>
+</head>
+<body>
+    <h2>Recursos</h2>
+    <ul>
+        {% for recurso in recursos %}
+            <li>
+                <a href="{{ recurso.archivo.url }}">{{ recurso.titulo }}</a> - {{ recurso.descripcion }}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

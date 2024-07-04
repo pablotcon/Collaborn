@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notificaciones</title>
+</head>
+<body>
+    <h2>Notificaciones</h2>
+    <ul>
+        {% for notificacion in notificaciones %}
+            <li{% if notificacion.leida %} style="font-weight: normal;"{% else %} style="font-weight: bold;"{% endif %}>
+                {{ notificacion.mensaje }} - {{ notificacion.fecha_creacion }}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

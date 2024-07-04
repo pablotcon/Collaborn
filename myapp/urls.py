@@ -13,4 +13,9 @@ urlpatterns = [
     path('mis-postulaciones/', views.mis_postulaciones, name='mis_postulaciones'),
     path('perfil/', views.ver_perfil, name='ver_perfil'),
     path('perfil/editar/', views.editar_perfil, name='editar_perfil'),
+    path('notificaciones/', views.listar_notificaciones, name='listar_notificaciones'),
+    path('mensajes/enviar/', views.enviar_mensaje, name='enviar_mensaje'),
+    path('mensajes/', views.listar_mensajes, name='listar_mensajes'),
+    path('recursos/', views.listar_recursos, name='listar_recursos'),
+    path('recursos/subir/', views.subir_recurso, name='subir_recurso'),
 ]

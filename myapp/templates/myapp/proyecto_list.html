@@ -1,0 +1,16 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Projects{% endblock %}
+
+{% block content %}
+<h2>Projects</h2>
+<form method="get" action="">
+    <input type="text" name="q" placeholder="Buscar proyectos" value="{{ request.GET.q }}">
+    <button type="submit">Buscar</button>
+</form>
+<ul>
+    {% for proyecto in proyectos %}
+        <li><a href="{% url 'proyecto_detail' proyecto.pk %}">{{ proyecto.nombre }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}
