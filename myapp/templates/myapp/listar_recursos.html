@@ -1,0 +1,19 @@
+<!-- myapp/templates/myapp/listar_recursos.html -->
+{% extends 'myapp/base.html' %}
+
+{% block title %}Lista de Recursos{% endblock %}
+
+{% block content %}
+<h1>Lista de Recursos</h1>
+<form method="get" action=".">
+    <input type="text" name="q" placeholder="Buscar recursos">
+    <button type="submit">Buscar</button>
+</form>
+<ul>
+    {% for recurso in recursos %}
+    <li>
+        <a href="{{ recurso.archivo.url }}">{{ recurso.titulo }}</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

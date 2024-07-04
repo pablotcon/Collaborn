@@ -7,6 +7,8 @@ from django.forms import ModelForm
 from django.db.models import Q
 from .forms import RecursoForm, PerfilForm
 from django.contrib import messages
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 
 from django.contrib.auth import logout as auth_logout
@@ -25,7 +27,14 @@ def subir_recurso(request):
 
 @login_required
 def listar_recursos(request):
+    query = request.GET.get('q')
     recursos = Recurso.objects.all()
+    
+    if query:
+        recursos = recursos.filter(
+            Q(titulo__icontains=query) | Q(descripcion__icontains=query)
+        )
+
     return render(request, 'myapp/listar_recursos.html', {'recursos': recursos})
 
 
@@ -73,6 +82,23 @@ def listar_mensajes(request):
     return render(request, 'myapp/listar_mensajes.html', {'mensajes': mensajes_recibidos})
 
 # Notificaciones
+
+def send_notification(user, message):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        f"user_{user.id}", 
+        {
+            "type": "user_notification",
+            "message": message,
+        }
+    )
+
+def user_notification(event):
+    message = event['message']
+    self.send(text_data=json.dumps({
+        'message': message
+    }))
+
 @login_required
 def listar_notificaciones(request):
     notificaciones = Notificacion.objects.filter(usuario=request.user)
@@ -84,16 +110,18 @@ def listar_notificaciones(request):
 def proyecto_list(request):
     query = request.GET.get('q')
     filter_by = request.GET.get('filter_by')
+    proyectos = Proyecto.objects.all()
+    
     if query:
-        proyectos = Proyecto.objects.filter(
+        proyectos = proyectos.filter(
             Q(nombre__icontains=query) | Q(descripcion__icontains=query)
         )
-    else:
-        proyectos = Proyecto.objects.all()
 
     if filter_by:
-        proyectos = proyectos.filter(creador=request.user)
-    
+        if filter_by == 'mis_proyectos':
+            proyectos = proyectos.filter(creador=request.user)
+
+   
     return render(request, 'myapp/proyecto_list.html', {'proyectos': proyectos})
 
 class ProyectoForm(ModelForm):
@@ -109,10 +137,10 @@ def proyecto_create(request):
             proyecto = form.save(commit=False)
             proyecto.creador = request.user
             proyecto.save()
-            messages.success(request, 'Proyecto creado exitosamente')
+            messages.success(request, 'Proyecto creado exitosamente.')
             return redirect('proyecto_list')
         else:
-            messages.error(request, 'Error al crear el proyecto')
+            messages.error(request, 'Error al crear el proyecto.')
     else:
         form = ProyectoForm()
     return render(request, 'myapp/proyecto_form.html', {'form': form})
@@ -136,7 +164,6 @@ def proyecto_detail(request, pk):
     return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto, 'form': form})
 
 #Edits proyect
-
 @permission_required('myapp.can_edit_proyecto', raise_exception=True)
 @login_required
 def proyecto_edit(request, pk):
@@ -145,7 +172,10 @@ def proyecto_edit(request, pk):
         form = ProyectoForm(request.POST, instance=proyecto)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Proyecto editado exitosamente.')
             return redirect('proyecto_list')
+        else:
+            messages.error(request, 'Error al editar el proyecto.')
     else:
         form = ProyectoForm(instance=proyecto)
     return render(request, 'myapp/proyecto_form.html', {'form': form})
@@ -156,20 +186,26 @@ def proyecto_delete(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
     if request.method == 'POST':
         proyecto.delete()
+        messages.success(request, 'Proyecto eliminado exitosamente.')
         return redirect('proyecto_list')
     return render(request, 'myapp/proyecto_confirm_delete.html', {'proyecto': proyecto})
 
 @login_required
 def postular_proyecto(request, proyecto_id):
-    proyecto = Proyecto.objects.get(id=proyecto_id)
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
     if request.method == 'POST':
-        Postulacion.objects.create(proyecto=proyecto, usuario=request.user)
-        Notificacion.objects.create(
-            usuario=proyecto.creador,
-            mensaje=f'El usuario {request.user.username} se ha postulado a tu proyecto "{proyecto.nombre}".'
-        )
-        return redirect('proyecto_list')
-    return render(request, 'myapp/postular_proyecto.html', {'proyecto': proyecto})
+        # Verificar si el usuario ya se ha postulado
+        if Postulacion.objects.filter(proyecto=proyecto, usuario=request.user).exists():
+            messages.error(request, 'Ya te has postulado a este proyecto.')
+        else:
+            Postulacion.objects.create(proyecto=proyecto, usuario=request.user)
+            Notificacion.objects.create(
+                usuario=proyecto.creador,
+                mensaje=f'El usuario {request.user.username} se ha postulado a tu proyecto "{proyecto.nombre}".'
+            )
+            messages.success(request, 'Te has postulado al proyecto exitosamente.')
+        return redirect('proyecto_detail', pk=proyecto_id)
+    return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto})
 
 @login_required
 def mis_postulaciones(request):

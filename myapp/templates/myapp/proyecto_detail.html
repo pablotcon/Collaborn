@@ -9,18 +9,14 @@
 <p>Fecha de Inicio: {{ proyecto.fecha_inicio }}</p>
 <p>Fecha de Fin: {{ proyecto.fecha_fin }}</p>
 
-<h2>Editar Proyecto</h2>
-<form method="post" action="{% url 'proyecto_edit' proyecto.pk %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Guardar Cambios</button>
-</form>
-
-<h2>Eliminar Proyecto</h2>
-<form method="post" action="{% url 'proyecto_delete' proyecto.pk %}">
-    {% csrf_token %}
-    <button type="submit">Eliminar</button>
-</form>
+{% if user.is_authenticated %}
+    <form method="post" action="{% url 'postular_proyecto' proyecto.id %}">
+        {% csrf_token %}
+        <button type="submit">Postular</button>
+    </form>
+{% else %}
+    <p>Por favor, <a href="{% url 'login' %}">inicia sesión</a> para postularte a este proyecto.</p>
+{% endif %}
 
 <a href="{% url 'proyecto_list' %}">Volver a la lista de proyectos</a>
 {% endblock %}
