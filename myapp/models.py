@@ -12,7 +12,7 @@ class Proyecto(models.Model):
             ("can_edit_proyecto", "Can edit project"),
             ("can_delete_proyecto", "Can delete project"),
         ]
-        
+
 class Postulacion(models.Model):
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -47,9 +47,18 @@ class Recurso(models.Model):
 
 class Perfil(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    bio = models.TextField(blank=True)
-    avatar = models.ImageField(upload_to='avatars/', blank=True)
-    location = models.CharField(max_length=255, blank=True)
+    bio = models.TextField(blank=True, null=True)
+    location = models.CharField(max_length=100, blank=True, null=True)
+    birth_date = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return self.user.username
+    
+class Comentario(models.Model):
+    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE, related_name='comentarios')  # Añadido related_name
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    contenido = models.TextField()
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Comentario de {self.usuario.username} en {self.proyecto.nombre}'

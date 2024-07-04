@@ -1,16 +1,23 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Notificaciones</title>
-</head>
-<body>
-    <h2>Notificaciones</h2>
-    <ul>
-        {% for notificacion in notificaciones %}
-            <li{% if notificacion.leida %} style="font-weight: normal;"{% else %} style="font-weight: bold;"{% endif %}>
-                {{ notificacion.mensaje }} - {{ notificacion.fecha_creacion }}
-            </li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+<!-- myapp/templates/myapp/listar_notificaciones.html -->
+{% extends 'myapp/base.html' %}
+
+{% block title %}Notificaciones{% endblock %}
+
+{% block content %}
+<h1>Notificaciones</h1>
+<ul>
+    {% for notificacion in notificaciones %}
+    <li>
+        {{ notificacion.mensaje }} - {{ notificacion.fecha_creacion }}
+        {% if notificacion.leida %}
+        <span>(Leída)</span>
+        {% else %}
+        <form method="post" action="{% url 'marcar_notificacion_leida' notificacion.id %}">
+            {% csrf_token %}
+            <button type="submit">Marcar como leída</button>
+        </form>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

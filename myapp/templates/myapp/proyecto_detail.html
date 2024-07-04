@@ -18,5 +18,24 @@
     <p>Por favor, <a href="{% url 'login' %}">inicia sesión</a> para postularte a este proyecto.</p>
 {% endif %}
 
+<h2>Comentarios</h2>
+<ul>
+    {% for comentario in comentarios %}
+    <li>
+        {{ comentario.contenido }} - <strong>{{ comentario.usuario.username }}</strong> ({{ comentario.fecha_creacion }})
+    </li>
+    {% endfor %}
+</ul>
+
+{% if user.is_authenticated %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Agregar Comentario</button>
+    </form>
+{% else %}
+    <p>Por favor, <a href="{% url 'login' %}">inicia sesión</a> para agregar un comentario.</p>
+{% endif %}
+
 <a href="{% url 'proyecto_list' %}">Volver a la lista de proyectos</a>
 {% endblock %}

@@ -1,16 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Mensajes Recibidos</title>
-</head>
-<body>
-    <h2>Mensajes Recibidos</h2>
-    <ul>
-        {% for mensaje in mensajes %}
-            <li>
-                <strong>{{ mensaje.emisor.username }}:</strong> {{ mensaje.contenido }} - {{ mensaje.fecha_envio }}
-            </li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+<!-- myapp/templates/myapp/listar_mensajes.html -->
+{% extends 'myapp/base.html' %}
+
+{% block title %}Mensajes Recibidos{% endblock %}
+
+{% block content %}
+<h1>Mensajes Recibidos</h1>
+<ul>
+    {% for mensaje in mensajes %}
+    <li>
+        De: {{ mensaje.emisor.username }} - {{ mensaje.contenido }}
+        <br>
+        Enviado: {{ mensaje.fecha_envio }}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -23,4 +23,6 @@ urlpatterns = [
     path('recursos/<int:pk>/', views.recurso_detail, name='recurso_detail'),
     path('recursos/<int:pk>/edit/', views.recurso_detail, name='recurso_edit'),
     path('recursos/<int:pk>/delete/', views.recurso_detail, name='recurso_delete'),
+    path('notificaciones/marcar-leida/<int:notificacion_id>/', views.marcar_notificacion_leida, name='marcar_notificacion_leida'),
+
 ]

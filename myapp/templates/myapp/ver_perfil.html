@@ -5,8 +5,12 @@
 
 {% block content %}
 <h1>Perfil de {{ user.username }}</h1>
+<p>Nombre: {{ user.first_name }}</p>
+<p>Apellido: {{ user.last_name }}</p>
+<p>Email: {{ user.email }}</p>
+<p>Nombre de Usuario: {{ user.username }}</p>
 <p>Bio: {{ user.perfil.bio }}</p>
 <p>Ubicación: {{ user.perfil.location }}</p>
-<img src="{{ user.perfil.avatar.url }}" alt="Avatar de {{ user.username }}" style="width: 150px;">
+<p>Fecha de Nacimiento: {{ user.perfil.birth_date }}</p>
 <a href="{% url 'editar_perfil' %}">Editar Perfil</a>
 {% endblock %}

@@ -1,17 +1,30 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
-from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso
+from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil
 from django.contrib.auth.decorators import login_required, permission_required
 from django.forms import ModelForm
 from django.db.models import Q
-from .forms import RecursoForm, PerfilForm
+from .forms import RecursoForm, PerfilForm, ComentarioForm, Comentario, UserForm
 from django.contrib import messages
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
 
 from django.contrib.auth import logout as auth_logout
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Perfil.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.perfil.save()
+
 
 # Modulo Recursos
 @login_required
@@ -63,7 +76,6 @@ class MensajeForm(ModelForm):
         model = Mensaje
         fields = ['receptor', 'contenido']
 
-@login_required
 def enviar_mensaje(request):
     if request.method == 'POST':
         form = MensajeForm(request.POST)
@@ -71,7 +83,14 @@ def enviar_mensaje(request):
             mensaje = form.save(commit=False)
             mensaje.emisor = request.user
             mensaje.save()
+            Notificacion.objects.create(
+                usuario=mensaje.receptor,
+                mensaje=f'Has recibido un nuevo mensaje de {request.user.username}.'
+            )
+            messages.success(request, 'Mensaje enviado exitosamente.')
             return redirect('listar_mensajes')
+        else:
+            messages.error(request, 'Error al enviar el mensaje.')
     else:
         form = MensajeForm()
     return render(request, 'myapp/enviar_mensaje.html', {'form': form})
@@ -80,6 +99,7 @@ def enviar_mensaje(request):
 def listar_mensajes(request):
     mensajes_recibidos = Mensaje.objects.filter(receptor=request.user)
     return render(request, 'myapp/listar_mensajes.html', {'mensajes': mensajes_recibidos})
+
 
 # Notificaciones
 
@@ -103,6 +123,17 @@ def user_notification(event):
 def listar_notificaciones(request):
     notificaciones = Notificacion.objects.filter(usuario=request.user)
     return render(request, 'myapp/listar_notificaciones.html', {'notificaciones': notificaciones})
+
+
+@login_required
+def marcar_notificacion_leida(request, notificacion_id):
+    notificacion = get_object_or_404(Notificacion, id=notificacion_id, usuario=request.user)
+    if request.method == 'POST':
+        notificacion.leida = True
+        notificacion.save()
+        messages.success(request, 'Notificación marcada como leída.')
+    return redirect('listar_notificaciones')
+
 
 # Modulo Proyectos
 
@@ -148,20 +179,19 @@ def proyecto_create(request):
 @login_required
 def proyecto_detail(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
-    
+    comentarios = proyecto.comentarios.all()  # Usando related_name personalizado
     if request.method == 'POST':
-        if 'edit' in request.POST:
-            form = ProyectoForm(request.POST, instance=proyecto)
-            if form.is_valid():
-                form.save()
-                return redirect('proyecto_detail', pk=pk)
-        elif 'delete' in request.POST:
-            proyecto.delete()
-            return redirect('proyecto_list')
+        form = ComentarioForm(request.POST)
+        if form.is_valid():
+            comentario = form.save(commit=False)
+            comentario.proyecto = proyecto
+            comentario.usuario = request.user
+            comentario.save()
+            messages.success(request, 'Comentario publicado exitosamente.')
+            return redirect('proyecto_detail', pk=pk)
     else:
-        form = ProyectoForm(instance=proyecto)
-    
-    return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto, 'form': form})
+        form = ComentarioForm()
+    return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto, 'form': form, 'comentarios': comentarios})
 
 #Edits proyect
 @permission_required('myapp.can_edit_proyecto', raise_exception=True)
@@ -220,13 +250,19 @@ def ver_perfil(request):
 @login_required
 def editar_perfil(request):
     if request.method == 'POST':
-        form = PerfilForm(request.POST, request.FILES, instance=request.user.perfil)
-        if form.is_valid():
-            form.save()
+        user_form = UserForm(request.POST, instance=request.user)
+        perfil_form = PerfilForm(request.POST, instance=request.user.perfil)
+        if user_form.is_valid() and perfil_form.is_valid():
+            user_form.save()
+            perfil_form.save()
+            messages.success(request, 'Perfil actualizado exitosamente.')
             return redirect('ver_perfil')
+        else:
+            messages.error(request, 'Error al actualizar el perfil.')
     else:
-        form = PerfilForm(instance=request.user.perfil)
-    return render(request, 'myapp/editar_perfil.html', {'form': form})
+        user_form = UserForm(instance=request.user)
+        perfil_form = PerfilForm(instance=request.user.perfil)
+    return render(request, 'myapp/editar_perfil.html', {'user_form': user_form, 'perfil_form': perfil_form})
 
 # Modulo de Login/Registro
 def login_view(request):
