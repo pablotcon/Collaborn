@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Projects</title>
+</head>
+<body>
+    <h2>Projects</h2>
+    <ul>
+        {% for proyecto in proyectos %}
+            <li><a href="{% url 'proyecto_detail' proyecto.pk %}">{{ proyecto.nombre }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
