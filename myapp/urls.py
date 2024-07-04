@@ -9,6 +9,8 @@ urlpatterns = [
     path('proyectos/', views.proyecto_list, name='proyecto_list'),
     path('proyectos/create/', views.proyecto_create, name='proyecto_create'),
     path('proyectos/<int:pk>/', views.proyecto_detail, name='proyecto_detail'),
+    path('proyectos/<int:pk>/edit/', views.proyecto_detail, name='proyecto_edit'),
+    path('proyectos/<int:pk>/delete/', views.proyecto_detail, name='proyecto_delete'),
     path('proyectos/<int:proyecto_id>/postular/', views.postular_proyecto, name='postular_proyecto'),
     path('mis-postulaciones/', views.mis_postulaciones, name='mis_postulaciones'),
     path('perfil/', views.ver_perfil, name='ver_perfil'),
@@ -18,4 +20,7 @@ urlpatterns = [
     path('mensajes/', views.listar_mensajes, name='listar_mensajes'),
     path('recursos/', views.listar_recursos, name='listar_recursos'),
     path('recursos/subir/', views.subir_recurso, name='subir_recurso'),
+    path('recursos/<int:pk>/', views.recurso_detail, name='recurso_detail'),
+    path('recursos/<int:pk>/edit/', views.recurso_detail, name='recurso_edit'),
+    path('recursos/<int:pk>/delete/', views.recurso_detail, name='recurso_delete'),
 ]

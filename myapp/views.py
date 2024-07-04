@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
 from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso
@@ -25,6 +25,25 @@ def subir_recurso(request):
 def listar_recursos(request):
     recursos = Recurso.objects.all()
     return render(request, 'myapp/listar_recursos.html', {'recursos': recursos})
+
+
+@login_required
+def recurso_detail(request, pk):
+    recurso = get_object_or_404(Recurso, pk=pk)
+    
+    if request.method == 'POST':
+        if 'edit' in request.POST:
+            form = RecursoForm(request.POST, request.FILES, instance=recurso)
+            if form.is_valid():
+                form.save()
+                return redirect('recurso_detail', pk=pk)
+        elif 'delete' in request.POST:
+            recurso.delete()
+            return redirect('listar_recursos')
+    else:
+        form = RecursoForm(instance=recurso)
+    
+    return render(request, 'myapp/recurso_detail.html', {'recurso': recurso, 'form': form})
 
 # Modulo Mensajes
 
@@ -90,8 +109,42 @@ def proyecto_create(request):
 
 @login_required
 def proyecto_detail(request, pk):
+    proyecto = get_object_or_404(Proyecto, pk=pk)
+    
+    if request.method == 'POST':
+        if 'edit' in request.POST:
+            form = ProyectoForm(request.POST, instance=proyecto)
+            if form.is_valid():
+                form.save()
+                return redirect('proyecto_detail', pk=pk)
+        elif 'delete' in request.POST:
+            proyecto.delete()
+            return redirect('proyecto_list')
+    else:
+        form = ProyectoForm(instance=proyecto)
+    
+    return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto, 'form': form})
+
+#Edits proyect
+@login_required
+def proyecto_edit(request, pk):
     proyecto = Proyecto.objects.get(pk=pk)
-    return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto})
+    if request.method == 'POST':
+        form = ProyectoForm(request.POST, instance=proyecto)
+        if form.is_valid():
+            form.save()
+            return redirect('proyecto_list')
+    else:
+        form = ProyectoForm(instance=proyecto)
+    return render(request, 'myapp/proyecto_form.html', {'form': form})
+
+@login_required
+def proyecto_delete(request, pk):
+    proyecto = Proyecto.objects.get(pk=pk)
+    if request.method == 'POST':
+        proyecto.delete()
+        return redirect('proyecto_list')
+    return render(request, 'myapp/proyecto_confirm_delete.html', {'proyecto': proyecto})
 
 @login_required
 def postular_proyecto(request, proyecto_id):
