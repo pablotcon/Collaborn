@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mi Perfil</title>
+</head>
+<body>
+    <h2>Mi Perfil</h2>
+    <p>Username: {{ user.username }}</p>
+    <p>Email: {{ user.email }}</p>
+    <a href="{% url 'editar_perfil' %}">Editar Perfil</a>
+</body>
+</html>

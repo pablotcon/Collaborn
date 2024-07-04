@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Postular a Proyecto</title>
+</head>
+<body>
+    <h2>Postular a {{ proyecto.nombre }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Postular</button>
+    </form>
+</body>
+</html>

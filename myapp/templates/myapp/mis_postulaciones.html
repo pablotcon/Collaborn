@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mis Postulaciones</title>
+</head>
+<body>
+    <h2>Mis Postulaciones</h2>
+    <ul>
+        {% for postulacion in postulaciones %}
+            <li>{{ postulacion.proyecto.nombre }} - Postulado el {{ postulacion.fecha_postulacion }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
