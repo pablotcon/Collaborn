@@ -6,16 +6,20 @@
 {% block content %}
 <h1>Lista de Proyectos</h1>
 <form method="get" action=".">
-    <input type="text" name="q" placeholder="Buscar proyectos">
-    <select name="filter_by">
-        <option value="">Todos</option>
-        <option value="mis_proyectos">Mis Proyectos</option>
-    </select>
-    <button type="submit">Buscar</button>
+    <div class="form-group">
+        <input type="text" name="q" placeholder="Buscar proyectos" class="form-control">
+    </div>
+    <div class="form-group">
+        <select name="filter_by" class="form-control">
+            <option value="">Todos</option>
+            <option value="mis_proyectos">Mis Proyectos</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Buscar</button>
 </form>
-<ul>
+<ul class="list-group mt-3">
     {% for proyecto in proyectos %}
-    <li>
+    <li class="list-group-item">
         <a href="{% url 'proyecto_detail' proyecto.pk %}">{{ proyecto.nombre }}</a>
     </li>
     {% endfor %}

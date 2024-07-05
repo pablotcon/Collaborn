@@ -3,37 +3,49 @@
 <html>
 <head>
     <title>{% block title %}Mi Proyecto{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
     {% if user.is_authenticated %}
     <header>
-        <nav>
-            <ul>
-                <li><a href="{% url 'index' %}">Inicio</a></li>
-                <li><a href="{% url 'ver_perfil' %}">Perfil</a></li>
-                <li><a href="{% url 'proyecto_list' %}">Proyectos</a></li>
-                <li><a href="{% url 'listar_recursos' %}">Recursos</a></li>
-                <li><a href="{% url 'listar_notificaciones' %}">Notificaciones</a></li>
-                <li><a href="{% url 'listar_mensajes' %}">Mensajes</a></li>
-                <li>
-                    <form method="post" action="{% url 'logout' %}">
-                        {% csrf_token %}
-                        <button type="submit">Cerrar Sesión</button>
-                    </form>
-                </li>
-            </ul>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="{% url 'index' %}">Collaborn</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'ver_perfil' %}">Perfil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'proyecto_list' %}">Proyectos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'listar_recursos' %}">Recursos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'listar_notificaciones' %}">Notificaciones</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'listar_mensajes' %}">Mensajes</a></li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link nav-link">Cerrar Sesión</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </nav>
     </header>
     {% endif %}
-    <main>
+    <main class="container">
         {% if messages %}
-        <ul>
+        <div class="alert alert-info" role="alert">
             {% for message in messages %}
-            <li>{{ message }}</li>
+            {{ message }}
             {% endfor %}
-        </ul>
+        </div>
         {% endif %}
         {% block content %}{% endblock %}
     </main>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
 </body>
 </html>
