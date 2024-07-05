@@ -3,15 +3,19 @@ from django.contrib.auth.models import User
 
 
 
+def get_default_user():
+    return User.objects.first().id if User.objects.exists() else None
+
 class Proyecto(models.Model):
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=200)
     descripcion = models.TextField()
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
+    creador = models.ForeignKey(User, related_name='proyectos_creados', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.nombre
-
+    
 class Comentario(models.Model):
     proyecto = models.ForeignKey(Proyecto, related_name='comentarios', on_delete=models.CASCADE)
     autor = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -19,8 +23,7 @@ class Comentario(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'Comentario por {self.autor.username} en {self.proyecto.nombre}'
-
+        return self.texto
 class Tarea(models.Model):
     proyecto = models.ForeignKey(Proyecto, related_name='tareas', on_delete=models.CASCADE)
     nombre = models.CharField(max_length=100)

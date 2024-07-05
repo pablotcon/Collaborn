@@ -13,6 +13,11 @@ from asgiref.sync import async_to_sync
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from .models import Recurso
+
+def recurso_detail(request, pk):
+    recurso = get_object_or_404(Recurso, pk=pk)
+    return render(request, 'myapp/recurso_detail.html', {'recurso': recurso})
 
 @login_required
 def historial_actividades(request):
@@ -98,24 +103,6 @@ def listar_recursos(request):
 
     return render(request, 'myapp/listar_recursos.html', {'recursos': recursos})
 
-
-@login_required
-def recurso_detail(request, pk):
-    recurso = get_object_or_404(Recurso, pk=pk)
-    
-    if request.method == 'POST':
-        if 'edit' in request.POST:
-            form = RecursoForm(request.POST, request.FILES, instance=recurso)
-            if form.is_valid():
-                form.save()
-                return redirect('recurso_detail', pk=pk)
-        elif 'delete' in request.POST:
-            recurso.delete()
-            return redirect('listar_recursos')
-    else:
-        form = RecursoForm(instance=recurso)
-    
-    return render(request, 'myapp/recurso_detail.html', {'recurso': recurso, 'form': form})
 
 # Modulo Mensajes
 @login_required
@@ -206,6 +193,7 @@ def proyecto_create(request):
         form = ProyectoForm()
     return render(request, 'myapp/proyecto_form.html', {'form': form})
 
+
 @login_required
 def proyecto_detail(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
@@ -242,6 +230,7 @@ def proyecto_edit(request, pk):
     else:
         form = ProyectoForm(instance=proyecto)
     return render(request, 'myapp/proyecto_form.html', {'form': form})
+
 
 @permission_required('myapp.can_delete_proyecto', raise_exception=True)
 @login_required
