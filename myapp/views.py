@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
+from django.contrib.auth import authenticate, login, logout,update_session_auth_hash
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.forms import ModelForm
 from django.db.models import Q
@@ -10,8 +10,16 @@ from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeFor
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
+
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+@login_required
+def historial_actividades(request):
+    comentarios = Comentario.objects.filter(autor=request.user).order_by('-fecha_creacion')
+    tareas_asignadas = Tarea.objects.filter(asignado_a=request.user).order_by('-fecha_creacion')
+    return render(request, 'myapp/historial_actividades.html', {'comentarios': comentarios, 'tareas_asignadas': tareas_asignadas})
+
 
 # Modulo de Tareas
 @login_required
@@ -154,16 +162,14 @@ def user_notification(event):
 
 @login_required
 def listar_notificaciones(request):
-    notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha_creacion')
+    notificaciones = request.user.notificacion_set.filter(leida=False)
     return render(request, 'myapp/listar_notificaciones.html', {'notificaciones': notificaciones})
 
 @login_required
 def marcar_notificacion_leida(request, notificacion_id):
     notificacion = get_object_or_404(Notificacion, id=notificacion_id, usuario=request.user)
-    if request.method == 'POST':
-        notificacion.leida = True
-        notificacion.save()
-        messages.success(request, 'Notificación marcada como leída.')
+    notificacion.leida = True
+    notificacion.save()
     return redirect('listar_notificaciones')
 
 # Modulo Proyectos
@@ -175,7 +181,7 @@ def proyecto_list(request):
     
     if query:
         proyectos = proyectos.filter(
-            Q(nombre__icontains=query) | Q(descripcion__icontains=query)
+            Q(nombre__icontains=query) | Q(descripcion__icontains(query))
         )
 
     if filter_by:
@@ -276,20 +282,37 @@ def ver_perfil(request):
 
 @login_required
 def editar_perfil(request):
+    user = request.user
+    perfil = get_object_or_404(Perfil, user=user)
     if request.method == 'POST':
-        user_form = UserForm(request.POST, instance=request.user)
-        perfil_form = PerfilForm(request.POST, instance=request.user.perfil)
+        user_form = UserForm(request.POST, instance=user)
+        perfil_form = PerfilForm(request.POST, request.FILES, instance=perfil)
         if user_form.is_valid() and perfil_form.is_valid():
             user_form.save()
             perfil_form.save()
             messages.success(request, 'Perfil actualizado exitosamente.')
             return redirect('ver_perfil')
         else:
-            messages.error(request, 'Error al actualizar el perfil.')
+            messages.error(request, 'Por favor corrija los errores a continuación.')
     else:
-        user_form = UserForm(instance=request.user)
-        perfil_form = PerfilForm(instance=request.user.perfil)
+        user_form = UserForm(instance=user)
+        perfil_form = PerfilForm(instance=perfil)
     return render(request, 'myapp/editar_perfil.html', {'user_form': user_form, 'perfil_form': perfil_form})
+
+@login_required
+def cambiar_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Mantener la sesión después de cambiar la contraseña
+            messages.success(request, 'Su contraseña ha sido cambiada exitosamente.')
+            return redirect('ver_perfil')
+        else:
+            messages.error(request, 'Por favor corrija los errores a continuación.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'cambiar_password.html', {'form': form})
 
 # Modulo de Login/Registro
 def login_view(request):

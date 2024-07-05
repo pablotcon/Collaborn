@@ -1,14 +1,16 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.models import User
-from .models import Perfil
+from .models import Tarea, Comentario, Notificacion
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
+@receiver(post_save, sender=Tarea)
+def notificar_asignacion_tarea(sender, instance, created, **kwargs):
+    if created and instance.asignado_a:
+        mensaje = f'Se te ha asignado una nueva tarea: {instance.nombre}'
+        Notificacion.objects.create(usuario=instance.asignado_a, mensaje=mensaje)
+
+@receiver(post_save, sender=Comentario)
+def notificar_comentario_proyecto(sender, instance, created, **kwargs):
     if created:
-        Perfil.objects.get_or_create(user=instance)
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    if hasattr(instance, 'perfil'):
-        instance.perfil.save()
+        mensaje = f'Nuevo comentario en el proyecto {instance.proyecto.nombre}: {instance.texto}'
+        for usuario in User.objects.filter(proyectos=instance.proyecto):
+            Notificacion.objects.create(usuario=usuario, mensaje=mensaje)

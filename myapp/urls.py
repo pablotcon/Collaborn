@@ -15,8 +15,10 @@ urlpatterns = [
     path('mis-postulaciones/', views.mis_postulaciones, name='mis_postulaciones'),
     path('perfil/', views.ver_perfil, name='ver_perfil'),
     path('perfil/editar/', views.editar_perfil, name='editar_perfil'),
+    path('perfil/cambiar_password/', views.cambiar_password, name='cambiar_password'),
+    path('historial_actividades/', views.historial_actividades, name='historial_actividades'),
     path('notificaciones/', views.listar_notificaciones, name='listar_notificaciones'),
-    path('notificaciones/marcar-leida/<int:notificacion_id>/', views.marcar_notificacion_leida, name='marcar_notificacion_leida'),
+    path('notificaciones/<int:notificacion_id>/marcar_leida/', views.marcar_notificacion_leida, name='marcar_notificacion_leida'),
     path('mensajes/enviar/', views.enviar_mensaje, name='enviar_mensaje'),
     path('mensajes/', views.listar_mensajes, name='listar_mensajes'),
     path('recursos/', views.listar_recursos, name='listar_recursos'),
@@ -25,8 +27,10 @@ urlpatterns = [
     path('recursos/<int:pk>/edit/', views.recurso_detail, name='recurso_edit'),
     path('recursos/<int:pk>/delete/', views.recurso_detail, name='recurso_delete'),
     path('notificaciones/marcar-leida/<int:notificacion_id>/', views.marcar_notificacion_leida, name='marcar_notificacion_leida'),
-   path('proyectos/<int:proyecto_id>/tareas/', views.listar_tareas, name='listar_tareas'),
+    path('proyectos/<int:proyecto_id>/tareas/', views.listar_tareas, name='listar_tareas'),
     path('proyectos/<int:proyecto_id>/tareas/agregar/', views.agregar_tarea, name='agregar_tarea'),
     path('tareas/<int:tarea_id>/editar/', views.editar_tarea, name='editar_tarea'),
     path('tareas/<int:tarea_id>/eliminar/', views.eliminar_tarea, name='eliminar_tarea'),
+    path('perfil/historial_actividades/', views.historial_actividades, name='historial_actividades'),
+
     ]

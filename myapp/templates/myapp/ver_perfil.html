@@ -1,16 +1,17 @@
 <!-- myapp/templates/myapp/ver_perfil.html -->
 {% extends 'myapp/base.html' %}
 
-{% block title %}Perfil de {{ user.username }}{% endblock %}
+{% block title %}Ver Perfil{% endblock %}
 
 {% block content %}
 <h1>Perfil de {{ user.username }}</h1>
-<p>Nombre: {{ user.first_name }}</p>
-<p>Apellido: {{ user.last_name }}</p>
+<p>Nombre: {{ user.perfil.nombre }}</p>
+<p>Apellido: {{ user.perfil.apellido }}</p>
 <p>Email: {{ user.email }}</p>
-<p>Nombre de Usuario: {{ user.username }}</p>
-<p>Bio: {{ user.perfil.bio }}</p>
-<p>Ubicación: {{ user.perfil.location }}</p>
+<p>Teléfono: {{ user.perfil.telefono }}</p>
 <p>Fecha de Nacimiento: {{ user.perfil.birth_date }}</p>
-<a href="{% url 'editar_perfil' %}">Editar Perfil</a>
+<img src="{{ user.perfil.avatar.url }}" alt="Avatar" width="100">
+<a href="{% url 'editar_perfil' %}" class="btn btn-primary mt-3">Editar Perfil</a>
+<a href="{% url 'cambiar_password' %}" class="btn btn-secondary mt-3">Cambiar Contraseña</a>
+<a href="{% url 'historial_actividades' %}" class="btn btn-info mt-3">Historial de Actividades</a>
 {% endblock %}

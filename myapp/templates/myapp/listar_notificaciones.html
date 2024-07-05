@@ -7,16 +7,12 @@
 <h1>Notificaciones</h1>
 <ul class="list-group">
     {% for notificacion in notificaciones %}
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-        {{ notificacion.mensaje }} - {{ notificacion.fecha_creacion }}
-        {% if notificacion.leida %}
-        <span class="badge badge-success">Leída</span>
-        {% else %}
-        <form method="post" action="{% url 'marcar_notificacion_leida' notificacion.id %}">
+    <li class="list-group-item">
+        {{ notificacion.mensaje }} <em>{{ notificacion.fecha_creacion }}</em>
+        <form method="post" action="{% url 'marcar_notificacion_leida' notificacion.id %}" style="display:inline;">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary btn-sm">Marcar como leída</button>
+            <button type="submit" class="btn btn-sm btn-success">Marcar como leída</button>
         </form>
-        {% endif %}
     </li>
     {% endfor %}
 </ul>

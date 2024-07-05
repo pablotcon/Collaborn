@@ -48,7 +48,8 @@ class Notificacion(models.Model):
     mensaje = models.TextField()
     leida = models.BooleanField(default=False)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-
+    leida = models.BooleanField(default=False)
+    
     def __str__(self):
         return f'Notificación para {self.usuario.username}'
 
