@@ -29,4 +29,8 @@
     {% csrf_token %}
     <button type="submit" class="btn btn-success">Postular</button>
 </form>
+
+<h2>Administrar Proyecto</h2>
+<a href="{% url 'proyecto_edit' proyecto.id %}" class="btn btn-warning">Editar</a>
+<a href="{% url 'proyecto_delete' proyecto.id %}" class="btn btn-danger">Eliminar</a>
 {% endblock %}

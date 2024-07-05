@@ -3,10 +3,12 @@
 {% block title %}Crear Proyecto{% endblock %}
 
 {% block content %}
-<h2>Crear Proyecto</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Crear Proyecto</button>
-</form>
+<div class="container mt-5">
+    <h2>Crear Proyecto</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Crear Proyecto</button>
+    </form>
+</div>
 {% endblock %}

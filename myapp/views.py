@@ -15,11 +15,36 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Recurso
 
+@login_required
 def recurso_detail(request, pk):
     recurso = get_object_or_404(Recurso, pk=pk)
     return render(request, 'myapp/recurso_detail.html', {'recurso': recurso})
 
+@permission_required('myapp.can_edit_recurso', raise_exception=True)
 @login_required
+def recurso_edit(request, pk):
+    recurso = get_object_or_404(Recurso, pk=pk)
+    if request.method == 'POST':
+        form = RecursoForm(request.POST, instance=recurso)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Recurso editado exitosamente.')
+            return redirect('recurso_detail', pk=recurso.pk)
+        else:
+            messages.error(request, 'Error al editar el recurso.')
+    else:
+        form = RecursoForm(instance=recurso)
+    return render(request, 'myapp/recurso_form.html', {'form': form})
+
+@permission_required('myapp.can_delete_recurso', raise_exception=True)
+@login_required
+def recurso_delete(request, pk):
+    recurso = get_object_or_404(Recurso, pk=pk)
+    if request.method == 'POST':
+        recurso.delete()
+        messages.success(request, 'Recurso eliminado exitosamente.')
+        return redirect('listar_recursos')
+    return render(request, 'myapp/recurso_confirm_delete.html', {'recurso': recurso})
 def historial_actividades(request):
     comentarios = Comentario.objects.filter(autor=request.user).order_by('-fecha_creacion')
     tareas_asignadas = Tarea.objects.filter(asignado_a=request.user).order_by('-fecha_creacion')
@@ -186,7 +211,7 @@ def crear_proyecto(request):
             proyecto.creador = request.user
             proyecto.save()
             messages.success(request, 'Proyecto creado exitosamente.')
-            return redirect('proyecto_detail', pk=proyecto.pk)
+            return redirect('proyecto_detail', proyecto_id=proyecto.id)
         else:
             messages.error(request, 'Error al crear el proyecto.')
     else:
@@ -240,7 +265,6 @@ def proyecto_delete(request, pk):
         messages.success(request, 'Proyecto eliminado exitosamente.')
         return redirect('proyecto_list')
     return render(request, 'myapp/proyecto_confirm_delete.html', {'proyecto': proyecto})
-
 @login_required
 def postular_proyecto(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)

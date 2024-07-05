@@ -1,0 +1,12 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Confirmar Eliminación{% endblock %}
+
+{% block content %}
+<h1>¿Estás seguro de que deseas eliminar el proyecto "{{ proyecto.nombre }}"?</h1>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a href="{% url 'proyecto_list' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

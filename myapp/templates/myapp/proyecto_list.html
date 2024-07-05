@@ -1,26 +1,22 @@
-<!-- myapp/templates/myapp/proyecto_list.html -->
 {% extends 'myapp/base.html' %}
 
 {% block title %}Lista de Proyectos{% endblock %}
 
 {% block content %}
 <h1>Lista de Proyectos</h1>
-<form method="get" action=".">
-    <div class="form-group">
-        <input type="text" name="q" placeholder="Buscar proyectos" class="form-control">
-    </div>
-    <div class="form-group">
-        <select name="filter_by" class="form-control">
-            <option value="">Todos</option>
-            <option value="mis_proyectos">Mis Proyectos</option>
-        </select>
-    </div>
-    <button type="submit" class="btn btn-primary">Buscar</button>
+<form method="get">
+    <input type="text" name="q" placeholder="Buscar proyectos" value="{{ request.GET.q }}">
+    <button type="submit">Buscar</button>
 </form>
-<ul class="list-group mt-3">
+
+<ul class="list-group">
     {% for proyecto in proyectos %}
-    <li class="list-group-item">
-        <a href="{% url 'proyecto_detail' proyecto.pk %}">{{ proyecto.nombre }}</a>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="{% url 'proyecto_detail' proyecto.id %}">{{ proyecto.nombre }}</a>
+        <span>
+            <a href="{% url 'proyecto_edit' proyecto.id %}" class="btn btn-primary btn-sm">Editar</a>
+            <a href="{% url 'proyecto_delete' proyecto.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+        </span>
     </li>
     {% endfor %}
 </ul>
