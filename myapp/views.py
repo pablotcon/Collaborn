@@ -15,13 +15,7 @@ from django.dispatch import receiver
 
 # Modulo de Tareas
 @login_required
-def listar_tareas(request, proyecto_id):
-    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
-    tareas = proyecto.tareas.all()
-    return render(request, 'myapp/listar_tareas.html', {'proyecto': proyecto, 'tareas': tareas})
-
-@login_required
-def crear_tarea(request, proyecto_id):
+def agregar_tarea(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
     if request.method == 'POST':
         form = TareaForm(request.POST)
@@ -29,14 +23,38 @@ def crear_tarea(request, proyecto_id):
             tarea = form.save(commit=False)
             tarea.proyecto = proyecto
             tarea.save()
-            messages.success(request, 'Tarea creada exitosamente.')
-            return redirect('listar_tareas', proyecto_id=proyecto_id)
-        else:
-            messages.error(request, 'Error al crear la tarea.')
+            messages.success(request, 'Tarea agregada exitosamente.')
+            return redirect('listar_tareas', proyecto_id=proyecto.id)
     else:
         form = TareaForm()
-    return render(request, 'myapp/crear_tarea.html', {'form': form, 'proyecto': proyecto})
+    return render(request, 'myapp/agregar_tarea.html', {'form': form})
 
+@login_required
+def listar_tareas(request, proyecto_id):
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+    tareas = proyecto.tareas.all()
+    return render(request, 'myapp/listar_tareas.html', {'proyecto': proyecto, 'tareas': tareas})
+
+@login_required
+def editar_tarea(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
+    if request.method == 'POST':
+        form = TareaForm(request.POST, instance=tarea)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Tarea actualizada exitosamente.')
+            return redirect('listar_tareas', proyecto_id=tarea.proyecto.id)
+    else:
+        form = TareaForm(instance=tarea)
+    return render(request, 'myapp/editar_tarea.html', {'form': form, 'tarea': tarea})
+
+@login_required
+def eliminar_tarea(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
+    proyecto_id = tarea.proyecto.id
+    tarea.delete()
+    messages.success(request, 'Tarea eliminada exitosamente.')
+    return redirect('listar_tareas', proyecto_id=proyecto_id)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

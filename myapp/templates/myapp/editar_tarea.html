@@ -1,0 +1,13 @@
+<!-- myapp/templates/myapp/editar_tarea.html -->
+{% extends 'myapp/base.html' %}
+
+{% block title %}Editar Tarea{% endblock %}
+
+{% block content %}
+<h1>Editar Tarea</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Actualizar Tarea</button>
+</form>
+{% endblock %}

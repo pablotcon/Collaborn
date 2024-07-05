@@ -1,0 +1,13 @@
+<!-- myapp/templates/myapp/agregar_tarea.html -->
+{% extends 'myapp/base.html' %}
+
+{% block title %}Agregar Tarea{% endblock %}
+
+{% block content %}
+<h1>Agregar Tarea</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Agregar Tarea</button>
+</form>
+{% endblock %}

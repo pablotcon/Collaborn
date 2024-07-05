@@ -22,15 +22,18 @@ class Comentario(models.Model):
         return f'Comentario por {self.autor.username} en {self.proyecto.nombre}'
 
 class Tarea(models.Model):
-    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE, related_name='tareas')
-    nombre = models.CharField(max_length=255)
-    descripcion = models.TextField(blank=True, null=True)
-    asignado_a = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='tareas_asignadas')
+    proyecto = models.ForeignKey(Proyecto, related_name='tareas', on_delete=models.CASCADE)
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    asignado_a = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    completada = models.BooleanField(default=False)  # Asegúrate de que este campo está definido
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_vencimiento = models.DateField()
+    fecha_vencimiento = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return self.nombre
+
+
 
 class Postulacion(models.Model):
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
