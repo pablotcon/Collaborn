@@ -34,10 +34,19 @@ class RecursoForm(forms.ModelForm):
         fields = ['titulo', 'descripcion', 'archivo']
 
 class ProyectoForm(forms.ModelForm):
+    fecha_inicio = forms.DateField(
+        widget=forms.TextInput(attrs={'id': 'id_fecha_inicio', 'class': 'form-control'}),
+        label='Fecha de inicio de postulaciones'
+    )
+    fecha_fin = forms.DateField(
+        widget=forms.TextInput(attrs={'id': 'id_fecha_fin', 'class': 'form-control'}),
+        label='Fecha de cierre de postulaciones'
+    )
+
     class Meta:
         model = Proyecto
         fields = ['nombre', 'descripcion', 'fecha_inicio', 'fecha_fin']
-
+        
 class TareaForm(forms.ModelForm):
     class Meta:
         model = Tarea
