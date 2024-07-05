@@ -10,9 +10,17 @@
         <nav>
             <ul>
                 <li><a href="{% url 'index' %}">Inicio</a></li>
-                <li><a href="{% url 'proyecto_list' %}">Proyectos</a></li>
                 <li><a href="{% url 'ver_perfil' %}">Perfil</a></li>
-                <li><a href="{% url 'logout' %}">Cerrar Sesión</a></li>
+                <li><a href="{% url 'proyecto_list' %}">Proyectos</a></li>
+                <li><a href="{% url 'listar_recursos' %}">Recursos</a></li>
+                <li><a href="{% url 'listar_notificaciones' %}">Notificaciones</a></li>
+                <li><a href="{% url 'listar_mensajes' %}">Mensajes</a></li>
+                <li>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit">Cerrar Sesión</button>
+                    </form>
+                </li>
             </ul>
         </nav>
     </header>
