@@ -37,6 +37,7 @@ def recurso_edit(request, pk):
     return render(request, 'myapp/recurso_form.html', {'form': form})
 
 @permission_required('myapp.can_delete_recurso', raise_exception=True)
+
 @login_required
 def recurso_delete(request, pk):
     recurso = get_object_or_404(Recurso, pk=pk)
@@ -53,6 +54,7 @@ def historial_actividades(request):
 
 # Modulo de Tareas
 @login_required
+@permission_required('myapp.add_tarea', raise_exception=True)
 def agregar_tarea(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
     if request.method == 'POST':
@@ -63,41 +65,63 @@ def agregar_tarea(request, proyecto_id):
             tarea.save()
             messages.success(request, 'Tarea agregada exitosamente.')
             return redirect('listar_tareas', proyecto_id=proyecto.id)
+        else:
+            messages.error(request, 'Error al agregar la tarea.')
     else:
         form = TareaForm()
-    return render(request, 'myapp/agregar_tarea.html', {'form': form})
+    return render(request, 'myapp/agregar_tarea.html', {'form': form, 'proyecto': proyecto})
 
+# Modulo Tarea
 @login_required
 def listar_tareas(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
-    tareas = proyecto.tareas.all()
+    tareas = Tarea.objects.filter(proyecto=proyecto)
     return render(request, 'myapp/listar_tareas.html', {'proyecto': proyecto, 'tareas': tareas})
 
 @login_required
 def editar_tarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, id=tarea_id)
+    proyecto_id = tarea.proyecto.id
     if request.method == 'POST':
         form = TareaForm(request.POST, instance=tarea)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Tarea actualizada exitosamente.')
-            return redirect('listar_tareas', proyecto_id=tarea.proyecto.id)
+            messages.success(request, 'Tarea editada exitosamente.')
+            return redirect('listar_tareas', proyecto_id=proyecto_id)
+        else:
+            messages.error(request, 'Error al editar la tarea.')
     else:
         form = TareaForm(instance=tarea)
-    return render(request, 'myapp/editar_tarea.html', {'form': form, 'tarea': tarea})
+    return render(request, 'myapp/editar_tarea.html', {'form': form, 'proyecto_id': proyecto_id})
 
 @login_required
 def eliminar_tarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, id=tarea_id)
     proyecto_id = tarea.proyecto.id
-    tarea.delete()
-    messages.success(request, 'Tarea eliminada exitosamente.')
-    return redirect('listar_tareas', proyecto_id=proyecto_id)
+    if request.method == 'POST':
+        tarea.delete()
+        messages.success(request, 'Tarea eliminada exitosamente.')
+        return redirect('listar_tareas', proyecto_id=proyecto_id)
+    return render(request, 'myapp/tarea_confirm_delete.html', {'tarea': tarea, 'proyecto_id': proyecto_id})
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Perfil.objects.get_or_create(user=instance)
+
+@login_required
+def agregar_tarea(request, proyecto_id):
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+    if request.method == 'POST':
+        form = TareaForm(request.POST)
+        if form.is_valid():
+            tarea = form.save(commit=False)
+            tarea.proyecto = proyecto
+            tarea.save()
+            messages.success(request, 'Tarea agregada exitosamente.')
+            return redirect('listar_tareas', proyecto_id=proyecto.id)
+        else:
+            messages.error(request, 'Error al agregar la tarea.')
+    else:
+        form = TareaForm()
+    return render(request, 'myapp/agregar_tarea.html', {'form': form, 'proyecto': proyecto})
+
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):

@@ -1,0 +1,15 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Eliminar Tarea{% endblock %}
+
+{% block content %}
+<h1>Eliminar Tarea: {{ tarea.nombre }}</h1>
+
+<p>¿Estás seguro de que deseas eliminar esta tarea?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a href="{% url 'listar_tareas' tarea.proyecto.id %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

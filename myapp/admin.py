@@ -38,6 +38,6 @@ class PerfilAdmin(admin.ModelAdmin):
 
 @admin.register(Tarea)
 class TareaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'proyecto', 'asignado_a', 'fecha_vencimiento')
-    search_fields = ('nombre', 'descripcion')
-    list_filter = ('fecha_vencimiento', 'proyecto', 'asignado_a')
+    list_display = ('nombre', 'proyecto', 'completada')  
+    list_filter = ('proyecto', 'completada')
+

@@ -14,10 +14,13 @@ class MyappConfig(AppConfig):
 
 @receiver(post_save, sender=Tarea)
 def notificar_asignacion_tarea(sender, instance, created, **kwargs):
-    if created and instance.asignado_a:
-        mensaje = f'Se te ha asignado una nueva tarea: {instance.nombre}'
-        Notificacion.objects.create(usuario=instance.asignado_a, mensaje=mensaje)
-
+    if created and instance.asignada_a:
+        mensaje = f'Has sido asignado a la tarea: {instance.nombre}'
+        Notificacion.objects.create(
+            usuario=instance.asignada_a,
+            mensaje=mensaje
+        )
+        
 @receiver(post_save, sender=Comentario)
 def notificar_comentario_proyecto(sender, instance, **kwargs):
     proyecto = instance.proyecto

@@ -50,4 +50,7 @@ class ProyectoForm(forms.ModelForm):
 class TareaForm(forms.ModelForm):
     class Meta:
         model = Tarea
-        fields = ['nombre', 'descripcion', 'asignado_a', 'completada', 'fecha_vencimiento']
+        fields = ['nombre', 'descripcion', 'fecha_limite', 'asignada_a']
+        widgets = {
+            'fecha_limite': forms.DateInput(attrs={'type': 'date'}),
+        }

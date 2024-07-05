@@ -15,7 +15,20 @@ class Proyecto(models.Model):
 
     def __str__(self):
         return self.nombre
-    
+
+
+class Tarea(models.Model):
+    proyecto = models.ForeignKey(Proyecto, related_name='tareas', on_delete=models.CASCADE)
+    nombre = models.CharField(max_length=200)
+    descripcion = models.TextField(blank=True, null=True)
+    completada = models.BooleanField(default=False)
+    fecha_limite = models.DateField(blank=True, null=True)
+    asignada_a = models.ForeignKey(User, related_name='tareas_asignadas', on_delete=models.SET_NULL, blank=True, null=True)
+
+    def __str__(self):
+        return self.nombre
+
+
 class Comentario(models.Model):
     proyecto = models.ForeignKey(Proyecto, related_name='comentarios', on_delete=models.CASCADE)
     autor = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -24,19 +37,6 @@ class Comentario(models.Model):
 
     def __str__(self):
         return self.texto
-class Tarea(models.Model):
-    proyecto = models.ForeignKey(Proyecto, related_name='tareas', on_delete=models.CASCADE)
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField()
-    asignado_a = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    completada = models.BooleanField(default=False)  # Asegúrate de que este campo está definido
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_vencimiento = models.DateField(null=True, blank=True)
-
-    def __str__(self):
-        return self.nombre
-
-
 
 class Postulacion(models.Model):
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
