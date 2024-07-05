@@ -1,0 +1,16 @@
+<!-- myapp/templates/myapp/listar_tareas.html -->
+{% extends 'myapp/base.html' %}
+
+{% block title %}Lista de Tareas{% endblock %}
+
+{% block content %}
+<h1>Tareas de {{ proyecto.nombre }}</h1>
+<ul>
+    {% for tarea in tareas %}
+    <li>
+        {{ tarea.nombre }} - {{ tarea.descripcion }} (Asignado a: {{ tarea.asignado_a }}) (Vence: {{ tarea.fecha_vencimiento }})
+    </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'crear_tarea' proyecto.id %}">Crear Nueva Tarea</a>
+{% endblock %}

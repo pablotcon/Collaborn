@@ -1,30 +1,52 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
-from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil
 from django.contrib.auth.decorators import login_required, permission_required
 from django.forms import ModelForm
 from django.db.models import Q
-from .forms import RecursoForm, PerfilForm, ComentarioForm, Comentario, UserForm
 from django.contrib import messages
+from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea
+from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-
-
-from django.contrib.auth import logout as auth_logout
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+# Modulo de Tareas
+@login_required
+def listar_tareas(request, proyecto_id):
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+    tareas = proyecto.tareas.all()
+    return render(request, 'myapp/listar_tareas.html', {'proyecto': proyecto, 'tareas': tareas})
+
+@login_required
+def crear_tarea(request, proyecto_id):
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+    if request.method == 'POST':
+        form = TareaForm(request.POST)
+        if form.is_valid():
+            tarea = form.save(commit=False)
+            tarea.proyecto = proyecto
+            tarea.save()
+            messages.success(request, 'Tarea creada exitosamente.')
+            return redirect('listar_tareas', proyecto_id=proyecto_id)
+        else:
+            messages.error(request, 'Error al crear la tarea.')
+    else:
+        form = TareaForm()
+    return render(request, 'myapp/crear_tarea.html', {'form': form, 'proyecto': proyecto})
+
+
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        Perfil.objects.create(user=instance)
+        Perfil.objects.get_or_create(user=instance)
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
-    instance.perfil.save()
-
+    if hasattr(instance, 'perfil'):
+        instance.perfil.save()
 
 # Modulo Recursos
 @login_required
@@ -70,12 +92,7 @@ def recurso_detail(request, pk):
     return render(request, 'myapp/recurso_detail.html', {'recurso': recurso, 'form': form})
 
 # Modulo Mensajes
-
-class MensajeForm(ModelForm):
-    class Meta:
-        model = Mensaje
-        fields = ['receptor', 'contenido']
-
+@login_required
 def enviar_mensaje(request):
     if request.method == 'POST':
         form = MensajeForm(request.POST)
@@ -100,9 +117,7 @@ def listar_mensajes(request):
     mensajes_recibidos = Mensaje.objects.filter(receptor=request.user)
     return render(request, 'myapp/listar_mensajes.html', {'mensajes': mensajes_recibidos})
 
-
 # Notificaciones
-
 def send_notification(user, message):
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
@@ -124,7 +139,6 @@ def listar_notificaciones(request):
     notificaciones = Notificacion.objects.filter(usuario=request.user)
     return render(request, 'myapp/listar_notificaciones.html', {'notificaciones': notificaciones})
 
-
 @login_required
 def marcar_notificacion_leida(request, notificacion_id):
     notificacion = get_object_or_404(Notificacion, id=notificacion_id, usuario=request.user)
@@ -134,9 +148,7 @@ def marcar_notificacion_leida(request, notificacion_id):
         messages.success(request, 'Notificación marcada como leída.')
     return redirect('listar_notificaciones')
 
-
 # Modulo Proyectos
-
 @login_required
 def proyecto_list(request):
     query = request.GET.get('q')
@@ -152,13 +164,7 @@ def proyecto_list(request):
         if filter_by == 'mis_proyectos':
             proyectos = proyectos.filter(creador=request.user)
 
-   
     return render(request, 'myapp/proyecto_list.html', {'proyectos': proyectos})
-
-class ProyectoForm(ModelForm):
-    class Meta:
-        model = Proyecto
-        fields = ['nombre', 'descripcion', 'fecha_inicio', 'fecha_fin']
 
 @login_required
 def proyecto_create(request):
@@ -193,7 +199,6 @@ def proyecto_detail(request, pk):
         form = ComentarioForm()
     return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto, 'form': form, 'comentarios': comentarios})
 
-#Edits proyect
 @permission_required('myapp.can_edit_proyecto', raise_exception=True)
 @login_required
 def proyecto_edit(request, pk):
@@ -276,17 +281,20 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'myapp/login.html', {'form': form})
 
+
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('login')
+            user = form.save()
+            # Asegurarse de que el perfil se crea si no existe
+            Perfil.objects.get_or_create(user=user)
+            login(request, user)
+            return redirect('index')
     else:
         form = UserCreationForm()
     return render(request, 'myapp/register.html', {'form': form})
 
-@login_required
 def logout_view(request):
     if request.method == 'POST':
         logout(request)

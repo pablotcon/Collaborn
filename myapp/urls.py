@@ -24,5 +24,7 @@ urlpatterns = [
     path('recursos/<int:pk>/edit/', views.recurso_detail, name='recurso_edit'),
     path('recursos/<int:pk>/delete/', views.recurso_detail, name='recurso_delete'),
     path('notificaciones/marcar-leida/<int:notificacion_id>/', views.marcar_notificacion_leida, name='marcar_notificacion_leida'),
-
+    path('proyectos/<int:proyecto_id>/tareas/', views.listar_tareas, name='listar_tareas'),
+    path('proyectos/<int:proyecto_id>/tareas/crear/', views.crear_tarea, name='crear_tarea'),
 ]
+
