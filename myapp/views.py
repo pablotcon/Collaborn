@@ -193,7 +193,7 @@ def proyecto_list(request):
     
     if query:
         proyectos = proyectos.filter(
-            Q(nombre__icontains=query) | Q(descripcion__icontains(query))
+            Q(nombre__icontains=query) | Q(descripcion__icontains=query)
         )
 
     if filter_by:
@@ -265,6 +265,7 @@ def proyecto_delete(request, pk):
         messages.success(request, 'Proyecto eliminado exitosamente.')
         return redirect('proyecto_list')
     return render(request, 'myapp/proyecto_confirm_delete.html', {'proyecto': proyecto})
+
 @login_required
 def postular_proyecto(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
