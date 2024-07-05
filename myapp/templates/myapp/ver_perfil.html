@@ -1,17 +1,36 @@
-<!-- myapp/templates/myapp/ver_perfil.html -->
 {% extends 'myapp/base.html' %}
 
-{% block title %}Ver Perfil{% endblock %}
+{% load static %}
+
+{% block title %}Perfil de {{ user.username }}{% endblock %}
 
 {% block content %}
-<h1>Perfil de {{ user.username }}</h1>
-<p>Nombre: {{ user.perfil.nombre }}</p>
-<p>Apellido: {{ user.perfil.apellido }}</p>
-<p>Email: {{ user.email }}</p>
-<p>Teléfono: {{ user.perfil.telefono }}</p>
-<p>Fecha de Nacimiento: {{ user.perfil.birth_date }}</p>
-<img src="{{ user.perfil.avatar.url }}" alt="Avatar" width="100">
-<a href="{% url 'editar_perfil' %}" class="btn btn-primary mt-3">Editar Perfil</a>
-<a href="{% url 'cambiar_password' %}" class="btn btn-secondary mt-3">Cambiar Contraseña</a>
-<a href="{% url 'historial_actividades' %}" class="btn btn-info mt-3">Historial de Actividades</a>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-3 text-center">
+            {% if user.perfil.avatar %}
+                <img src="{{ user.perfil.avatar.url }}" alt="Avatar" class="img-thumbnail mb-3" width="150">
+            {% else %}
+                <img src="{% static 'img/default-avatar.png' %}" alt="Avatar" class="img-thumbnail mb-3" width="150">
+            {% endif %}
+            <h2>{{ user.username }}</h2>
+        </div>
+        <div class="col-md-9">
+            <h3>Información Personal</h3>
+            <ul class="list-group">
+                <li class="list-group-item"><strong>Nombre:</strong> {{ user.perfil.nombre }}</li>
+                <li class="list-group-item"><strong>Apellido:</strong> {{ user.perfil.apellido }}</li>
+                <li class="list-group-item"><strong>Email:</strong> {{ user.email }}</li>
+                <li class="list-group-item"><strong>Teléfono:</strong> {{ user.perfil.telefono }}</li>
+                <li class="list-group-item"><strong>Fecha de Nacimiento:</strong> {{ user.perfil.birth_date }}</li>
+                <li class="list-group-item"><strong>Descripción:</strong> {{ user.perfil.descripcion }}</li>
+            </ul>
+            <div class="mt-4">
+                <a href="{% url 'editar_perfil' %}" class="btn btn-primary">Editar Perfil</a>
+                <a href="{% url 'cambiar_password' %}" class="btn btn-secondary">Cambiar Contraseña</a>
+                <a href="{% url 'historial_actividades' %}" class="btn btn-info">Historial de Actividades</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

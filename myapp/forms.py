@@ -10,13 +10,35 @@ class UserForm(forms.ModelForm):
 class PerfilForm(forms.ModelForm):
     birth_date = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date'}),
-        input_formats=['%Y-%m-%d']  # Asegúrate de que el formato de entrada es correcto
+        input_formats=['%Y-%m-%d']
     )
+    email = forms.EmailField()
 
     class Meta:
         model = Perfil
-        fields = ['bio', 'location', 'birth_date']
+        fields = ['nombre', 'apellido', 'telefono', 'birth_date', 'descripcion', 'avatar', 'website', 'twitter', 'facebook', 'linkedin', 'email']
 
+    def __init__(self, *args, **kwargs):
+        super(PerfilForm, self).__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['nombre'].initial = self.instance.nombre
+            self.fields['apellido'].initial = self.instance.apellido
+            self.fields['telefono'].initial = self.instance.telefono
+            self.fields['descripcion'].initial = self.instance.descripcion
+            self.fields['email'].initial = self.instance.user.email
+
+    def save(self, *args, **kwargs):
+        user = self.instance.user
+        user.email = self.cleaned_data['email']
+        user.save()
+        return super(PerfilForm, self).save(*args, **kwargs)
+
+
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']  # Incluye otros campos si es necesario
 
 class ComentarioForm(forms.ModelForm):
     class Meta:

@@ -75,12 +75,19 @@ class Recurso(models.Model):
     def __str__(self):
         return self.titulo
 
+
 class Perfil(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    bio = models.TextField(blank=True, null=True)
-    location = models.CharField(max_length=100, blank=True, null=True)
-    birth_date = models.DateField(blank=True, null=True)
+    telefono = models.CharField(max_length=15, blank=True, null=True)
+    birth_date = models.DateField(null=True, blank=True)
+    descripcion = models.TextField(blank=True, null=True, default='')
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    website = models.URLField(blank=True, null=True)
+    twitter = models.URLField(blank=True, null=True)
+    facebook = models.URLField(blank=True, null=True)
+    linkedin = models.URLField(blank=True, null=True)
+    nombre = models.CharField(max_length=30, blank=True, null=True, default='')
+    apellido = models.CharField(max_length=30, blank=True, null=True, default='')
 
     def __str__(self):
         return self.user.username
-

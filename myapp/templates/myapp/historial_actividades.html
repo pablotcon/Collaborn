@@ -4,23 +4,14 @@
 {% block title %}Historial de Actividades{% endblock %}
 
 {% block content %}
-<h1>Historial de Actividades</h1>
-
-<h2>Comentarios</h2>
-<ul class="list-group">
-    {% for comentario in comentarios %}
-    <li class="list-group-item">
-        {{ comentario.texto }} en <strong>{{ comentario.proyecto.nombre }}</strong> el {{ comentario.fecha_creacion }}
-    </li>
-    {% endfor %}
-</ul>
-
-<h2>Tareas Asignadas</h2>
-<ul class="list-group">
-    {% for tarea in tareas_asignadas %}
-    <li class="list-group-item">
-        {{ tarea.nombre }} en <strong>{{ tarea.proyecto.nombre }}</strong> el {{ tarea.fecha_creacion }}
-    </li>
-    {% endfor %}
-</ul>
+<div class="container mt-5">
+    <h1>Historial de Actividades</h1>
+    <ul class="list-group">
+        {% for actividad in actividades %}
+            <li class="list-group-item">
+                <strong>{{ actividad.fecha }}</strong>: {{ actividad.descripcion }}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}

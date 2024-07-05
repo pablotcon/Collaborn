@@ -15,6 +15,14 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Recurso
 
+from django.contrib.auth.models import Group, User
+
+def assign_role_to_user(user, role_name):
+    group = Group.objects.get(name=role_name)
+    user.groups.add(group)
+    user.save()
+
+
 @login_required
 def recurso_detail(request, pk):
     recurso = get_object_or_404(Recurso, pk=pk)
@@ -46,10 +54,13 @@ def recurso_delete(request, pk):
         messages.success(request, 'Recurso eliminado exitosamente.')
         return redirect('listar_recursos')
     return render(request, 'myapp/recurso_confirm_delete.html', {'recurso': recurso})
+
+# Activiades
+@login_required
 def historial_actividades(request):
-    comentarios = Comentario.objects.filter(autor=request.user).order_by('-fecha_creacion')
-    tareas_asignadas = Tarea.objects.filter(asignado_a=request.user).order_by('-fecha_creacion')
-    return render(request, 'myapp/historial_actividades.html', {'comentarios': comentarios, 'tareas_asignadas': tareas_asignadas})
+    actividades = Actividad.objects.filter(usuario=request.user)
+    return render(request, 'myapp/historial_actividades.html', {'actividades': actividades})
+
 
 
 # Modulo de Tareas
@@ -263,6 +274,7 @@ def proyecto_detail(request, proyecto_id):
 
     return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto, 'comentarios': comentarios, 'form': form})
 
+
 @permission_required('myapp.can_edit_proyecto', raise_exception=True)
 @login_required
 def proyecto_edit(request, pk):
@@ -314,27 +326,21 @@ def mis_postulaciones(request):
 
 # Modulo Perfil
 @login_required
-def ver_perfil(request):
-    return render(request, 'myapp/ver_perfil.html', {'user': request.user})
+def editar_perfil(request):
+    if request.method == 'POST':
+        perfil_form = PerfilForm(request.POST, request.FILES, instance=request.user.perfil)
+        if perfil_form.is_valid():
+            perfil_form.save()
+            messages.success(request, 'Perfil actualizado exitosamente')
+            return redirect('ver_perfil')
+    else:
+        perfil_form = PerfilForm(instance=request.user.perfil)
+
+    return render(request, 'myapp/editar_perfil.html', {'perfil_form': perfil_form})
 
 @login_required
-def editar_perfil(request):
-    user = request.user
-    perfil = get_object_or_404(Perfil, user=user)
-    if request.method == 'POST':
-        user_form = UserForm(request.POST, instance=user)
-        perfil_form = PerfilForm(request.POST, request.FILES, instance=perfil)
-        if user_form.is_valid() and perfil_form.is_valid():
-            user_form.save()
-            perfil_form.save()
-            messages.success(request, 'Perfil actualizado exitosamente.')
-            return redirect('ver_perfil')
-        else:
-            messages.error(request, 'Por favor corrija los errores a continuación.')
-    else:
-        user_form = UserForm(instance=user)
-        perfil_form = PerfilForm(instance=perfil)
-    return render(request, 'myapp/editar_perfil.html', {'user_form': user_form, 'perfil_form': perfil_form})
+def ver_perfil(request):
+    return render(request, 'myapp/ver_perfil.html', {'user': request.user})
 
 @login_required
 def cambiar_password(request):
