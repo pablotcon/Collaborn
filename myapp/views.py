@@ -136,7 +136,7 @@ def user_notification(event):
 
 @login_required
 def listar_notificaciones(request):
-    notificaciones = Notificacion.objects.filter(usuario=request.user)
+    notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha_creacion')
     return render(request, 'myapp/listar_notificaciones.html', {'notificaciones': notificaciones})
 
 @login_required
@@ -183,21 +183,25 @@ def proyecto_create(request):
     return render(request, 'myapp/proyecto_form.html', {'form': form})
 
 @login_required
-def proyecto_detail(request, pk):
-    proyecto = get_object_or_404(Proyecto, pk=pk)
-    comentarios = proyecto.comentarios.all()  # Usando related_name personalizado
+def proyecto_detail(request, proyecto_id):
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+    comentarios = proyecto.comentarios.all()
+
     if request.method == 'POST':
         form = ComentarioForm(request.POST)
         if form.is_valid():
             comentario = form.save(commit=False)
             comentario.proyecto = proyecto
-            comentario.usuario = request.user
+            comentario.autor = request.user
             comentario.save()
-            messages.success(request, 'Comentario publicado exitosamente.')
-            return redirect('proyecto_detail', pk=pk)
+            messages.success(request, 'Comentario agregado exitosamente.')
+            return redirect('proyecto_detail', proyecto_id=proyecto.id)
+        else:
+            messages.error(request, 'Error al agregar el comentario.')
     else:
         form = ComentarioForm()
-    return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto, 'form': form, 'comentarios': comentarios})
+
+    return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto, 'comentarios': comentarios, 'form': form})
 
 @permission_required('myapp.can_edit_proyecto', raise_exception=True)
 @login_required

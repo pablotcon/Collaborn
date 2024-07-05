@@ -4,19 +4,22 @@ from django.contrib.auth.models import User
 
 
 class Proyecto(models.Model):
-    nombre = models.CharField(max_length=255)
+    nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
-    creador = models.ForeignKey(User, on_delete=models.CASCADE)
-    class Meta:
-        permissions = [
-            ("can_edit_proyecto", "Can edit project"),
-            ("can_delete_proyecto", "Can delete project"),
-        ]
 
     def __str__(self):
         return self.nombre
+
+class Comentario(models.Model):
+    proyecto = models.ForeignKey(Proyecto, related_name='comentarios', on_delete=models.CASCADE)
+    autor = models.ForeignKey(User, on_delete=models.CASCADE)
+    texto = models.TextField()
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Comentario por {self.autor.username} en {self.proyecto.nombre}'
 
 class Tarea(models.Model):
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE, related_name='tareas')
@@ -74,11 +77,3 @@ class Perfil(models.Model):
     def __str__(self):
         return self.user.username
 
-class Comentario(models.Model):
-    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE, related_name='comentarios')
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
-    contenido = models.TextField()
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f'Comentario de {self.usuario.username} en {self.proyecto.nombre}'

@@ -8,14 +8,20 @@ class UserForm(forms.ModelForm):
         fields = ['first_name', 'last_name', 'email', 'username']
 
 class PerfilForm(forms.ModelForm):
+    birth_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        input_formats=['%Y-%m-%d']  # Asegúrate de que el formato de entrada es correcto
+    )
+
     class Meta:
         model = Perfil
         fields = ['bio', 'location', 'birth_date']
 
+
 class ComentarioForm(forms.ModelForm):
     class Meta:
         model = Comentario
-        fields = ['contenido']
+        fields = ['texto']
 
 class MensajeForm(forms.ModelForm):
     class Meta:

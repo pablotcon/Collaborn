@@ -3,15 +3,15 @@ from .models import Proyecto, Comentario, Mensaje, Notificacion, Recurso, Perfil
 
 @admin.register(Proyecto)
 class ProyectoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'creador', 'fecha_inicio', 'fecha_fin')
+    list_display = ('nombre', 'fecha_inicio', 'fecha_fin')  # Removido 'creador' si no está definido en el modelo
     search_fields = ('nombre', 'descripcion')
-    list_filter = ('fecha_inicio', 'fecha_fin', 'creador')
+    list_filter = ('fecha_inicio', 'fecha_fin')  # Removido 'creador'
 
 @admin.register(Comentario)
 class ComentarioAdmin(admin.ModelAdmin):
-    list_display = ('proyecto', 'usuario', 'fecha_creacion')
-    search_fields = ('contenido',)
-    list_filter = ('fecha_creacion', 'usuario')
+    list_display = ('proyecto', 'autor', 'fecha_creacion')  # Cambiado 'usuario' a 'autor'
+    search_fields = ('texto',)  # Cambiado 'contenido' a 'texto'
+    list_filter = ('fecha_creacion', 'autor')  # Cambiado 'usuario' a 'autor'
 
 @admin.register(Mensaje)
 class MensajeAdmin(admin.ModelAdmin):

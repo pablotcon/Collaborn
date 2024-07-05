@@ -9,6 +9,13 @@
     {% csrf_token %}
     {{ user_form.as_p }}
     {{ perfil_form.as_p }}
-    <button type="submit">Guardar Cambios</button>
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
 </form>
+{% if messages %}
+<div class="alert alert-danger" role="alert">
+    {% for message in messages %}
+    {{ message }}
+    {% endfor %}
+</div>
+{% endif %}
 {% endblock %}
