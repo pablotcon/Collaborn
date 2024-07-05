@@ -178,7 +178,7 @@ def proyecto_list(request):
     return render(request, 'myapp/proyecto_list.html', {'proyectos': proyectos})
 
 @login_required
-def proyecto_create(request):
+def crear_proyecto(request):
     if request.method == 'POST':
         form = ProyectoForm(request.POST)
         if form.is_valid():
@@ -186,13 +186,12 @@ def proyecto_create(request):
             proyecto.creador = request.user
             proyecto.save()
             messages.success(request, 'Proyecto creado exitosamente.')
-            return redirect('proyecto_list')
+            return redirect('proyecto_detail', pk=proyecto.pk)
         else:
             messages.error(request, 'Error al crear el proyecto.')
     else:
         form = ProyectoForm()
-    return render(request, 'myapp/proyecto_form.html', {'form': form})
-
+    return render(request, 'myapp/crear_proyecto.html', {'form': form})
 
 @login_required
 def proyecto_detail(request, proyecto_id):
@@ -301,7 +300,7 @@ def cambiar_password(request):
             messages.error(request, 'Por favor corrija los errores a continuación.')
     else:
         form = PasswordChangeForm(request.user)
-    return render(request, 'cambiar_password.html', {'form': form})
+    return render(request, 'myapp/cambiar_password.html', {'form': form})
 
 # Modulo de Login/Registro
 def login_view(request):
