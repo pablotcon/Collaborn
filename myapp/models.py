@@ -59,7 +59,7 @@ class Notificacion(models.Model):
     mensaje = models.TextField()
     leida = models.BooleanField(default=False)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    leida = models.BooleanField(default=False)
+    leido = models.BooleanField(default=False)
     
     def __str__(self):
         return f'Notificación para {self.usuario.username}'
@@ -69,7 +69,7 @@ class Mensaje(models.Model):
     receptor = models.ForeignKey(User, related_name='mensajes_recibidos', on_delete=models.CASCADE)
     contenido = models.TextField()
     fecha_envio = models.DateTimeField(auto_now_add=True)
-    mensaje_respuesta = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='respuestas')
+    leido = models.BooleanField(default=False)  # Añadir el campo leido
 
     def __str__(self):
         return f'Mensaje de {self.emisor.username} a {self.receptor.username}'

@@ -25,7 +25,14 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'proyecto_list' %}">Proyectos</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'listar_recursos' %}">Recursos</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'listar_notificaciones' %}">Notificaciones</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'listar_mensajes' %}">Mensajes</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'listar_mensajes' %}">
+                            Mensajes
+                            {% if unread_messages_count > 0 %}
+                                <span class="badge badge-danger">{{ unread_messages_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
                     {% if user.is_staff %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'crear_proyecto' %}">Crear Proyecto</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel_tareas' %}">Panel de Tareas</a></li>

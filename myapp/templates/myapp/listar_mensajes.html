@@ -5,6 +5,12 @@
 {% block content %}
 <div class="container mt-5">
     <h1>Mensajes</h1>
+    
+    <!-- Formulario de Búsqueda -->
+    <form method="get" class="form-inline mb-3">
+        <input type="text" name="q" class="form-control mr-2" placeholder="Buscar mensajes" value="{{ query|default:'' }}">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
 
     <!-- Formulario para enviar un nuevo mensaje -->
     <div class="card mb-4">

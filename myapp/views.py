@@ -191,13 +191,21 @@ def listar_recursos(request):
 # Modulo Mensajes
 @login_required
 def listar_mensajes(request):
-    mensajes_recibidos = Mensaje.objects.filter(receptor=request.user)
-    mensajes_enviados = Mensaje.objects.filter(emisor=request.user)
-    users = User.objects.exclude(id=request.user.id)
+    query = request.GET.get('q')
+    if query:
+        mensajes_recibidos = Mensaje.objects.filter(receptor=request.user, contenido__icontains=query).order_by('-fecha_envio')
+        mensajes_enviados = Mensaje.objects.filter(emisor=request.user, contenido__icontains=query).order_by('-fecha_envio')
+    else:
+        mensajes_recibidos = Mensaje.objects.filter(receptor=request.user).order_by('-fecha_envio')
+        mensajes_enviados = Mensaje.objects.filter(emisor=request.user).order_by('-fecha_envio')
+    
+    mensajes_recibidos.update(leido=True)
+
     return render(request, 'myapp/listar_mensajes.html', {
         'mensajes_recibidos': mensajes_recibidos,
         'mensajes_enviados': mensajes_enviados,
-        'users': users,
+        'users': User.objects.exclude(id=request.user.id),
+        'query': query
     })
 
 @login_required
@@ -224,15 +232,19 @@ def eliminar_mensaje(request, mensaje_id):
     return render(request, 'myapp/confirm_delete_mensaje.html', {'mensaje': mensaje})
 
 @login_required
-def enviar_mensaje_receptor(request, receptor_id):
-    receptor = get_object_or_404(User, id=receptor_id)
+def enviar_mensaje(request, receptor_id=None):
     if request.method == 'POST':
-        contenido = request.POST.get('contenido')
-        if contenido:
-            Mensaje.objects.create(emisor=request.user, receptor=receptor, contenido=contenido)
+        form = MensajeForm(request.POST)
+        if form.is_valid():
+            mensaje = form.save(commit=False)
+            mensaje.emisor = request.user
+            mensaje.save()
             messages.success(request, 'Mensaje enviado exitosamente.')
             return redirect('listar_mensajes')
-    return redirect('listar_mensajes')
+    else:
+        form = MensajeForm(initial={'receptor': receptor_id})
+    return render(request, 'myapp/enviar_mensaje.html', {'form': form})
+
 # Notificaciones
 def send_notification(user, message):
     channel_layer = get_channel_layer()
@@ -432,5 +444,7 @@ def logout_view(request):
         return redirect('login')
     return render(request, 'myapp/logout.html')
 
+@login_required
 def index(request):
-    return render(request, 'myapp/index.html')
+    nuevos_mensajes = Mensaje.objects.filter(receptor=request.user, leido=False).count()
+    return render(request, 'myapp/index.html', {'nuevos_mensajes': nuevos_mensajes})

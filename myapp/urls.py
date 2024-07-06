@@ -10,7 +10,8 @@ urlpatterns = [
     path('proyectos/', views.proyecto_list, name='proyecto_list'),
     path('crear_proyecto/', views.crear_proyecto, name='crear_proyecto'),
     path('proyectos/<int:proyecto_id>/', views.proyecto_detail, name='proyecto_detail'),
-    path('proyectos/<int:proyecto_id>/post ular/', views.postular_proyecto, name='postular_proyecto'),    path('proyectos/<int:pk>/edit/', views.proyecto_edit, name='proyecto_edit'),
+    path('proyectos/<int:proyecto_id>/post ular/', views.postular_proyecto, name='postular_proyecto'),    
+    path('proyectos/<int:pk>/edit/', views.proyecto_edit, name='proyecto_edit'),
     path('proyectos/<int:pk>/delete/', views.proyecto_delete, name='proyecto_delete'),
 
     path('mis-postulaciones/', views.mis_postulaciones, name='mis_postulaciones'),
@@ -24,8 +25,8 @@ urlpatterns = [
     path('notificaciones/<int:notificacion_id>/marcar_leida/', views.marcar_notificacion_leida, name='marcar_notificacion_leida'),
 
     path('mensajes/', views.listar_mensajes, name='listar_mensajes'),
+     path('mensajes/enviar/<int:receptor_id>/', views.enviar_mensaje, name='enviar_mensaje_receptor'),
     path('mensajes/enviar/', views.enviar_mensaje, name='enviar_mensaje'),
-    path('mensajes/enviar/<int:receptor_id>/', views.enviar_mensaje_receptor, name='enviar_mensaje_receptor'),
     path('mensajes/eliminar/<int:mensaje_id>/', views.eliminar_mensaje, name='eliminar_mensaje'),
 
     path('recursos/', views.listar_recursos, name='listar_recursos'),
