@@ -55,13 +55,14 @@ class Postulacion(models.Model):
         return f'{self.usuario.username} en {self.proyecto.nombre}'
 
 class Notificacion(models.Model):
-    receptor = models.ForeignKey(User, related_name='notificaciones', on_delete=models.CASCADE, default=1)
-    mensaje = models.TextField()
-    fecha = models.DateTimeField(auto_now_add=True)
+    receptor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificaciones')
+    mensaje = models.CharField(max_length=255)
+    url = models.CharField(max_length=200, default='/')  # Usamos un valor predeterminado
     leido = models.BooleanField(default=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.mensaje
+        return f'Notificación para {self.receptor.username} - {self.mensaje}'
 
     
 class Mensaje(models.Model):

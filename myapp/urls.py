@@ -1,5 +1,9 @@
 from django.urls import path
 from . import views
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -44,3 +48,6 @@ urlpatterns = [
     path('tareas/<int:tarea_id>/confirmar_eliminar/', views.confirmar_eliminar_tarea, name='confirmar_eliminar_tarea'),
     path('historial_actividades/', views.historial_actividades, name='historial_actividades'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

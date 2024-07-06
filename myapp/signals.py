@@ -3,7 +3,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Tarea, Comentario, Notificacion, Actividad, Mensaje
 from django.apps import AppConfig
-
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 class MyappConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
@@ -14,13 +15,23 @@ class MyappConfig(AppConfig):
 
 
 @receiver(post_save, sender=Mensaje)
-def enviar_notificacion_mensaje(sender, instance, **kwargs):
-    Notificacion.objects.create(
-        receptor=instance.receptor,
-        mensaje=f"Tienes un nuevo mensaje de {instance.emisor.username}",
-        fecha=instance.fecha_envio,
-        leido=False
-    )
+def enviar_notificacion_mensaje(sender, instance, created, **kwargs):
+    if created:
+        receptor = instance.receptor
+        Notificacion.objects.create(
+            receptor=receptor,
+            mensaje=f"Tienes un nuevo mensaje de {instance.emisor.username}",
+            url=f"/mensajes/{instance.id}/"
+        )
+        # Enviar notificación en tiempo real
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f"user_{receptor.id}",
+            {
+                'type': 'send_notification',
+                'notification': f"Tienes un nuevo mensaje de {instance.emisor.username}"
+            }
+        )
 
 @receiver(post_save, sender=Tarea)
 def notificar_asignacion_tarea(sender, instance, created, **kwargs):

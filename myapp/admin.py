@@ -45,9 +45,9 @@ class MensajeAdmin(admin.ModelAdmin):
 
 @admin.register(Notificacion)
 class NotificacionAdmin(admin.ModelAdmin):
-    list_display = ('receptor', 'mensaje', 'fecha', 'leido')    
+    list_display = ('receptor', 'mensaje', 'fecha_creacion', 'leido')
     search_fields = ('mensaje',)
-    list_filter = ('fecha', 'leido', 'receptor')
+    list_filter = ('fecha_creacion', 'leido', 'receptor')
 
 @admin.register(Recurso)
 class RecursoAdmin(admin.ModelAdmin):

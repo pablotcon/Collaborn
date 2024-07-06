@@ -1,21 +1,26 @@
 # myapp/consumers.py
 import json
-from channels.generic.websocket import WebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
 
-class NotificationConsumer(WebsocketConsumer):
-    def connect(self):
-        self.accept()
+class NotificationConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.group_name = f"user_{self.scope['user'].id}"
 
-    def disconnect(self, close_code):
-        pass
+        await self.channel_layer.group_add(
+            self.group_name,
+            self.channel_name
+        )
 
-    def receive(self, text_data):
-        self.send(text_data=json.dumps({
-            'message': 'Notification received!'
-        }))
+        await self.accept()
 
-    def user_notification(self, event):
-        message = event['message']
-        self.send(text_data=json.dumps({
-            'message': message
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(
+            self.group_name,
+            self.channel_name
+        )
+
+    async def send_notification(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'notification',
+            'message': event['notification']
         }))
