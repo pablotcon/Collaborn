@@ -23,8 +23,9 @@ urlpatterns = [
     path('notificaciones/', views.listar_notificaciones, name='listar_notificaciones'),
     path('notificaciones/<int:notificacion_id>/marcar_leida/', views.marcar_notificacion_leida, name='marcar_notificacion_leida'),
 
-    path('mensajes/enviar/', views.enviar_mensaje, name='enviar_mensaje'),
     path('mensajes/', views.listar_mensajes, name='listar_mensajes'),
+    path('mensajes/eliminar/<int:mensaje_id>/', views.eliminar_mensaje, name='eliminar_mensaje'),
+    path('mensajes/enviar/<int:receptor_id>/', views.enviar_mensaje, name='enviar_mensaje'),
 
     path('recursos/', views.listar_recursos, name='listar_recursos'),
     path('recursos/subir/', views.subir_recurso, name='subir_recurso'),

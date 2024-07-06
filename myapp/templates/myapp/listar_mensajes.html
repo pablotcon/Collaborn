@@ -1,17 +1,74 @@
-<!-- myapp/templates/myapp/listar_mensajes.html -->
 {% extends 'myapp/base.html' %}
 
-{% block title %}Mensajes Recibidos{% endblock %}
+{% block title %}Mensajes{% endblock %}
 
 {% block content %}
-<h1>Mensajes Recibidos</h1>
-<ul>
-    {% for mensaje in mensajes %}
-    <li>
-        De: {{ mensaje.emisor.username }} - {{ mensaje.contenido }}
-        <br>
-        Enviado: {{ mensaje.fecha_envio }}
-    </li>
-    {% endfor %}
-</ul>
+<div class="container mt-5">
+    <h1>Mensajes</h1>
+
+    <!-- Mensajes Recibidos -->
+    <h2>Mensajes Recibidos</h2>
+    <ul class="list-group mb-4">
+        {% for mensaje in mensajes_recibidos %}
+        <li class="list-group-item">
+            <strong>De:</strong> {{ mensaje.emisor.username }}<br>
+            <strong>Mensaje:</strong> {{ mensaje.contenido }}<br>
+            <strong>Enviado:</strong> {{ mensaje.fecha_envio }}<br>
+            <a href="{% url 'enviar_mensaje' mensaje.emisor.id %}" class="btn btn-sm btn-primary mt-2">Responder</a>
+            <button type="button" class="btn btn-sm btn-danger mt-2" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="{{ mensaje.id }}">Eliminar</button>
+        </li>
+        {% empty %}
+        <li class="list-group-item">No tienes mensajes recibidos.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Mensajes Enviados -->
+    <h2>Mensajes Enviados</h2>
+    <ul class="list-group mb-4">
+        {% for mensaje in mensajes_enviados %}
+        <li class="list-group-item">
+            <strong>Para:</strong> {{ mensaje.receptor.username }}<br>
+            <strong>Mensaje:</strong> {{ mensaje.contenido }}<br>
+            <strong>Enviado:</strong> {{ mensaje.fecha_envio }}<br>
+            <button type="button" class="btn btn-sm btn-danger mt-2" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="{{ mensaje.id }}">Eliminar</button>
+        </li>
+        {% empty %}
+        <li class="list-group-item">No has enviado mensajes.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas eliminar este mensaje?
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" method="post" action="">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#confirmDeleteModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget) 
+        var mensajeId = button.data('mensaje-id') 
+        var action = "{% url 'eliminar_mensaje' 0 %}".slice(0, -2) + mensajeId + "/";
+        var modal = $(this)
+        modal.find('#deleteForm').attr('action', action);
+    })
+</script>
 {% endblock %}
