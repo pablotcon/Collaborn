@@ -30,9 +30,11 @@
     <button type="submit" class="btn btn-success">Postular</button>
 </form>
 
+{% if perms.myapp.change_proyecto %}
 <h2>Administrar Proyecto</h2>
 <a href="{% url 'proyecto_edit' proyecto.id %}" class="btn btn-warning">Editar</a>
 <a href="{% url 'proyecto_delete' proyecto.id %}" class="btn btn-danger">Eliminar</a>
-<a href="{% url 'listar_tareas' proyecto.id %}" class="btn btn-danger">Tareas</a>
+<a href="{% url 'listar_tareas' proyecto.id %}" class="btn btn-info">Tareas</a>
+{% endif %}
 
 {% endblock %}

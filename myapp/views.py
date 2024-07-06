@@ -3,7 +3,7 @@ from asgiref.sync import async_to_sync
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout,update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm, PasswordChangeForm
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.db.models import Q
 from django.contrib import messages
 from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad
@@ -21,7 +21,7 @@ def detalle_tarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, id=tarea_id)
     return render(request, 'myapp/tarea_detail.html', {'tarea': tarea})
 
-
+@user_passes_test(lambda u: u.is_staff)
 @permission_required('myapp.view_tarea', raise_exception=True)
 @login_required
 def admin_panel_tareas(request):
