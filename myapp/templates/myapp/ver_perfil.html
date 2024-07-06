@@ -24,6 +24,10 @@
                 <li class="list-group-item"><strong>Teléfono:</strong> {{ user.perfil.telefono }}</li>
                 <li class="list-group-item"><strong>Fecha de Nacimiento:</strong> {{ user.perfil.birth_date }}</li>
                 <li class="list-group-item"><strong>Descripción:</strong> {{ user.perfil.descripcion }}</li>
+                <li class="list-group-item"><strong>Sitio Web:</strong> <a href="{{ user.perfil.website }}" target="_blank">{{ user.perfil.website }}</a></li>
+                <li class="list-group-item"><strong>Twitter:</strong> <a href="{{ user.perfil.twitter }}" target="_blank">{{ user.perfil.twitter }}</a></li>
+                <li class="list-group-item"><strong>Facebook:</strong> <a href="{{ user.perfil.facebook }}" target="_blank">{{ user.perfil.facebook }}</a></li>
+                <li class="list-group-item"><strong>LinkedIn:</strong> <a href="{{ user.perfil.linkedin }}" target="_blank">{{ user.perfil.linkedin }}</a></li>
             </ul>
             <div class="mt-4">
                 <a href="{% url 'editar_perfil' %}" class="btn btn-primary">Editar Perfil</a>
