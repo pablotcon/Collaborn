@@ -6,6 +6,31 @@
 <div class="container mt-5">
     <h1>Mensajes</h1>
 
+    <!-- Formulario para enviar un nuevo mensaje -->
+    <div class="card mb-4">
+        <div class="card-header">
+            Enviar Nuevo Mensaje
+        </div>
+        <div class="card-body">
+            <form method="post" action="{% url 'enviar_mensaje' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="receptor">Para:</label>
+                    <select name="receptor" id="receptor" class="form-control">
+                        {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="contenido">Mensaje:</label>
+                    <textarea name="contenido" id="contenido" class="form-control" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </form>
+        </div>
+    </div>
+
     <!-- Mensajes Recibidos -->
     <h2>Mensajes Recibidos</h2>
     <ul class="list-group mb-4">
@@ -14,7 +39,7 @@
             <strong>De:</strong> {{ mensaje.emisor.username }}<br>
             <strong>Mensaje:</strong> {{ mensaje.contenido }}<br>
             <strong>Enviado:</strong> {{ mensaje.fecha_envio }}<br>
-            <a href="{% url 'enviar_mensaje' mensaje.emisor.id %}" class="btn btn-sm btn-primary mt-2">Responder</a>
+            <a href="#" class="btn btn-sm btn-primary mt-2 responder-btn" data-emisor-id="{{ mensaje.emisor.id }}">Responder</a>
             <button type="button" class="btn btn-sm btn-danger mt-2" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="{{ mensaje.id }}">Eliminar</button>
         </li>
         {% empty %}
@@ -62,6 +87,11 @@
     </div>
 </div>
 
+<!-- Incluir jQuery primero -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<!-- Incluir Bootstrap JS después de jQuery -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 <script>
     $('#confirmDeleteModal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget) 
@@ -70,5 +100,15 @@
         var modal = $(this)
         modal.find('#deleteForm').attr('action', action);
     })
+
+    // Preseleccionar el usuario para responder
+    $('.responder-btn').on('click', function (event) {
+        event.preventDefault();
+        var emisorId = $(this).data('emisor-id');
+        $('#receptor').val(emisorId);
+        $('html, body').animate({
+            scrollTop: $("#receptor").offset().top
+        }, 1000);
+    });
 </script>
 {% endblock %}
