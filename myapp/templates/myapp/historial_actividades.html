@@ -1,17 +1,14 @@
-<!-- myapp/templates/myapp/historial_actividades.html -->
 {% extends 'myapp/base.html' %}
 
 {% block title %}Historial de Actividades{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1>Historial de Actividades</h1>
-    <ul class="list-group">
-        {% for actividad in actividades %}
-            <li class="list-group-item">
-                <strong>{{ actividad.fecha }}</strong>: {{ actividad.descripcion }}
-            </li>
-        {% endfor %}
-    </ul>
-</div>
+<h1>Historial de Actividades</h1>
+<ul class="list-group">
+    {% for actividad in actividades %}
+    <li class="list-group-item">
+        {{ actividad.accion }} - {{ actividad.fecha }}
+    </li>
+    {% endfor %}
+</ul>
 {% endblock %}

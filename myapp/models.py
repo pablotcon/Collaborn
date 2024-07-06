@@ -27,6 +27,14 @@ class Tarea(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+class Actividad(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    accion = models.CharField(max_length=255)
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.usuario.username} - {self.accion}"
 
 
 class Comentario(models.Model):

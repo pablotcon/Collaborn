@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Tarea, Comentario, Notificacion
+from .models import Tarea, Comentario, Notificacion, Actividad
 from django.apps import AppConfig
 
 
@@ -21,6 +21,14 @@ def notificar_asignacion_tarea(sender, instance, created, **kwargs):
             mensaje=mensaje
         )
         
+@receiver(post_save, sender=Tarea)
+def registrar_actividad_tarea(sender, instance, created, **kwargs):
+    if created:
+        accion = f"Creó la tarea: {instance.nombre}"
+    else:
+        accion = f"Actualizó la tarea: {instance.nombre}"
+    Actividad.objects.create(usuario=instance.asignada_a, accion=accion)
+       
 @receiver(post_save, sender=Comentario)
 def notificar_comentario_proyecto(sender, instance, **kwargs):
     proyecto = instance.proyecto

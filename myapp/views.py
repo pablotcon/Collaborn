@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.forms import ModelForm
 from django.db.models import Q
 from django.contrib import messages
-from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea
+from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad
 from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -58,10 +58,8 @@ def recurso_delete(request, pk):
 # Activiades
 @login_required
 def historial_actividades(request):
-    actividades = Actividad.objects.filter(usuario=request.user)
+    actividades = Actividad.objects.filter(usuario=request.user).order_by('-fecha')
     return render(request, 'myapp/historial_actividades.html', {'actividades': actividades})
-
-
 
 # Modulo de Tareas
 @login_required
@@ -83,6 +81,25 @@ def agregar_tarea(request, proyecto_id):
     return render(request, 'myapp/agregar_tarea.html', {'form': form, 'proyecto': proyecto})
 
 # Modulo Tarea
+# Modulo de Tareas
+@login_required
+@permission_required('myapp.add_tarea', raise_exception=True)
+def agregar_tarea(request, proyecto_id):
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+    if request.method == 'POST':
+        form = TareaForm(request.POST)
+        if form.is_valid():
+            tarea = form.save(commit=False)
+            tarea.proyecto = proyecto
+            tarea.save()
+            messages.success(request, 'Tarea agregada exitosamente.')
+            return redirect('listar_tareas', proyecto_id=proyecto.id)
+        else:
+            messages.error(request, 'Error al agregar la tarea.')
+    else:
+        form = TareaForm()
+    return render(request, 'myapp/agregar_tarea.html', {'form': form, 'proyecto': proyecto})
+
 @login_required
 def listar_tareas(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
@@ -114,26 +131,7 @@ def eliminar_tarea(request, tarea_id):
         messages.success(request, 'Tarea eliminada exitosamente.')
         return redirect('listar_tareas', proyecto_id=proyecto_id)
     return render(request, 'myapp/tarea_confirm_delete.html', {'tarea': tarea, 'proyecto_id': proyecto_id})
-
-
-@login_required
-def agregar_tarea(request, proyecto_id):
-    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
-    if request.method == 'POST':
-        form = TareaForm(request.POST)
-        if form.is_valid():
-            tarea = form.save(commit=False)
-            tarea.proyecto = proyecto
-            tarea.save()
-            messages.success(request, 'Tarea agregada exitosamente.')
-            return redirect('listar_tareas', proyecto_id=proyecto.id)
-        else:
-            messages.error(request, 'Error al agregar la tarea.')
-    else:
-        form = TareaForm()
-    return render(request, 'myapp/agregar_tarea.html', {'form': form, 'proyecto': proyecto})
-
-
+# Guardado Perfil ##############
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     if hasattr(instance, 'perfil'):
@@ -217,6 +215,7 @@ def marcar_notificacion_leida(request, notificacion_id):
     notificacion = get_object_or_404(Notificacion, id=notificacion_id, usuario=request.user)
     notificacion.leida = True
     notificacion.save()
+    messages.success(request, 'Notificación marcada como leída.')
     return redirect('listar_notificaciones')
 
 # Modulo Proyectos
