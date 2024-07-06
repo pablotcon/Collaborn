@@ -10,7 +10,7 @@ urlpatterns = [
     path('proyectos/', views.proyecto_list, name='proyecto_list'),
     path('crear_proyecto/', views.crear_proyecto, name='crear_proyecto'),
     path('proyectos/<int:proyecto_id>/', views.proyecto_detail, name='proyecto_detail'),
-    path('proyectos/<int:proyecto_id>/postular/', views.postular_proyecto, name='postular_proyecto'),    path('proyectos/<int:pk>/edit/', views.proyecto_edit, name='proyecto_edit'),
+    path('proyectos/<int:proyecto_id>/post ular/', views.postular_proyecto, name='postular_proyecto'),    path('proyectos/<int:pk>/edit/', views.proyecto_edit, name='proyecto_edit'),
     path('proyectos/<int:pk>/delete/', views.proyecto_delete, name='proyecto_delete'),
 
     path('mis-postulaciones/', views.mis_postulaciones, name='mis_postulaciones'),
@@ -38,6 +38,6 @@ urlpatterns = [
     path('proyectos/<int:proyecto_id>/tareas/agregar/', views.agregar_tarea, name='agregar_tarea'),
     path('tareas/<int:tarea_id>/editar/', views.editar_tarea, name='editar_tarea'),
     path('tareas/<int:tarea_id>/eliminar/', views.eliminar_tarea, name='eliminar_tarea'),
-
+    path('tareas/<int:tarea_id>/confirmar_eliminar/', views.confirmar_eliminar_tarea, name='confirmar_eliminar_tarea'),
     path('historial_actividades/', views.historial_actividades, name='historial_actividades'),
 ]

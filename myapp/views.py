@@ -32,6 +32,15 @@ def assign_role_to_user(user, role_name):
     group = Group.objects.get(name=role_name)
     user.groups.add(group)
     user.save()
+    
+@login_required
+def confirmar_eliminar_tarea(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
+    if request.method == 'POST':
+        tarea.delete()
+        messages.success(request, 'Tarea eliminada exitosamente.')
+        return redirect('listar_tareas', proyecto_id=tarea.proyecto.id)
+    return render(request, 'myapp/tarea_confirm_delete.html', {'tarea': tarea})
 
 
 @login_required
