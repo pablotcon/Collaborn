@@ -1,15 +1,53 @@
-<!-- myapp/templates/myapp/login.html -->
 <!DOCTYPE html>
 <html>
 <head>
     <title>Inicio de Sesión</title>
+    {% load static %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Karla:wght@200;300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
 </head>
 <body>
-    <h1>Inicio de Sesión</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Iniciar Sesión</button>
-    </form>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6 col-md-7 intro-section">
+                <div class="brand-wrapper">
+                    <h1><a href="https://stackfindover.com/">Collaborn</a></h1>
+                </div>
+                <div class="intro-content-wrapper">
+                    <h1 class="intro-title">Únete a Nosotros</h1>
+                    <p class="intro-text">Colabora y crece con nosotros.</p>
+                    <img src="{% static 'img/main.png.png' %}" alt="Colaborize Logo" class="img-fluid"> <!-- Asegúrate de usar la ruta correcta -->
+                    <a href="#!" class="btn btn-read-more">Leer más</a>
+                </div>
+                <div class="intro-section-footer">
+                    <nav class="footer-nav">
+                        <a href="#!">Facebook</a>
+                        <a href="#!">Twitter</a>
+                        <a href="#!">Gmail</a>
+                    </nav>
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-5 form-section">
+                <div class="login-wrapper">
+                    <h2 class="login-title">Inicia Aquí</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <div class="d-flex justify-content-between align-items-center mb-5">
+                            <button type="submit" class="btn login-btn">Iniciar Sesión</button>
+                            <a href="#!" class="forgot-password-link">Contraseña?</a>
+                        </div>
+                    </form>
+                    <p class="login-wrapper-footer-text">No tienes Cuenta? <a href="{% url 'register' %}" class="text-reset">Regístrate Aquí</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
