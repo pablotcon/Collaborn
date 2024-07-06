@@ -1,0 +1,16 @@
+<!-- myapp/templates/myapp/tarea_detail.html -->
+{% extends 'myapp/base.html' %}
+
+{% block title %}Detalles de la Tarea{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Detalles de la Tarea: {{ tarea.nombre }}</h1>
+    <p><strong>Descripción:</strong> {{ tarea.descripcion }}</p>
+    <p><strong>Fecha Límite:</strong> {{ tarea.fecha_limite }}</p>
+    <p><strong>Asignada a:</strong> {{ tarea.asignada_a.username }}</p>
+    <p><strong>Completada:</strong> {{ tarea.completada }}</p>
+    <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-primary">Editar Tarea</a>
+    <a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-danger">Eliminar Tarea</a>
+</div>
+{% endblock %}

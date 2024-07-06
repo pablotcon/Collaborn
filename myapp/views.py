@@ -16,6 +16,12 @@ from django.contrib.auth.models import Group, User
 from channels.layers import get_channel_layer
 
 
+@login_required
+def detalle_tarea(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
+    return render(request, 'myapp/tarea_detail.html', {'tarea': tarea})
+
+
 @permission_required('myapp.view_tarea', raise_exception=True)
 @login_required
 def admin_panel_tareas(request):
@@ -109,7 +115,13 @@ def agregar_tarea(request, proyecto_id):
 def listar_tareas(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
     tareas = Tarea.objects.filter(proyecto=proyecto)
+    
+    query = request.GET.get('q')
+    if query:
+        tareas = tareas.filter(nombre__icontains=query)
+    
     return render(request, 'myapp/listar_tareas.html', {'proyecto': proyecto, 'tareas': tareas})
+
 
 @login_required
 def editar_tarea(request, tarea_id):
@@ -320,8 +332,7 @@ def postular_proyecto(request, proyecto_id):
                 mensaje=f'El usuario {request.user.username} se ha postulado a tu proyecto "{proyecto.nombre}".'
             )
             messages.success(request, 'Te has postulado al proyecto exitosamente.')
-        return redirect('proyecto_detail', pk=proyecto_id)
-    return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto})
+        return redirect('proyecto_detail', proyecto_id=proyecto_id)  # Usando 'proyecto_id' en lugar de 'pk'    return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto})
 
 @login_required
 def mis_postulaciones(request):

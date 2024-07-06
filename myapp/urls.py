@@ -10,8 +10,7 @@ urlpatterns = [
     path('proyectos/', views.proyecto_list, name='proyecto_list'),
     path('crear_proyecto/', views.crear_proyecto, name='crear_proyecto'),
     path('proyectos/<int:proyecto_id>/', views.proyecto_detail, name='proyecto_detail'),
-    path('proyectos/<int:proyecto_id>/postular/', views.postular_proyecto, name='postular_proyecto'),
-    path('proyectos/<int:pk>/edit/', views.proyecto_edit, name='proyecto_edit'),
+    path('proyectos/<int:proyecto_id>/postular/', views.postular_proyecto, name='postular_proyecto'),    path('proyectos/<int:pk>/edit/', views.proyecto_edit, name='proyecto_edit'),
     path('proyectos/<int:pk>/delete/', views.proyecto_delete, name='proyecto_delete'),
 
     path('mis-postulaciones/', views.mis_postulaciones, name='mis_postulaciones'),
@@ -34,7 +33,7 @@ urlpatterns = [
     path('recursos/<int:pk>/delete/', views.recurso_delete, name='recurso_delete'),
 
     path('panel/tareas/', views.admin_panel_tareas, name='admin_panel_tareas'),
-
+    path('tareas/<int:tarea_id>/detalle/', views.detalle_tarea, name='detalle_tarea'),
     path('proyectos/<int:proyecto_id>/tareas/', views.listar_tareas, name='listar_tareas'),
     path('proyectos/<int:proyecto_id>/tareas/agregar/', views.agregar_tarea, name='agregar_tarea'),
     path('tareas/<int:tarea_id>/editar/', views.editar_tarea, name='editar_tarea'),
