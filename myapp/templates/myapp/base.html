@@ -7,6 +7,7 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
     <!-- Bootstrap Datepicker CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
 </head>
@@ -27,6 +28,7 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'listar_recursos' %}">Recursos</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'listar_notificaciones' %}">Notificaciones</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'listar_mensajes' %}">Mensajes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel_tareas' %}">Panel de Tareas</a></li>
                     <li class="nav-item">
                         <form method="post" action="{% url 'logout' %}">
                             {% csrf_token %}

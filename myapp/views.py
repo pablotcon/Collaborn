@@ -1,22 +1,27 @@
+from django.forms import ModelForm
+from asgiref.sync import async_to_sync
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout,update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required, permission_required
-from django.forms import ModelForm
 from django.db.models import Q
 from django.contrib import messages
 from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad
 from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-
-
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Recurso
-
 from django.contrib.auth.models import Group, User
 
+from channels.layers import get_channel_layer
+
+
+@permission_required('myapp.view_tarea', raise_exception=True)
+@login_required
+def admin_panel_tareas(request):
+    tareas = Tarea.objects.all()
+    return render(request, 'myapp/admin_panel_tareas.html', {'tareas': tareas})
+    
 def assign_role_to_user(user, role_name):
     group = Group.objects.get(name=role_name)
     user.groups.add(group)

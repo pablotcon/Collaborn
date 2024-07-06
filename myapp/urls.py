@@ -33,6 +33,8 @@ urlpatterns = [
     path('recursos/<int:pk>/edit/', views.recurso_edit, name='recurso_edit'),
     path('recursos/<int:pk>/delete/', views.recurso_delete, name='recurso_delete'),
 
+    path('panel/tareas/', views.admin_panel_tareas, name='admin_panel_tareas'),
+
     path('proyectos/<int:proyecto_id>/tareas/', views.listar_tareas, name='listar_tareas'),
     path('proyectos/<int:proyecto_id>/tareas/agregar/', views.agregar_tarea, name='agregar_tarea'),
     path('tareas/<int:tarea_id>/editar/', views.editar_tarea, name='editar_tarea'),
