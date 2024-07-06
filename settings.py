@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'channels',
 ]
 
-ASGI_APPLICATION = 'collaborn.routing.application'
+ASGI_APPLICATION = 'collaborn.asgi.application'
 
 CHANNEL_LAYERS = {
     'default': {
