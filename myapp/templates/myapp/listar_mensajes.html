@@ -5,9 +5,9 @@
 {% block content %}
 <div class="container mt-5">
     <h1>Mensajes</h1>
-    
+
     <!-- Formulario de Búsqueda -->
-    <form method="get" class="form-inline mb-3">
+    <form method="get" class="form-inline mb-4">
         <input type="text" name="q" class="form-control mr-2" placeholder="Buscar mensajes" value="{{ query|default:'' }}">
         <button type="submit" class="btn btn-primary">Buscar</button>
     </form>
@@ -38,35 +38,51 @@
     </div>
 
     <!-- Mensajes Recibidos -->
-    <h2>Mensajes Recibidos</h2>
-    <ul class="list-group mb-4">
+    <h2 class="mb-3">Mensajes Recibidos</h2>
+    {% if mensajes_recibidos %}
+    <div class="list-group mb-4">
         {% for mensaje in mensajes_recibidos %}
-        <li class="list-group-item">
-            <strong>De:</strong> {{ mensaje.emisor.username }}<br>
-            <strong>Mensaje:</strong> {{ mensaje.contenido }}<br>
-            <strong>Enviado:</strong> {{ mensaje.fecha_envio }}<br>
-            <a href="#" class="btn btn-sm btn-primary mt-2 responder-btn" data-emisor-id="{{ mensaje.emisor.id }}">Responder</a>
-            <button type="button" class="btn btn-sm btn-danger mt-2" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="{{ mensaje.id }}">Eliminar</button>
-        </li>
-        {% empty %}
-        <li class="list-group-item">No tienes mensajes recibidos.</li>
+        <div class="list-group-item {% if not mensaje.leido %}font-weight-bold{% endif %}">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>De:</strong> {{ mensaje.emisor.username }}<br>
+                    <strong>Mensaje:</strong> {{ mensaje.contenido }}<br>
+                    <small class="text-muted">Enviado: {{ mensaje.fecha_envio }}</small>
+                </div>
+                <div>
+                    <a href="#" class="btn btn-sm btn-primary responder-btn" data-emisor-id="{{ mensaje.emisor.id }}">Responder</a>
+                    <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="{{ mensaje.id }}">Eliminar</button>
+                </div>
+            </div>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
+    {% else %}
+    <div class="alert alert-info">No tienes mensajes recibidos.</div>
+    {% endif %}
 
     <!-- Mensajes Enviados -->
-    <h2>Mensajes Enviados</h2>
-    <ul class="list-group mb-4">
+    <h2 class="mb-3">Mensajes Enviados</h2>
+    {% if mensajes_enviados %}
+    <div class="list-group mb-4">
         {% for mensaje in mensajes_enviados %}
-        <li class="list-group-item">
-            <strong>Para:</strong> {{ mensaje.receptor.username }}<br>
-            <strong>Mensaje:</strong> {{ mensaje.contenido }}<br>
-            <strong>Enviado:</strong> {{ mensaje.fecha_envio }}<br>
-            <button type="button" class="btn btn-sm btn-danger mt-2" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="{{ mensaje.id }}">Eliminar</button>
-        </li>
-        {% empty %}
-        <li class="list-group-item">No has enviado mensajes.</li>
+        <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>Para:</strong> {{ mensaje.receptor.username }}<br>
+                    <strong>Mensaje:</strong> {{ mensaje.contenido }}<br>
+                    <small class="text-muted">Enviado: {{ mensaje.fecha_envio }}</small>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="{{ mensaje.id }}">Eliminar</button>
+                </div>
+            </div>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
+    {% else %}
+    <div class="alert alert-info">No has enviado mensajes.</div>
+    {% endif %}
 </div>
 
 <!-- Modal de Confirmación de Eliminación -->

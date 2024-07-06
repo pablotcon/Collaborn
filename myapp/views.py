@@ -199,6 +199,7 @@ def listar_mensajes(request):
         mensajes_recibidos = Mensaje.objects.filter(receptor=request.user).order_by('-fecha_envio')
         mensajes_enviados = Mensaje.objects.filter(emisor=request.user).order_by('-fecha_envio')
     
+    # Marca los mensajes recibidos como leídos
     mensajes_recibidos.update(leido=True)
 
     return render(request, 'myapp/listar_mensajes.html', {
@@ -211,16 +212,17 @@ def listar_mensajes(request):
 @login_required
 def enviar_mensaje(request):
     if request.method == 'POST':
-        form = MensajeForm(request.POST)
-        if form.is_valid():
-            mensaje = form.save(commit=False)
-            mensaje.emisor = request.user
-            mensaje.save()
-            messages.success(request, 'Mensaje enviado exitosamente.')
-            return redirect('listar_mensajes')
-    else:
-        form = MensajeForm()
-    return render(request, 'myapp/enviar_mensaje.html', {'form': form})
+        receptor_id = request.POST.get('receptor')
+        contenido = request.POST.get('contenido')
+        receptor = User.objects.get(id=receptor_id)
+        Mensaje.objects.create(
+            emisor=request.user,
+            receptor=receptor,
+            contenido=contenido
+        )
+        messages.success(request, 'Mensaje enviado exitosamente.')
+        return redirect('listar_mensajes')
+    return render(request, 'myapp/enviar_mensaje.html', {'users': User.objects.exclude(id=request.user.id)})
 
 @login_required
 def eliminar_mensaje(request, mensaje_id):
@@ -264,8 +266,12 @@ def user_notification(event):
 
 @login_required
 def listar_notificaciones(request):
-    notificaciones = request.user.notificacion_set.filter(leida=False)
-    return render(request, 'myapp/listar_notificaciones.html', {'notificaciones': notificaciones})
+    notificaciones_no_leidas = request.user.notificaciones.filter(leido=False).count()
+    notificaciones = request.user.notificaciones.all()
+    return render(request, 'myapp/listar_notificaciones.html', {
+        'notificaciones': notificaciones,
+        'notificaciones_no_leidas': notificaciones_no_leidas,
+    })
 
 @login_required
 def marcar_notificacion_leida(request, notificacion_id):

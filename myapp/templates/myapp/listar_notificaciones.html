@@ -3,17 +3,23 @@
 {% block title %}Notificaciones{% endblock %}
 
 {% block content %}
-<h1>Notificaciones</h1>
-<ul class="list-group">
-    {% for notificacion in notificaciones %}
-    <li class="list-group-item {% if notificacion.leida %}list-group-item-secondary{% else %}list-group-item-info{% endif %}">
-        {{ notificacion.mensaje }} - {{ notificacion.fecha_creacion }}
-        {% if notificacion.leida %}
-        <span class="badge badge-success">Leída</span>
-        {% else %}
-        <a href="{% url 'marcar_notificacion_leida' notificacion.id %}" class="btn btn-sm btn-primary">Marcar como leída</a>
-        {% endif %}
-    </li>
-    {% endfor %}
-</ul>
+<div class="container mt-5">
+    <h1>Notificaciones</h1>
+    <ul class="list-group">
+        {% for notificacion in notificaciones %}
+        <li class="list-group-item">
+            {{ notificacion.mensaje }}
+            <br>
+            <small>{{ notificacion.fecha }}</small>
+            {% if notificacion.leido %}
+            <span class="badge badge-success">Leído</span>
+            {% else %}
+            <span class="badge badge-warning">No leído</span>
+            {% endif %}
+        </li>
+        {% empty %}
+        <li class="list-group-item">No tienes notificaciones.</li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}

@@ -55,24 +55,24 @@ class Postulacion(models.Model):
         return f'{self.usuario.username} en {self.proyecto.nombre}'
 
 class Notificacion(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    receptor = models.ForeignKey(User, related_name='notificaciones', on_delete=models.CASCADE, default=1)
     mensaje = models.TextField()
-    leida = models.BooleanField(default=False)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha = models.DateTimeField(auto_now_add=True)
     leido = models.BooleanField(default=False)
-    
-    def __str__(self):
-        return f'Notificación para {self.usuario.username}'
 
+    def __str__(self):
+        return self.mensaje
+
+    
 class Mensaje(models.Model):
     emisor = models.ForeignKey(User, related_name='mensajes_enviados', on_delete=models.CASCADE)
     receptor = models.ForeignKey(User, related_name='mensajes_recibidos', on_delete=models.CASCADE)
     contenido = models.TextField()
     fecha_envio = models.DateTimeField(auto_now_add=True)
-    leido = models.BooleanField(default=False)  # Añadir el campo leido
+    leido = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'Mensaje de {self.emisor.username} a {self.receptor.username}'
+        return f"Mensaje de {self.emisor} a {self.receptor}"
 
 class Recurso(models.Model):
     titulo = models.CharField(max_length=255)

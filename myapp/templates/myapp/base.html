@@ -1,3 +1,5 @@
+<!-- base.html -->
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -24,7 +26,7 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'ver_perfil' %}">Perfil</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'proyecto_list' %}">Proyectos</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'listar_recursos' %}">Recursos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'listar_notificaciones' %}">Notificaciones</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'listar_notificaciones' %}">Notificaciones {% if notificaciones_no_leidas > 0 %} <span class="badge badge-danger">{{ notificaciones_no_leidas }}</span> {% endif %}</a></li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'listar_mensajes' %}">
                             Mensajes

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Tarea, Comentario, Notificacion, Actividad
+from .models import Tarea, Comentario, Notificacion, Actividad, Mensaje
 from django.apps import AppConfig
 
 
@@ -11,6 +11,16 @@ class MyappConfig(AppConfig):
 
     def ready(self):
         import myapp.signals
+
+
+@receiver(post_save, sender=Mensaje)
+def enviar_notificacion_mensaje(sender, instance, **kwargs):
+    Notificacion.objects.create(
+        receptor=instance.receptor,
+        mensaje=f"Tienes un nuevo mensaje de {instance.emisor.username}",
+        fecha=instance.fecha_envio,
+        leido=False
+    )
 
 @receiver(post_save, sender=Tarea)
 def notificar_asignacion_tarea(sender, instance, created, **kwargs):
