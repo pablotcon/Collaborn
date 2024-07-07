@@ -1,23 +1,19 @@
-<!-- myapp/templates/myapp/admin_panel_tareas.html -->
 {% extends 'myapp/base.html' %}
 
-{% load static %}
-
-{% block title %}Panel de Gestión de Tareas{% endblock %}
+{% block title %}Panel de Tareas{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Panel de Gestión de Tareas</h1>
-    <table class="table table-striped">
+    <h1>Panel de Tareas</h1>
+    <table class="table">
         <thead>
             <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Proyecto</th>
-                <th>Asignada a</th>
-                <th>Fecha Límite</th>
-                <th>Completada</th>
-                <th>Acciones</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Descripción</th>
+                <th scope="col">Fecha Límite</th>
+                <th scope="col">Asignada a</th>
+                <th scope="col">Completada</th>
+                <th scope="col">Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -25,59 +21,17 @@
             <tr>
                 <td>{{ tarea.nombre }}</td>
                 <td>{{ tarea.descripcion }}</td>
-                <td>{{ tarea.proyecto.nombre }}</td>
-                <td>
-                    {% if tarea.asignada_a %}
-                        {{ tarea.asignada_a.username }}
-                    {% else %}
-                        No asignada
-                    {% endif %}
-                </td>
                 <td>{{ tarea.fecha_limite }}</td>
+                <td>{{ tarea.asignada_a.username }}</td>
                 <td>{{ tarea.completada }}</td>
                 <td>
-                    <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-primary btn-sm">Editar</a>
-                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#confirmDeleteModal" data-tarea-id="{{ tarea.id }}">Eliminar</button>
+                    <a href="{% url 'detalle_tarea' tarea.id %}" class="btn btn-info">Ver Detalles</a>
+                    <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-primary">Editar</a>
+                    <a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-danger">Eliminar</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
-
-<!-- Modal de Confirmación de Eliminación -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                ¿Estás seguro de que deseas eliminar esta tarea?
-            </div>
-            <div class="modal-footer">
-                <form id="deleteForm" method="post" action="">
-                    {% csrf_token %}
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>
-    $('#confirmDeleteModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var tareaId = button.data('tarea-id');
-        var action = "{% url 'eliminar_tarea' 0 %}".replace('0', tareaId);
-        var modal = $(this);
-        modal.find('#deleteForm').attr('action', action);
-    });
-</script>
 {% endblock %}

@@ -1,4 +1,3 @@
-<!-- myapp/templates/myapp/tarea_detail.html -->
 {% extends 'myapp/base.html' %}
 
 {% block title %}Detalles de la Tarea{% endblock %}
@@ -12,19 +11,30 @@
     <p><strong>Completada:</strong> {{ tarea.completada }}</p>
     <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-primary">Editar Tarea</a>
     <a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-danger">Eliminar Tarea</a>
+    <form method="post" action="{% url 'actualizar_estado_tarea' tarea.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-warning">
+            {% if tarea.completada %}Marcar como Incompleta{% else %}Marcar como Completada{% endif %}
+        </button>
+    </form>
+
+    <hr>
 
     <h2>Seguimientos</h2>
-    <ul>
+    <ul class="list-group mb-3">
         {% for seguimiento in seguimientos %}
-            <li>{{ seguimiento.fecha }} - {{ seguimiento.comentario }}</li>
+        <li class="list-group-item">
+            <p>{{ seguimiento.descripcion }}</p>
+            <small><em>{{ seguimiento.fecha }} - {{ seguimiento.creado_por.username }}</em></small>
+        </li>
         {% endfor %}
     </ul>
 
-    <h3>Agregar Seguimiento</h3>
-    <form method="post" action="{% url 'agregar_seguimiento' tarea.id %}">
+    <h2>Agregar Seguimiento</h2>
+    <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Agregar</button>
+        <button type="submit" class="btn btn-success">Agregar Seguimiento</button>
     </form>
 </div>
 {% endblock %}

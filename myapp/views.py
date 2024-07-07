@@ -7,12 +7,13 @@ from django.contrib.auth.decorators import login_required, permission_required, 
 from django.db.models import Q
 from django.contrib import messages
 from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad, SeguimientoTarea
-from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm, SeguimientoTareaForm,EducacionFormSet,ExperienciaLaboralFormSet
+from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm, SeguimientoTareaForm, EducacionFormSet, ExperienciaLaboralFormSet
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
 from channels.layers import get_channel_layer
 
+# Functions related to Task Management
 @login_required
 def detalle_tarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, id=tarea_id)
@@ -35,42 +36,6 @@ def confirmar_eliminar_tarea(request, tarea_id):
         messages.success(request, 'Tarea eliminada exitosamente.')
         return redirect('listar_tareas', proyecto_id=tarea.proyecto.id)
     return render(request, 'myapp/tarea_confirm_delete.html', {'tarea': tarea})
-
-@login_required
-def recurso_detail(request, pk):
-    recurso = get_object_or_404(Recurso, pk=pk)
-    return render(request, 'myapp/recurso_detail.html', {'recurso': recurso})
-
-@permission_required('myapp.can_edit_recurso', raise_exception=True)
-@login_required
-def recurso_edit(request, pk):
-    recurso = get_object_or_404(Recurso, pk=pk)
-    if request.method == 'POST':
-        form = RecursoForm(request.POST, instance=recurso)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Recurso editado exitosamente.')
-            return redirect('recurso_detail', pk=recurso.pk)
-        else:
-            messages.error(request, 'Error al editar el recurso.')
-    else:
-        form = RecursoForm(instance=recurso)
-    return render(request, 'myapp/recurso_form.html', {'form': form})
-
-@permission_required('myapp.can_delete_recurso', raise_exception=True)
-@login_required
-def recurso_delete(request, pk):
-    recurso = get_object_or_404(Recurso, pk=pk)
-    if request.method == 'POST':
-        recurso.delete()
-        messages.success(request, 'Recurso eliminado exitosamente.')
-        return redirect('listar_recursos')
-    return render(request, 'myapp/recurso_confirm_delete.html', {'recurso': recurso})
-
-@login_required
-def historial_actividades(request):
-    actividades = Actividad.objects.filter(usuario=request.user).order_by('-fecha')
-    return render(request, 'myapp/historial_actividades.html', {'actividades': actividades})
 
 @login_required
 @permission_required('myapp.add_tarea', raise_exception=True)
@@ -127,91 +92,54 @@ def eliminar_tarea(request, tarea_id):
         return redirect('listar_tareas', proyecto_id=proyecto_id)
     return render(request, 'myapp/tarea_confirm_delete.html', {'tarea': tarea, 'proyecto_id': proyecto_id})
 
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    if hasattr(instance, 'perfil'):
-        instance.perfil.save()
+@login_required
+def seguir_tarea(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
+    seguimiento, created = SeguimientoTarea.objects.get_or_create(usuario=request.user, tarea=tarea)
+    if created:
+        messages.success(request, 'Ahora sigues esta tarea.')
+    else:
+        messages.info(request, 'Ya sigues esta tarea.')
+    return redirect('detalle_tarea', tarea_id=tarea_id)
 
 @login_required
-def subir_recurso(request):
+def dejar_seguir_tarea(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
+    seguimiento = get_object_or_404(SeguimientoTarea, usuario=request.user, tarea=tarea)
+    seguimiento.delete()
+    messages.success(request, 'Has dejado de seguir esta tarea.')
+    return redirect('detalle_tarea', tarea_id=tarea_id)
+
+@login_required
+def listar_seguimientos(request):
+    seguimientos = request.user.seguimientos.all()
+    return render(request, 'myapp/listar_seguimientos.html', {'seguimientos': seguimientos})
+
+@login_required
+def agregar_seguimiento(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
     if request.method == 'POST':
-        form = RecursoForm(request.POST, request.FILES)
+        form = SeguimientoTareaForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('listar_recursos')
+            seguimiento = form.save(commit=False)
+            seguimiento.tarea = tarea
+            seguimiento.usuario = request.user
+            seguimiento.save()
+            return redirect('detalle_tarea', tarea_id=tarea.id)
     else:
-        form = RecursoForm()
-    return render(request, 'myapp/subir_recurso.html', {'form': form})
+        form = SeguimientoTareaForm()
+    return render(request, 'myapp/detalle_tarea.html', {'tarea': tarea, 'form': form})
 
 @login_required
-def listar_recursos(request):
-    query = request.GET.get('q')
-    recursos = Recurso.objects.all()
-    
-    if query:
-        recursos = recursos.filter(
-            Q(titulo__icontains=query) | Q(descripcion__icontains=query)
-        )
-
-    return render(request, 'myapp/listar_recursos.html', {'recursos': recursos})
-
-@login_required
-def listar_mensajes(request):
-    query = request.GET.get('q')
-    if query:
-        mensajes_recibidos = Mensaje.objects.filter(receptor=request.user, contenido__icontains=query).order_by('-fecha_envio')
-        mensajes_enviados = Mensaje.objects.filter(emisor=request.user, contenido__icontains=query).order_by('-fecha_envio')
-    else:
-        mensajes_recibidos = Mensaje.objects.filter(receptor=request.user).order_by('-fecha_envio')
-        mensajes_enviados = Mensaje.objects.filter(emisor=request.user).order_by('-fecha_envio')
-    
-    mensajes_recibidos.update(leido=True)
-
-    return render(request, 'myapp/listar_mensajes.html', {
-        'mensajes_recibidos': mensajes_recibidos,
-        'mensajes_enviados': mensajes_enviados,
-        'users': User.objects.exclude(id=request.user.id),
-        'query': query
-    })
-
-@login_required
-def enviar_mensaje(request):
+def actualizar_estado_tarea(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
     if request.method == 'POST':
-        receptor_id = request.POST.get('receptor')
-        contenido = request.POST.get('contenido')
-        receptor = User.objects.get(id=receptor_id)
-        Mensaje.objects.create(
-            emisor=request.user,
-            receptor=receptor,
-            contenido=contenido
-        )
-        messages.success(request, 'Mensaje enviado exitosamente.')
-        return redirect('listar_mensajes')
-    return render(request, 'myapp/enviar_mensaje.html', {'users': User.objects.exclude(id=request.user.id)})
+        tarea.completada = not tarea.completada
+        tarea.save()
+        messages.success(request, 'El estado de la tarea ha sido actualizado.')
+    return redirect('detalle_tarea', tarea_id=tarea.id)
 
-@login_required
-def eliminar_mensaje(request, mensaje_id):
-    mensaje = get_object_or_404(Mensaje, id=mensaje_id)
-    if request.method == 'POST':
-        mensaje.delete()
-        messages.success(request, 'Mensaje eliminado exitosamente.')
-        return redirect('listar_mensajes')
-    return render(request, 'myapp/confirm_delete_mensaje.html', {'mensaje': mensaje})
-
-@login_required
-def enviar_mensaje(request, receptor_id=None):
-    if request.method == 'POST':
-        form = MensajeForm(request.POST)
-        if form.is_valid():
-            mensaje = form.save(commit=False)
-            mensaje.emisor = request.user
-            mensaje.save()
-            messages.success(request, 'Mensaje enviado exitosamente.')
-            return redirect('listar_mensajes')
-    else:
-        form = MensajeForm(initial={'receptor': receptor_id})
-    return render(request, 'myapp/enviar_mensaje.html', {'form': form})
-
+# Function to send notifications
 def send_notification(user, message):
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
@@ -228,6 +156,65 @@ def user_notification(event):
         'message': message
     }))
 
+# Functions related to User Profile
+@login_required
+def editar_perfil(request):
+    perfil = request.user.perfil
+
+    if request.method == 'POST':
+        user_form = UserForm(request.POST, instance=request.user)
+        perfil_form = PerfilForm(request.POST, request.FILES, instance=perfil)
+        experiencia_formset = ExperienciaLaboralFormSet(request.POST, instance=perfil)
+        educacion_formset = EducacionFormSet(request.POST, instance=perfil)
+        
+        if user_form.is_valid() and perfil_form.is_valid() and experiencia_formset.is_valid() and educacion_formset.is_valid():
+            user_form.save()
+            perfil_form.save()
+            experiencia_formset.save()
+            educacion_formset.save()
+            messages.success(request, 'Perfil actualizado exitosamente')
+            return redirect('ver_perfil')
+    else:
+        user_form = UserForm(instance=request.user)
+        perfil_form = PerfilForm(instance=perfil)
+        experiencia_formset = ExperienciaLaboralFormSet(instance=perfil)
+        educacion_formset = EducacionFormSet(instance=perfil)
+
+    return render(request, 'myapp/editar_perfil.html', {
+        'user_form': user_form,
+        'perfil_form': perfil_form,
+        'experiencia_formset': experiencia_formset,
+        'educacion_formset': educacion_formset,
+    })
+
+@login_required
+def ver_perfil(request):
+    perfil = request.user.perfil
+    experiencias = perfil.experiencias.all()
+    educaciones = perfil.educaciones.all()
+
+    return render(request, 'myapp/ver_perfil.html', {
+        'perfil': perfil,
+        'experiencias': experiencias,
+        'educaciones': educaciones,
+    })
+
+@login_required
+def cambiar_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Su contraseña ha sido cambiada exitosamente.')
+            return redirect('ver_perfil')
+        else:
+            messages.error(request, 'Por favor corrija los errores a continuación.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'myapp/cambiar_password.html', {'form': form})
+
+# Functions related to Notifications
 @login_required
 def listar_notificaciones(request):
     notificaciones_no_leidas = request.user.notificaciones.filter(leido=False).count()
@@ -245,6 +232,7 @@ def marcar_notificacion_leida(request, notificacion_id):
     messages.success(request, 'Notificación marcada como leída.')
     return redirect('listar_notificaciones')
 
+# Functions related to Projects
 @login_required
 def proyecto_list(request):
     query = request.GET.get('q')
@@ -253,7 +241,7 @@ def proyecto_list(request):
     
     if query:
         proyectos = proyectos.filter(
-            Q(nombre__icontains=query) | Q(descripcion__icontains=query)
+            Q(nombre__icontains=query) | Q(descripcion__icontains(query))
         )
 
     if filter_by:
@@ -346,63 +334,126 @@ def mis_postulaciones(request):
     postulaciones = Postulacion.objects.filter(usuario=request.user)
     return render(request, 'myapp/mis_postulaciones.html', {'postulaciones': postulaciones})
 
+# Functions related to Resources
 @login_required
-def editar_perfil(request):
-    perfil = request.user.perfil
+def recurso_detail(request, pk):
+    recurso = get_object_or_404(Recurso, pk=pk)
+    return render(request, 'myapp/recurso_detail.html', {'recurso': recurso})
 
+@permission_required('myapp.can_edit_recurso', raise_exception=True)
+@login_required
+def recurso_edit(request, pk):
+    recurso = get_object_or_404(Recurso, pk=pk)
     if request.method == 'POST':
-        user_form = UserForm(request.POST, instance=request.user)
-        perfil_form = PerfilForm(request.POST, request.FILES, instance=perfil)
-        experiencia_formset = ExperienciaLaboralFormSet(request.POST, instance=perfil)
-        educacion_formset = EducacionFormSet(request.POST, instance=perfil)
-        
-        if user_form.is_valid() and perfil_form.is_valid() and experiencia_formset.is_valid() and educacion_formset.is_valid():
-            user_form.save()
-            perfil_form.save()
-            experiencia_formset.save()
-            educacion_formset.save()
-            messages.success(request, 'Perfil actualizado exitosamente')
-            return redirect('ver_perfil')
-    else:
-        user_form = UserForm(instance=request.user)
-        perfil_form = PerfilForm(instance=perfil)
-        experiencia_formset = ExperienciaLaboralFormSet(instance=perfil)
-        educacion_formset = EducacionFormSet(instance=perfil)
-
-    return render(request, 'myapp/editar_perfil.html', {
-        'user_form': user_form,
-        'perfil_form': perfil_form,
-        'experiencia_formset': experiencia_formset,
-        'educacion_formset': educacion_formset,
-    })
-
-@login_required
-def ver_perfil(request):
-    perfil = request.user.perfil
-    experiencias = perfil.experiencias.all()
-    educaciones = perfil.educaciones.all()
-
-    return render(request, 'myapp/ver_perfil.html', {
-        'perfil': perfil,
-        'experiencias': experiencias,
-        'educaciones': educaciones,
-    })
-
-@login_required
-def cambiar_password(request):
-    if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
+        form = RecursoForm(request.POST, instance=recurso)
         if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)
-            messages.success(request, 'Su contraseña ha sido cambiada exitosamente.')
-            return redirect('ver_perfil')
+            form.save()
+            messages.success(request, 'Recurso editado exitosamente.')
+            return redirect('recurso_detail', pk=recurso.pk)
         else:
-            messages.error(request, 'Por favor corrija los errores a continuación.')
+            messages.error(request, 'Error al editar el recurso.')
     else:
-        form = PasswordChangeForm(request.user)
-    return render(request, 'myapp/cambiar_password.html', {'form': form})
+        form = RecursoForm(instance=recurso)
+    return render(request, 'myapp/recurso_form.html', {'form': form})
 
+@permission_required('myapp.can_delete_recurso', raise_exception=True)
+@login_required
+def recurso_delete(request, pk):
+    recurso = get_object_or_404(Recurso, pk=pk)
+    if request.method == 'POST':
+        recurso.delete()
+        messages.success(request, 'Recurso eliminado exitosamente.')
+        return redirect('listar_recursos')
+    return render(request, 'myapp/recurso_confirm_delete.html', {'recurso': recurso})
+
+@login_required
+def subir_recurso(request):
+    if request.method == 'POST':
+        form = RecursoForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_recursos')
+    else:
+        form = RecursoForm()
+    return render(request, 'myapp/subir_recurso.html', {'form': form})
+
+@login_required
+def listar_recursos(request):
+    query = request.GET.get('q')
+    recursos = Recurso.objects.all()
+    
+    if query:
+        recursos = recursos.filter(
+            Q(titulo__icontains=query) | Q(descripcion__icontains=query)
+        )
+
+    return render(request, 'myapp/listar_recursos.html', {'recursos': recursos})
+
+# Functions related to Messages
+@login_required
+def listar_mensajes(request):
+    query = request.GET.get('q')
+    if query:
+        mensajes_recibidos = Mensaje.objects.filter(receptor=request.user, contenido__icontains=query).order_by('-fecha_envio')
+        mensajes_enviados = Mensaje.objects.filter(emisor=request.user, contenido__icontains=query).order_by('-fecha_envio')
+    else:
+        mensajes_recibidos = Mensaje.objects.filter(receptor=request.user).order_by('-fecha_envio')
+        mensajes_enviados = Mensaje.objects.filter(emisor=request.user).order_by('-fecha_envio')
+    
+    mensajes_recibidos.update(leido=True)
+
+    return render(request, 'myapp/listar_mensajes.html', {
+        'mensajes_recibidos': mensajes_recibidos,
+        'mensajes_enviados': mensajes_enviados,
+        'users': User.objects.exclude(id=request.user.id),
+        'query': query
+    })
+
+@login_required
+def enviar_mensaje(request):
+    if request.method == 'POST':
+        receptor_id = request.POST.get('receptor')
+        contenido = request.POST.get('contenido')
+        receptor = User.objects.get(id=receptor_id)
+        Mensaje.objects.create(
+            emisor=request.user,
+            receptor=receptor,
+            contenido=contenido
+        )
+        messages.success(request, 'Mensaje enviado exitosamente.')
+        return redirect('listar_mensajes')
+    return render(request, 'myapp/enviar_mensaje.html', {'users': User.objects.exclude(id=request.user.id)})
+
+@login_required
+def eliminar_mensaje(request, mensaje_id):
+    mensaje = get_object_or_404(Mensaje, id=mensaje_id)
+    if request.method == 'POST':
+        mensaje.delete()
+        messages.success(request, 'Mensaje eliminado exitosamente.')
+        return redirect('listar_mensajes')
+    return render(request, 'myapp/confirm_delete_mensaje.html', {'mensaje': mensaje})
+
+@login_required
+def enviar_mensaje(request, receptor_id=None):
+    if request.method == 'POST':
+        form = MensajeForm(request.POST)
+        if form.is_valid():
+            mensaje = form.save(commit=False)
+            mensaje.emisor = request.user
+            mensaje.save()
+            messages.success(request, 'Mensaje enviado exitosamente.')
+            return redirect('listar_mensajes')
+    else:
+        form = MensajeForm(initial={'receptor': receptor_id})
+    return render(request, 'myapp/enviar_mensaje.html', {'form': form})
+
+# Functions related to Activities
+@login_required
+def historial_actividades(request):
+    actividades = Actividad.objects.filter(usuario=request.user).order_by('-fecha')
+    return render(request, 'myapp/historial_actividades.html', {'actividades': actividades})
+
+# User Authentication Functions
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -437,40 +488,8 @@ def index(request):
     nuevos_mensajes = Mensaje.objects.filter(receptor=request.user, leido=False).count()
     return render(request, 'myapp/index.html', {'nuevos_mensajes': nuevos_mensajes})
 
-@login_required
-def seguir_tarea(request, tarea_id):
-    tarea = get_object_or_404(Tarea, id=tarea_id)
-    seguimiento, created = SeguimientoTarea.objects.get_or_create(usuario=request.user, tarea=tarea)
-    if created:
-        messages.success(request, 'Ahora sigues esta tarea.')
-    else:
-        messages.info(request, 'Ya sigues esta tarea.')
-    return redirect('detalle_tarea', tarea_id=tarea_id)
-
-@login_required
-def dejar_seguir_tarea(request, tarea_id):
-    tarea = get_object_or_404(Tarea, id=tarea_id)
-    seguimiento = get_object_or_404(SeguimientoTarea, usuario=request.user, tarea=tarea)
-    seguimiento.delete()
-    messages.success(request, 'Has dejado de seguir esta tarea.')
-    return redirect('detalle_tarea', tarea_id=tarea_id)
-
-@login_required
-def listar_seguimientos(request):
-    seguimientos = request.user.seguimientos.all()
-    return render(request, 'myapp/listar_seguimientos.html', {'seguimientos': seguimientos})
-
-@login_required
-def agregar_seguimiento(request, tarea_id):
-    tarea = get_object_or_404(Tarea, id=tarea_id)
-    if request.method == 'POST':
-        form = SeguimientoTareaForm(request.POST)
-        if form.is_valid():
-            seguimiento = form.save(commit=False)
-            seguimiento.tarea = tarea
-            seguimiento.usuario = request.user
-            seguimiento.save()
-            return redirect('detalle_tarea', tarea_id=tarea.id)
-    else:
-        form = SeguimientoTareaForm()
-    return render(request, 'myapp/detalle_tarea.html', {'tarea': tarea, 'form': form})
+# Signal to save user profile upon user creation
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    if hasattr(instance, 'perfil'):
+        instance.perfil.save()
