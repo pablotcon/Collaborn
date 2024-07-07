@@ -28,14 +28,23 @@ class Tarea(models.Model):
     def __str__(self):
         return self.nombre
     
+class Subtarea(models.Model):
+    tarea = models.ForeignKey(Tarea, on_delete=models.CASCADE, related_name='subtareas')
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    fecha_limite = models.DateTimeField()
+    completada = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return self.nombre
+    
 # Definición del modelo SeguimientoTarea
+# models.py
 class SeguimientoTarea(models.Model):
     tarea = models.ForeignKey(Tarea, on_delete=models.CASCADE, related_name='seguimientos')
     comentario = models.TextField()
     fecha = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{self.tarea.nombre} - {self.fecha}"
 
 class Actividad(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)

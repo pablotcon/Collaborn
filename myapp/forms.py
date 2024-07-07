@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 from django.contrib.auth.models import User
-from .models import Recurso, Perfil, Comentario, Mensaje, Proyecto, Tarea, ExperienciaLaboral, Educacion,SeguimientoTarea
+from .models import Recurso, Perfil, Comentario, Mensaje, Proyecto, Tarea, ExperienciaLaboral, Educacion,SeguimientoTarea,Subtarea
 
 class UserForm(forms.ModelForm):
     class Meta:
@@ -62,6 +62,11 @@ class TareaForm(forms.ModelForm):
         widgets = {
             'fecha_limite': forms.DateInput(attrs={'type': 'date'}),
         }
+
+class SubtareaForm(forms.ModelForm):
+    class Meta:
+        model = Subtarea
+        fields = ['nombre', 'descripcion', 'fecha_limite', 'completada']
 
 class SeguimientoTareaForm(forms.ModelForm):
     class Meta:

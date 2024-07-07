@@ -1,3 +1,4 @@
+<!-- detalle_tarea.html -->
 {% extends 'myapp/base.html' %}
 
 {% block title %}Detalles de la Tarea{% endblock %}
@@ -9,32 +10,28 @@
     <p><strong>Fecha Límite:</strong> {{ tarea.fecha_limite }}</p>
     <p><strong>Asignada a:</strong> {{ tarea.asignada_a.username }}</p>
     <p><strong>Completada:</strong> {{ tarea.completada }}</p>
-    <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-primary">Editar Tarea</a>
-    <a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-danger">Eliminar Tarea</a>
-    <form method="post" action="{% url 'actualizar_estado_tarea' tarea.id %}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-warning">
-            {% if tarea.completada %}Marcar como Incompleta{% else %}Marcar como Completada{% endif %}
-        </button>
-    </form>
-
-    <hr>
-
-    <h2>Seguimientos</h2>
-    <ul class="list-group mb-3">
-        {% for seguimiento in seguimientos %}
-        <li class="list-group-item">
-            <p>{{ seguimiento.descripcion }}</p>
-            <small><em>{{ seguimiento.fecha }} - {{ seguimiento.creado_por.username }}</em></small>
-        </li>
+    
+    <h2>Subtareas</h2>
+    <ul>
+        {% for subtarea in subtareas %}
+        <li>{{ subtarea.nombre }} - {{ subtarea.descripcion }} - {{ subtarea.fecha_limite }} - Completada: {{ subtarea.completada }}</li>
         {% endfor %}
     </ul>
-
-    <h2>Agregar Seguimiento</h2>
+    <a href="{% url 'agregar_subtarea' tarea.id %}" class="btn btn-primary">Agregar Subtarea</a>
+    
+    <h2>Seguimientos</h2>
+    <ul>
+        {% for seguimiento in seguimientos %}
+        <li>{{ seguimiento.comentario }} - {{ seguimiento.fecha }}</li>
+        {% endfor %}
+    </ul>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Agregar Seguimiento</button>
+        <button type="submit" class="btn btn-primary">Agregar Seguimiento</button>
     </form>
+    
+    <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-primary">Editar Tarea</a>
+    <a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-danger">Eliminar Tarea</a>
 </div>
 {% endblock %}

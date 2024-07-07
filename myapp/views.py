@@ -6,8 +6,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, User
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.db.models import Q
 from django.contrib import messages
-from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad, SeguimientoTarea
-from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm, SeguimientoTareaForm, EducacionFormSet, ExperienciaLaboralFormSet
+from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad, SeguimientoTarea, Subtarea
+from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm, SeguimientoTareaForm, EducacionFormSet, ExperienciaLaboralFormSet,SubtareaForm
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
@@ -17,6 +17,7 @@ from channels.layers import get_channel_layer
 @login_required
 def detalle_tarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, id=tarea_id)
+    subtareas = tarea.subtareas.all()
     seguimientos = SeguimientoTarea.objects.filter(tarea=tarea).order_by('-fecha')
     form = SeguimientoTareaForm()
     return render(request, 'myapp/detalle_tarea.html', {'tarea': tarea, 'seguimientos': seguimientos, 'form': form})
@@ -54,6 +55,20 @@ def agregar_tarea(request, proyecto_id):
     else:
         form = TareaForm()
     return render(request, 'myapp/agregar_tarea.html', {'form': form, 'proyecto': proyecto})
+
+@login_required
+def agregar_subtarea(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
+    if request.method == 'POST':
+        form = SubtareaForm(request.POST)
+        if form.is_valid():
+            subtarea = form.save(commit=False)
+            subtarea.tarea = tarea
+            subtarea.save()
+            return redirect('detalle_tarea', tarea_id=tarea.id)
+    else:
+        form = SubtareaForm()
+    return render(request, 'myapp/agregar_subtarea.html', {'form': form, 'tarea': tarea})
 
 @login_required
 def listar_tareas(request, proyecto_id):
