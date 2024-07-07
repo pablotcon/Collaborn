@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
-
 def get_default_user():
     return User.objects.first().id if User.objects.exists() else None
 
@@ -16,7 +14,6 @@ class Proyecto(models.Model):
     def __str__(self):
         return self.nombre
 
-
 class Tarea(models.Model):
     proyecto = models.ForeignKey(Proyecto, related_name='tareas', on_delete=models.CASCADE)
     nombre = models.CharField(max_length=200)
@@ -27,7 +24,7 @@ class Tarea(models.Model):
 
     def __str__(self):
         return self.nombre
-    
+
 class Actividad(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     accion = models.CharField(max_length=255)
@@ -35,7 +32,6 @@ class Actividad(models.Model):
 
     def __str__(self):
         return f"{self.usuario.username} - {self.accion}"
-
 
 class Comentario(models.Model):
     proyecto = models.ForeignKey(Proyecto, related_name='comentarios', on_delete=models.CASCADE)
@@ -57,14 +53,13 @@ class Postulacion(models.Model):
 class Notificacion(models.Model):
     receptor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificaciones')
     mensaje = models.CharField(max_length=255)
-    url = models.CharField(max_length=200, default='/')  # Usamos un valor predeterminado
+    url = models.CharField(max_length=200, default='/')
     leido = models.BooleanField(default=False)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'Notificación para {self.receptor.username} - {self.mensaje}'
 
-    
 class Mensaje(models.Model):
     emisor = models.ForeignKey(User, related_name='mensajes_enviados', on_delete=models.CASCADE)
     receptor = models.ForeignKey(User, related_name='mensajes_recibidos', on_delete=models.CASCADE)
@@ -84,7 +79,6 @@ class Recurso(models.Model):
     def __str__(self):
         return self.titulo
 
-
 class Perfil(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     telefono = models.CharField(max_length=15, blank=True, null=True)
@@ -100,3 +94,20 @@ class Perfil(models.Model):
 
     def __str__(self):
         return self.user.username
+
+class ExperienciaLaboral(models.Model):
+    perfil = models.ForeignKey(Perfil, related_name='experiencias', on_delete=models.CASCADE)
+    titulo = models.CharField(max_length=200)
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField(blank=True, null=True)
+    descripcion = models.TextField(blank=True, null=True)
+
+class Educacion(models.Model):
+    perfil = models.ForeignKey(Perfil, related_name='educaciones', on_delete=models.CASCADE)
+    institucion = models.CharField(max_length=200)
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField(blank=True, null=True)
+    descripcion = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.institucion

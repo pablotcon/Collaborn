@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.contrib import messages
 from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad
 from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm
+from .forms import UserForm, PerfilForm, ExperienciaLaboralFormSet, EducacionFormSet
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Recurso
@@ -388,21 +389,45 @@ def mis_postulaciones(request):
 # Modulo Perfil
 @login_required
 def editar_perfil(request):
+    perfil = request.user.perfil
+
     if request.method == 'POST':
-        perfil_form = PerfilForm(request.POST, request.FILES, instance=request.user.perfil)
-        if perfil_form.is_valid():
+        user_form = UserForm(request.POST, instance=request.user)
+        perfil_form = PerfilForm(request.POST, request.FILES, instance=perfil)
+        experiencia_formset = ExperienciaLaboralFormSet(request.POST, instance=perfil)
+        educacion_formset = EducacionFormSet(request.POST, instance=perfil)
+        
+        if user_form.is_valid() and perfil_form.is_valid() and experiencia_formset.is_valid() and educacion_formset.is_valid():
+            user_form.save()
             perfil_form.save()
+            experiencia_formset.save()
+            educacion_formset.save()
             messages.success(request, 'Perfil actualizado exitosamente')
             return redirect('ver_perfil')
     else:
-        perfil_form = PerfilForm(instance=request.user.perfil)
+        user_form = UserForm(instance=request.user)
+        perfil_form = PerfilForm(instance=perfil)
+        experiencia_formset = ExperienciaLaboralFormSet(instance=perfil)
+        educacion_formset = EducacionFormSet(instance=perfil)
 
-    return render(request, 'myapp/editar_perfil.html', {'perfil_form': perfil_form})
+    return render(request, 'myapp/editar_perfil.html', {
+        'user_form': user_form,
+        'perfil_form': perfil_form,
+        'experiencia_formset': experiencia_formset,
+        'educacion_formset': educacion_formset,
+    })
 
 @login_required
 def ver_perfil(request):
-    return render(request, 'myapp/ver_perfil.html', {'user': request.user})
+    perfil = request.user.perfil
+    experiencias = perfil.experiencias.all()
+    educaciones = perfil.educaciones.all()
 
+    return render(request, 'myapp/ver_perfil.html', {
+        'perfil': perfil,
+        'experiencias': experiencias,
+        'educaciones': educaciones,
+    })
 @login_required
 def cambiar_password(request):
     if request.method == 'POST':

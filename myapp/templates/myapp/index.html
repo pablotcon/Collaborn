@@ -1,14 +1,30 @@
-{% extends 'myapp/base.html' %}
-{% block title %}Inicio{% endblock %}
-{% block content %}
+{% extends "myapp/base.html" %}
+{% load static %}
+{% block title %}Home - Colaborize{% endblock %}
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Collaborize</title>
-</head>
-<body>
-    <h1>Bienvenido a Collaborize</h1>
-</body>
-</html>
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/index.css.css' %}">
+<section class="hero">
+    <div class="hero-text">
+        <h5>#2 Trending</h5>
+        <h4>Lideres en el mercado</h4>
+        <h1>¿Buscas ser parte de algo?</h1>
+        <p>Se parte de la revolucion de Colaborize, <br> Publica tus Proyectos o necesidades para <br> que gente capacitada pueda hecharte una mano</p>
+        <a href="#">Comparte</a>
+        <a href="#" class="ctaa"><i class="ri-play-fill"></i>Aprende Como</a>
+    </div>
+    <div class="hero-img">
+        <img src="{% static 'img/main.png.png' %}" alt="Main Image">
+    </div>
+</section>
+
+<div class="icons">
+    <a href="#"><i class="ri-instagram-line"></i></a>
+    <a href="#"><i class="ri-youtube-line"></i></a>
+    <a href="#"><i class="ri-dribbble-line"></i></a>
+</div>
+
+<div class="scroll-down">
+    <a href="#"><i class="ri-arrow-down-s-fill"></i></a>
+</div>x
 {% endblock %}

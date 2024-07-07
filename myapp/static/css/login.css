@@ -1,0 +1,144 @@
+body {
+    background-color: #ffffff;
+    font-family: 'Karla', sans-serif; 
+}
+
+h1 > a {
+    text-decoration: none;
+    color: #000000 !important;
+}
+
+.intro-section {
+    background-color: #f5f378;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 40px; /* Reduce el padding para juntar más el contenido */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centra verticalmente */
+    align-items: center; /* Centra horizontalmente */
+    color: #000000;
+    text-align: center; /* Alinea el texto en el centro */
+}
+
+.brand-wrapper .logo {
+    height: 50px; /* Ajustar tamaño del logo */
+    margin-bottom: 20px; /* Añadir espacio debajo del logo */
+}
+
+.intro-content-wrapper {
+    width: 100%; /* Asegúrate de que el contenido use todo el ancho disponible */
+    max-width: 600px; /* Ancho máximo para el contenido */
+    margin: 0; /* Eliminar margen */
+    padding: 0; /* Eliminar padding */
+    flex-grow: 1; /* Asegura que el contenido crezca para empujar hacia abajo */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Empuja los elementos al final del contenedor */
+    align-items: center; /* Centra horizontalmente */
+}
+
+.intro-content-wrapper .intro-title {
+    font-size: 35px; /* Ajusta el tamaño de la fuente si es necesario */
+    font-weight: bold;
+    margin-bottom: 5px; /* Reduce el margen inferior */
+    margin-top: auto; /* Empuja el título hacia abajo */
+}
+
+.intro-content-wrapper .intro-text {
+    font-size: 18px; /* Ajusta el tamaño de la fuente si es necesario */
+    line-height: 1.2; /* Ajusta el interlineado */
+    margin-bottom: 20px; /* Añadir margen inferior para el espaciado */
+}
+
+.intro-content-wrapper img {
+    margin: 20px 0; /* Añadir margen superior e inferior */
+    max-width: 100%;
+    height: auto;
+}
+
+.intro-content-wrapper .btn-read-more {
+    background-color: #fff;
+    padding: 10px 20px; /* Ajusta el padding */
+    border-radius: 0;
+    font-size: 14px; /* Ajusta el tamaño de la fuente */
+    font-weight: bold;
+    color: #000;
+    margin: 10px 0; /* Añadir margen superior e inferior */
+}
+
+.intro-content-wrapper .btn-read-more:hover {
+    background-color: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+}
+
+.intro-section-footer {
+    margin-top: 10px; /* Reduce el margen superior */
+}
+
+.intro-section-footer .footer-nav a {
+    font-size: 18px; /* Ajusta el tamaño de la fuente */
+    font-weight: bold;
+    color: inherit;
+}
+
+.intro-section-footer .footer-nav a + a {
+    margin-left: 20px; /* Ajusta el espacio entre enlaces */
+}
+
+.form-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 35px;
+}
+
+.login-wrapper {
+    width: 300px;
+    max-width: 100%;
+}
+
+.login-wrapper .form-control {
+    border: 0;
+    border-bottom: 1px solid #e7e7e7;
+    border-radius: 0;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 15px 10px;
+    margin-bottom: 7px;
+}
+
+.login-title {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.login-btn {
+    padding: 13px 30px;
+    background-color: #000;
+    border-radius: 0;
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.login-btn:hover {
+    border: 1px solid #000;
+    background-color: transparent;
+    color: #000;
+}
+
+.forgot-password-link {
+    font-size: 14px;
+    color: #080808;
+    text-decoration: underline;
+}
+
+.login-wrapper-footer-text {
+    font-size: 14px;
+    text-align: center;
+}

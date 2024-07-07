@@ -1,14 +1,71 @@
 {% extends 'myapp/base.html' %}
 
+{% load static %}
+
 {% block title %}Editar Perfil{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/editar_perfil.css' %}">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@icon/entypo@1.0.3/entypo.css" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <h1>Editar Perfil</h1>
-    <form method="post" enctype="multipart/form-data">
+<div class="container bootstrap snippet">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="top-breadcrumb">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Editar Perfil</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         {{ perfil_form.as_p }}
-        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <h3>Experiencia Laboral</h3>
+        {{ experiencia_formset.management_form }}
+        <div id="experiencias">
+            {% for form in experiencia_formset %}
+                <div class="formset">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+        </div>
+        <button type="button" class="btn btn-primary" id="add-experiencia">Agregar Experiencia</button>
+        <h3>Educación</h3>
+        {{ educacion_formset.management_form }}
+        <div id="educaciones">
+            {% for form in educacion_formset %}
+                <div class="formset">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+        </div>
+        <button type="button" class="btn btn-primary" id="add-educacion">Agregar Educación</button>
+        <button type="submit" class="btn btn-success">Guardar Cambios</button>
     </form>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#add-experiencia').click(function() {
+            var form_idx = $('#id_experiencias-TOTAL_FORMS').val();
+            $('#experiencias').append($('#empty_form_experiencia').html().replace(/__prefix__/g, form_idx));
+            $('#id_experiencias-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+        });
+        $('#add-educacion').click(function() {
+            var form_idx = $('#id_educaciones-TOTAL_FORMS').val();
+            $('#educaciones').append($('#empty_form_educacion').html().replace(/__prefix__/g, form_idx));
+            $('#id_educaciones-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+        });
+    });
+</script>
+{% include 'myapp/empty_form_experiencia.html' %}
+{% include 'myapp/empty_form_educacion.html' %}
 {% endblock %}

@@ -1,0 +1,49 @@
+body {
+    background-color: #dcc4fa;
+}
+
+.bg-primary {
+    background-color: #dcc4fa !important;
+}
+
+.card-custom {
+    background-color: #dcc4fa !important;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.logo-img {
+    width: 350px; /* Ajusta el tamaño según tu necesidad */
+    height: auto;
+}
+
+.card-custom .h1,
+.card-custom .lead {
+    margin-bottom: 10px;
+}
+
+.card-custom .h1 {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.card-custom .lead {
+    font-size: 16px;
+    color: #333;
+}
+
+.card-custom .bi {
+    margin-top: 20px;
+}
+
+.full-height {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+}

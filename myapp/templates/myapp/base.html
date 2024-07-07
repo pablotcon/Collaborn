@@ -5,52 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Mi Proyecto{% endblock %}</title>
     {% load static %}
+    <link rel="stylesheet" href="{% static 'css/ver_perfil.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@icon/entypo@1.0.3/entypo.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <!-- Bootstrap Datepicker CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/register.css' %}">
+    {% block extra_css %}{% endblock %}
+    <style>
+        main.container {
+            margin-top: 80px; /* Ajusta esto según la altura de tu navbar */
+        }
+    </style>
 </head>
 <body>
     {% if user.is_authenticated %}
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="{% url 'index' %}">Collaborn</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Inicio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'ver_perfil' %}">Perfil</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'proyecto_list' %}">Proyectos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'listar_recursos' %}">Recursos</a></li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'listar_notificaciones' %}">
-                            Notificaciones
-                            {% if notificaciones_no_leidas > 0 %}
-                                <span class="badge badge-danger">{{ notificaciones_no_leidas }}</span>
-                            {% endif %}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'listar_mensajes' %}">
-                            Mensajes
-                            {% if unread_messages_count > 0 %}
-                                <span class="badge badge-danger">{{ unread_messages_count }}</span>
-                            {% endif %}
-                        </a>
-                    </li>
-                    {% if user.is_staff %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'crear_proyecto' %}">Crear Proyecto</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel_tareas' %}">Panel de Tareas</a></li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <form method="post" action="{% url 'logout' %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-link nav-link">Cerrar Sesión</button>
-                        </form>
-                    </li>
-                </ul>
+        <nav class="navbar navbar-expand-lg fixed-top custom-navbar bg-light">
+            <div class="container">
+                <a class="navbar-brand" href="{% url 'index' %}">Collaborn</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'ver_perfil' %}">Perfil</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'proyecto_list' %}">Proyectos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'listar_recursos' %}">Recursos</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'listar_notificaciones' %}">Notificaciones
+                                {% if notificaciones_no_leidas > 0 %}
+                                    <span class="badge badge-danger">{{ notificaciones_no_leidas }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'listar_mensajes' %}">Mensajes
+                                {% if unread_messages_count > 0 %}
+                                    <span class="badge badge-danger">{{ unread_messages_count }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        {% if user.is_staff %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'crear_proyecto' %}">Crear Proyecto</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel_tareas' %}">Panel de Tareas</a></li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link nav-link">Cerrar Sesión</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </nav>
     </header>
@@ -66,16 +74,15 @@
         {% block content %}{% endblock %}
     </main>
     <!-- jQuery -->
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <!-- Popper.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <!-- Bootstrap JS -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- Bootstrap Datepicker JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
-    <!-- Bootstrap Datepicker Spanish Translation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.es.min.js"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepi    cker/1.9.0/locales/bootstrap-datepicker.es.min.js"></script>
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <script src="{% static 'js/script.js' %}"></script>
     <!-- WebSocket para notificaciones -->
     <script>
         const userId = {{ user.id }};
@@ -96,7 +103,6 @@
             console.error('Notification socket closed unexpectedly');
         };
     </script>
-    
     {% block scripts %}{% endblock %}
 </body>
 </html>

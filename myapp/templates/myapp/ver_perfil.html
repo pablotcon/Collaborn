@@ -4,35 +4,95 @@
 
 {% block title %}Perfil de {{ user.username }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ver_perfil.css' %}">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@icon/entypo@1.0.3/entypo.css" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
+<div class="container bootstrap snippet">
     <div class="row">
-        <div class="col-md-3 text-center">
-            {% if user.perfil.avatar %}
-                <img src="{{ user.perfil.avatar.url }}" alt="Avatar" class="img-thumbnail mb-3" width="150">
-            {% else %}
-                <img src="{% static 'img/default-avatar.png' %}" alt="Avatar" class="img-thumbnail mb-3" width="150">
-            {% endif %}
-            <h2>{{ user.username }}</h2>
+        <div class="col-md-12">
+            <div class="top-breadcrumb">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Perfil de {{ user.username }}</li>
+                    </ol>
+                </nav>
+            </div>
         </div>
-        <div class="col-md-9">
-            <h3>Información Personal</h3>
-            <ul class="list-group">
-                <li class="list-group-item"><strong>Nombre:</strong> {{ user.perfil.nombre }}</li>
-                <li class="list-group-item"><strong>Apellido:</strong> {{ user.perfil.apellido }}</li>
-                <li class="list-group-item"><strong>Email:</strong> {{ user.email }}</li>
-                <li class="list-group-item"><strong>Teléfono:</strong> {{ user.perfil.telefono }}</li>
-                <li class="list-group-item"><strong>Fecha de Nacimiento:</strong> {{ user.perfil.birth_date }}</li>
-                <li class="list-group-item"><strong>Descripción:</strong> {{ user.perfil.descripcion }}</li>
-                <li class="list-group-item"><strong>Sitio Web:</strong> <a href="{{ user.perfil.website }}" target="_blank">{{ user.perfil.website }}</a></li>
-                <li class="list-group-item"><strong>Twitter:</strong> <a href="{{ user.perfil.twitter }}" target="_blank">{{ user.perfil.twitter }}</a></li>
-                <li class="list-group-item"><strong>Facebook:</strong> <a href="{{ user.perfil.facebook }}" target="_blank">{{ user.perfil.facebook }}</a></li>
-                <li class="list-group-item"><strong>LinkedIn:</strong> <a href="{{ user.perfil.linkedin }}" target="_blank">{{ user.perfil.linkedin }}</a></li>
-            </ul>
-            <div class="mt-4">
-                <a href="{% url 'editar_perfil' %}" class="btn btn-primary">Editar Perfil</a>
-                <a href="{% url 'cambiar_password' %}" class="btn btn-secondary">Cambiar Contraseña</a>
-                <a href="{% url 'historial_actividades' %}" class="btn btn-info">Historial de Actividades</a>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="left-profile-card card">
+                <div class="card-body">
+                    <div class="user-profile">
+                        {% if perfil.avatar %}
+                            <img src="{{ perfil.avatar.url }}" class="img-fluid rounded-circle" alt="Avatar">
+                        {% else %}
+                            <img src="{% static 'images/default-avatar.png' %}" class="img-fluid rounded-circle" alt="Avatar">
+                        {% endif %}
+                    </div>
+                    <h3>{{ user.username }}</h3>
+                    <p>{{ perfil.nombre }} {{ perfil.apellido }}</p>
+                    <div class="personal-info">
+                        <h3>Información Personal</h3>
+                        <ul class="personal-list">
+                            <li><i class="entypo-mail"></i>{{ user.email }}</li>
+                            <li><i class="entypo-phone"></i>{{ perfil.telefono }}</li>
+                            <li><i class="entypo-calendar"></i>{{ perfil.birth_date }}</li>
+                            <li><i class="entypo-globe"></i>{{ perfil.website }}</li>
+                            <li><i class="entypo-twitter"></i>{{ perfil.twitter }}</li>
+                            <li><i class="entypo-facebook"></i>{{ perfil.facebook }}</li>
+                            <li><i class="entypo-linkedin"></i>{{ perfil.linkedin }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="right-profile-card card">
+                <div class="card-body">
+                    <h3>Experiencia Laboral</h3>
+                    <div class="timeline-centered">
+                        {% for experiencia in experiencias %}
+                            <article class="timeline-entry">
+                                <div class="timeline-entry-inner">
+                                    <div class="timeline-icon bg-success">
+                                        <i class="entypo-suitcase"></i>
+                                    </div>
+                                    <div class="timeline-label">
+                                        <h2>{{ experiencia.titulo }}</h2>
+                                        <p>{{ experiencia.descripcion }}</p>
+                                    </div>
+                                    <time class="timeline-time" datetime="{{ experiencia.fecha_inicio }}">{{ experiencia.fecha_inicio }} - {{ experiencia.fecha_fin }}</time>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                    <h3>Educación</h3>
+                    <div class="timeline-centered">
+                        {% for educacion in educaciones %}
+                            <article class="timeline-entry">
+                                <div class="timeline-entry-inner">
+                                    <div class="timeline-icon bg-info">
+                                        <i class="entypo-graduation-cap"></i>
+                                    </div>
+                                    <div class="timeline-label">
+                                        <h2>{{ educacion.institucion }}</h2>
+                                        <p>{{ educacion.descripcion }}</p>
+                                    </div>
+                                    <time class="timeline-time" datetime="{{ educacion.fecha_inicio }}">{{ educacion.fecha_inicio }} - {{ educacion.fecha_fin }}</time>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                    <a href="{% url 'editar_perfil' %}" class="btn btn-primary">Editar Perfil</a>
+                    <a href="{% url 'cambiar_password' %}" class="btn btn-secondary">Cambiar Contraseña</a>
+                    <a href="{% url 'historial_actividades' %}" class="btn btn-info">Historial de Actividades</a>
+                </div>
             </div>
         </div>
     </div>

@@ -1,44 +1,30 @@
 from django import forms
+from django.forms import inlineformset_factory
 from django.contrib.auth.models import User
-from .models import Recurso, Perfil, Comentario, Mensaje, Proyecto, Tarea
+from .models import Recurso, Perfil, Comentario, Mensaje, Proyecto, Tarea, ExperienciaLaboral, Educacion
 
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'username']
+        fields = ['first_name', 'last_name', 'email']
 
 class PerfilForm(forms.ModelForm):
-    birth_date = forms.DateField(
-        widget=forms.DateInput(attrs={'type': 'date'}),
-        input_formats=['%Y-%m-%d']
-    )
-    email = forms.EmailField()
-
     class Meta:
         model = Perfil
-        fields = ['nombre', 'apellido', 'telefono', 'birth_date', 'descripcion', 'avatar', 'website', 'twitter', 'facebook', 'linkedin', 'email']
+        fields = ['nombre', 'apellido','telefono', 'birth_date','avatar', 'website', 'twitter', 'facebook', 'linkedin']
 
-    def __init__(self, *args, **kwargs):
-        super(PerfilForm, self).__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
-            self.fields['nombre'].initial = self.instance.nombre
-            self.fields['apellido'].initial = self.instance.apellido
-            self.fields['telefono'].initial = self.instance.telefono
-            self.fields['descripcion'].initial = self.instance.descripcion
-            self.fields['email'].initial = self.instance.user.email
-
-    def save(self, *args, **kwargs):
-        user = self.instance.user
-        user.email = self.cleaned_data['email']
-        user.save()
-        return super(PerfilForm, self).save(*args, **kwargs)
-
-
-
-class UserForm(forms.ModelForm):
+class ExperienciaLaboralForm(forms.ModelForm):
     class Meta:
-        model = User
-        fields = ['first_name', 'last_name', 'email']  # Incluye otros campos si es necesario
+        model = ExperienciaLaboral
+        fields = ['titulo', 'fecha_inicio', 'fecha_fin', 'descripcion']
+
+class EducacionForm(forms.ModelForm):
+    class Meta:
+        model = Educacion
+        fields = ['institucion', 'fecha_inicio', 'fecha_fin', 'descripcion']
+
+ExperienciaLaboralFormSet = inlineformset_factory(Perfil, ExperienciaLaboral, form=ExperienciaLaboralForm, extra=1, can_delete=True)
+EducacionFormSet = inlineformset_factory(Perfil, Educacion, form=EducacionForm, extra=1, can_delete=True)
 
 class ComentarioForm(forms.ModelForm):
     class Meta:
