@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 from django.contrib.auth.models import User
-from .models import Recurso, Perfil, Comentario, Mensaje, Proyecto, Tarea, ExperienciaLaboral, Educacion,SeguimientoTarea,Subtarea
+from .models import Recurso, Perfil, Comentario, Mensaje, Proyecto, Tarea, ExperienciaLaboral, Educacion,SeguimientoTarea,Subtarea, ComentarioTarea
 
 class UserForm(forms.ModelForm):
     class Meta:
@@ -72,3 +72,8 @@ class SeguimientoTareaForm(forms.ModelForm):
     class Meta:
         model = SeguimientoTarea
         fields = ['comentario']
+
+class ComentarioTareaForm(forms.ModelForm):
+    class Meta:
+        model = ComentarioTarea
+        fields = ['texto']

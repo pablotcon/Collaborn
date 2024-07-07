@@ -1,37 +1,63 @@
-<!-- detalle_tarea.html -->
 {% extends 'myapp/base.html' %}
 
 {% block title %}Detalles de la Tarea{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Detalles de la Tarea: {{ tarea.nombre }}</h1>
+    <h1 class="mb-4">Detalles de la Tarea: {{ tarea.nombre }}</h1>
     <p><strong>Descripción:</strong> {{ tarea.descripcion }}</p>
     <p><strong>Fecha Límite:</strong> {{ tarea.fecha_limite }}</p>
     <p><strong>Asignada a:</strong> {{ tarea.asignada_a.username }}</p>
     <p><strong>Completada:</strong> {{ tarea.completada }}</p>
-    
+    <div class="btn-group mb-4" role="group">
+        <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-outline-primary">Editar Tarea</a>
+        <a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-outline-danger">Eliminar Tarea</a>
+    </div>
+
     <h2>Subtareas</h2>
     <ul>
         {% for subtarea in subtareas %}
-        <li>{{ subtarea.nombre }} - {{ subtarea.descripcion }} - {{ subtarea.fecha_limite }} - Completada: {{ subtarea.completada }}</li>
+            <li>{{ subtarea.nombre }}</li>
         {% endfor %}
     </ul>
-    <a href="{% url 'agregar_subtarea' tarea.id %}" class="btn btn-primary">Agregar Subtarea</a>
-    
+    <button class="btn btn-secondary mb-4" onclick="toggleForm('subtarea-form')">Agregar Subtarea</button>
+    <form id="subtarea-form" method="post" class="mb-4" style="display:none;">
+        {% csrf_token %}
+        {{ subtarea_form.as_p }}
+        <button type="submit" class="btn btn-primary">Agregar Subtarea</button>
+    </form>
+
     <h2>Seguimientos</h2>
     <ul>
         {% for seguimiento in seguimientos %}
-        <li>{{ seguimiento.comentario }} - {{ seguimiento.fecha }}</li>
+            <li>{{ seguimiento.descripcion }} - {{ seguimiento.fecha }}</li>
         {% endfor %}
     </ul>
-    <form method="post">
+    <button class="btn btn-secondary mb-4" onclick="toggleForm('seguimiento-form')">Agregar Seguimiento</button>
+    <form id="seguimiento-form" method="post" class="mb-4" style="display:none;">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ seguimiento_form.as_p }}
         <button type="submit" class="btn btn-primary">Agregar Seguimiento</button>
     </form>
-    
-    <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-primary">Editar Tarea</a>
-    <a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-danger">Eliminar Tarea</a>
+
+    <h2>Comentarios</h2>
+    <ul>
+        {% for comentario in comentarios %}
+            <li>{{ comentario.autor.username }}: {{ comentario.texto }} - {{ comentario.fecha_creacion }}</li>
+        {% endfor %}
+    </ul>
+    <button class="btn btn-secondary mb-4" onclick="toggleForm('comentario-form')">Agregar Comentario</button>
+    <form id="comentario-form" method="post" class="mb-4" style="display:none;">
+        {% csrf_token %}
+        {{ comentario_form.as_p }}
+        <button type="submit" class="btn btn-primary">Agregar Comentario</button>
+    </form>
 </div>
+
+<script>
+    function toggleForm(formId) {
+        const form = document.getElementById(formId);
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+</script>
 {% endblock %}

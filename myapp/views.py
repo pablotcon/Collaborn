@@ -7,25 +7,64 @@ from django.contrib.auth.decorators import login_required, permission_required, 
 from django.db.models import Q
 from django.contrib import messages
 from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad, SeguimientoTarea, Subtarea
-from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm, SeguimientoTareaForm, EducacionFormSet, ExperienciaLaboralFormSet,SubtareaForm
+from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm, SeguimientoTareaForm, EducacionFormSet, ExperienciaLaboralFormSet,SubtareaForm, ComentarioTareaForm
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
 from channels.layers import get_channel_layer
 
 # Functions related to Task Management
+
 @login_required
 def detalle_tarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, id=tarea_id)
     subtareas = tarea.subtareas.all()
     seguimientos = SeguimientoTarea.objects.filter(tarea=tarea).order_by('-fecha')
-    form = SeguimientoTareaForm()
-    return render(request, 'myapp/detalle_tarea.html', {'tarea': tarea, 'seguimientos': seguimientos, 'form': form})
+    comentarios = tarea.comentarios.all().order_by('-fecha_creacion')
 
-@user_passes_test(lambda u: u.is_staff)
-@permission_required('myapp.view_tarea', raise_exception=True)
+    if request.method == 'POST':
+        if 'comentario' in request.POST:
+            comentario_form = ComentarioTareaForm(request.POST)
+            if comentario_form.is_valid():
+                comentario = comentario_form.save(commit=False)
+                comentario.tarea = tarea
+                comentario.autor = request.user
+                comentario.save()
+                return redirect('detalle_tarea', tarea_id=tarea.id)
+        elif 'seguimiento' in request.POST:
+            seguimiento_form = SeguimientoTareaForm(request.POST)
+            if seguimiento_form.is_valid():
+                seguimiento = seguimiento_form.save(commit=False)
+                seguimiento.tarea = tarea
+                seguimiento.autor = request.user
+                seguimiento.save()
+                return redirect('detalle_tarea', tarea_id=tarea.id)
+        elif 'subtarea' in request.POST:
+            subtarea_form = SubtareaForm(request.POST)
+            if subtarea_form.is_valid():
+                subtarea = subtarea_form.save(commit=False)
+                subtarea.tarea = tarea
+                subtarea.save()
+                return redirect('detalle_tarea', tarea_id=tarea.id)
+    else:
+        comentario_form = ComentarioTareaForm()
+        seguimiento_form = SeguimientoTareaForm()
+        subtarea_form = SubtareaForm()
+
+    return render(request, 'myapp/detalle_tarea.html', {
+        'tarea': tarea,
+        'subtareas': subtareas,
+        'seguimientos': seguimientos,
+        'comentarios': comentarios,
+        'comentario_form': comentario_form,
+        'seguimiento_form': seguimiento_form,
+        'subtarea_form': subtarea_form
+    })
+
 @login_required
 def admin_panel_tareas(request):
+    if not request.user.is_staff:
+        return redirect('index')
     tareas = Tarea.objects.all()
     return render(request, 'myapp/admin_panel_tareas.html', {'tareas': tareas})
 

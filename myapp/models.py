@@ -39,12 +39,19 @@ class Subtarea(models.Model):
         return self.nombre
     
 # Definición del modelo SeguimientoTarea
-# models.py
 class SeguimientoTarea(models.Model):
     tarea = models.ForeignKey(Tarea, on_delete=models.CASCADE, related_name='seguimientos')
     comentario = models.TextField()
     fecha = models.DateTimeField(auto_now_add=True)
 
+class ComentarioTarea(models.Model):
+    tarea = models.ForeignKey(Tarea, on_delete=models.CASCADE, related_name='comentarios')
+    autor = models.ForeignKey(User, on_delete=models.CASCADE)
+    texto = models.TextField()
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.texto[:20]
 
 class Actividad(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
