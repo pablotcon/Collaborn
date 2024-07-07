@@ -20,6 +20,10 @@
         main.container {
             margin-top: 80px; /* Ajusta esto según la altura de tu navbar */
         }
+        .dropdown-menu-notifications {
+            max-height: 400px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -44,12 +48,28 @@
                                     <span class="badge badge-danger">{{ notificaciones_no_leidas }}</span>
                                 {% endif %}
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificacionesDropdown">
-                                {% for notificacion in request.user.notificaciones.all %}
-                                    <a class="dropdown-item{% if notificacion.leido %} text-muted{% endif %}" href="{% url 'marcar_notificacion_leida' notificacion.id %}">{{ notificacion.mensaje }}</a>
+                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-notifications" aria-labelledby="notificacionesDropdown">
+                                {% for notificacion in notificaciones %}
+                                <a class="dropdown-item {% if notificacion.leido %}list-group-item-light{% else %}list-group-item-info{% endif %}" href="{{ notificacion.url }}">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <p class="mb-1">{{ notificacion.mensaje }}</p>
+                                            <small class="text-muted">{{ notificacion.fecha_creacion|date:"d M Y, H:i" }}</small>
+                                        </div>
+                                        <div>
+                                            {% if notificacion.leido %}
+                                            <span class="badge badge-success mr-2">Leído</span>
+                                            {% else %}
+                                            <a href="{% url 'marcar_notificacion_leida' notificacion.id %}" class="btn btn-sm btn-primary mr-2">Marcar como leído</a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </a>
                                 {% empty %}
-                                    <a class="dropdown-item text-muted">No tienes notificaciones</a>
+                                <a class="dropdown-item" href="#">No tienes notificaciones.</a>
                                 {% endfor %}
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-center" href="{% url 'listar_notificaciones' %}">Ver todas las notificaciones</a>
                             </div>
                         </li>
                         <li class="nav-item">
@@ -110,6 +130,23 @@
                 const notificationBadge = document.querySelector('.nav-link[href="{% url "listar_notificaciones" %}"] .badge');
                 const unreadCount = parseInt(notificationBadge.textContent) || 0;
                 notificationBadge.textContent = unreadCount + 1;
+                // Agregar nueva notificación al menú desplegable
+                const notificacionesDropdown = document.getElementById('notificacionesDropdown');
+                const dropdownMenu = notificacionesDropdown.nextElementSibling;
+                const newNotification = `
+                    <a class="dropdown-item list-group-item-info" href="${data.url}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-1">${data.mensaje}</p>
+                                <small class="text-muted">${new Date(data.fecha_creacion).toLocaleString()}</small>
+                            </div>
+                            <div>
+                                <a href="/notificaciones/marcar_leida/${data.id}/" class="btn btn-sm btn-primary mr-2">Marcar como leído</a>
+                            </div>
+                        </div>
+                    </a>
+                `;
+                dropdownMenu.insertAdjacentHTML('afterbegin', newNotification);
             }
         };
 

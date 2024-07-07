@@ -297,11 +297,12 @@ def cambiar_password(request):
 @login_required
 def listar_notificaciones(request):
     notificaciones_no_leidas = request.user.notificaciones.filter(leido=False).count()
-    notificaciones = request.user.notificaciones.all()
+    notificaciones = request.user.notificaciones.all().order_by('-fecha_creacion')
     return render(request, 'myapp/listar_notificaciones.html', {
         'notificaciones': notificaciones,
         'notificaciones_no_leidas': notificaciones_no_leidas,
     })
+
 
 @login_required
 def marcar_notificacion_leida(request, notificacion_id):
@@ -309,7 +310,7 @@ def marcar_notificacion_leida(request, notificacion_id):
     notificacion.leido = True
     notificacion.save()
     messages.success(request, 'Notificación marcada como leída.')
-    return redirect(notificacion.url)
+    return redirect('listar_notificaciones')
 
 # Functions related to Projects
 @login_required

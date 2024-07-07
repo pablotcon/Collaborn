@@ -1,257 +1,89 @@
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);body {
-        margin-top: 20px;
-        background: #DCDCDC;
-    }
-    
-    /* profile page */
-    .left-profile-card .user-profile img {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        margin: auto;
-        display: block;
-        margin-bottom: 20px;
-    }
-    
-    .left-profile-card h3 {
-        font-size: 18px;
-        margin-bottom: 0;
-        font-weight: 700;
-        text-align: center;
-    }
-    
-    .left-profile-card p {
-        margin-bottom: 5px;
-        text-align: center;
-    }
-    
-    .personal-info {
-        margin-bottom: 30px;
-    }
-    
-    .personal-info .personal-list {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-    }
-    
-    .personal-list li {
-        margin-bottom: 5px;
-        display: flex;
-        align-items: center;
-    }
-    
-    .personal-info h3 {
-        margin-bottom: 10px;
-    }
-    
-    .personal-info p {
-        margin-bottom: 5px;
-        font-size: 14px;
-    }
-    
-    .personal-info i {
-        font-size: 15px;
-        color: var(--main-color);
-        margin-right: 15px;
-        width: 18px;
-    }
-    
-    /* timeline */
-    .timeline-centered {
-        position: relative;
-        margin-bottom: 30px;
-    }
-    
-    .timeline-centered:before {
-        content: '';
-        position: absolute;
-        display: block;
-        width: 4px;
-        background: #f5f5f6;
-        top: 20px;
-        bottom: 20px;
-        margin-left: 30px;
-    }
-    
-    .timeline-centered .timeline-entry {
-        position: relative;
-        margin-top: 5px;
-        margin-left: 30px;
-        margin-bottom: 10px;
-        clear: both;
-    }
-    
-    .timeline-centered .timeline-entry .timeline-entry-inner {
-        display: flex;
-        align-items: center; /* Alinea los íconos y el contenido */
-        margin-left: -20px;
-        position: relative;
-    }
-    
-    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-time {
-        position: relative; /* Cambiado de absolute a relative */
-        text-align: right;
-        padding: 10px;
-        box-sizing: border-box;
-        font-size: 14px; /* Ajustar el tamaño de la fuente si es necesario */
-        z-index: 1000; /* Asegura que esté por encima de otros elementos */
-        background: #f5f5f6; /* Fondo para mayor visibilidad */
-        border-radius: 4px; /* Bordes redondeados para una mejor estética */
-        margin-top: 10px; /* Espacio entre el timeline-label y el timeline-time */
-    }
-    
-    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-time > span {
-        display: block;
-        font-weight: 700;
-    }
-    
-    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon {
-        background: #fff;
-        width: 40px;
-        height: 40px;
-        text-align: center;
-        line-height: 40px;
-        border-radius: 50%;
-        box-shadow: 0 0 0 5px #f5f5f6;
-        color: #fff;
-        border: 1px solid #d4d4d4;
-        font-size: 16px;
-        margin-right: 15px; /* Añade espacio entre el ícono y el texto */
-        flex-shrink: 0; /* Evita que el ícono se reduzca de tamaño */
-    }
-    
-    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label {
-        background: #f5f5f6;
-        padding: 1.5em;
-        margin-left: 0; /* Ajustado a 0 para eliminar espacio innecesario */
-        border-radius: 3px;
-        flex-grow: 1; /* Permite que el contenido del label ocupe el espacio disponible */
-    }
-    
-    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label h2 {
-        margin-top: 0;
-        font-size: 1.5em;
-        margin-bottom: 5px;
-        display: flex;
-        align-items: center; /* Alinea verticalmente el ícono y el texto */
-    }
-    
-    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label p {
-        margin: 0;
-        font-size: 1em;
-        line-height: 1.5em;
-    }
-    
-    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label:after {
-        content: '';
-        display: block;
-        position: absolute;
-        left: 0;
-        top: 19px;
-        width: 0;
-        height: 0;
-        border: 9px solid transparent;
-        border-right-color: #f5f5f6;
-        margin-left: -9px;
-    }
-    
-    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon.bg-success {
-        background: #00a65a !important;
-        border: none;
-    }
-    
-    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon.bg-info {
-        background: #3c8dbc !important;
-        border: none;
-    }
-    
+body {
+    margin-top: 20px;
+    background: #f5f5f5;
+    font-family: Arial, sans-serif;
 }
 
-.top-breadcrumb {
-    margin-bottom: 20px;
+.container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.breadcrumb-container {
+    background: #e9ecef;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+.breadcrumb-item a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.breadcrumb-item.active {
+    color: #6c757d;
 }
 
 h3 {
-    margin-top: 20px;
-    margin-bottom: 10px;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    color: #007bff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.form-section {
+    margin-bottom: 30px;
 }
 
 .formset {
-    margin-bottom: 20px;
-}
-
-.formset input, 
-.formset textarea, 
-.formset select {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
     margin-bottom: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    box-sizing: border-box;
+    position: relative;
 }
 
-.formset button {
-    margin-top: 10px;
+.collapsible {
+    display: none;
 }
 
-.btn-primary, .btn-success {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 5px;
+.profile-form .btn-link {
+    color: #007bff;
+    text-decoration: none;
+    padding: 0;
+    margin-left: 10px;
+}
+
+.profile-form .btn-link:hover {
+    text-decoration: underline;
+}
+
+.btn-outline-primary {
+    color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-outline-primary:hover {
     background-color: #007bff;
-    color: white;
-    font-size: 16px;
+    color: #fff;
 }
 
-.btn-primary:hover, .btn-success:hover {
-    background-color: #0056b3;
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
 }
 
-#add-experiencia, #add-educacion {
+.text-right {
+    text-align: right;
+}
+
+.remove-form {
     margin-top: 10px;
-    margin-bottom: 20px;
 }
-
-.breadcrumb {
-    background-color: #f8f9fa;
-    padding: 10px 15px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-.container {
-    margin-top: 80px; /* Ajusta esto según la altura de tu navbar */
-}
-
-.formset {
-    border: 1px solid #e5e5e5;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-label {
-    font-weight: bold;
-}
-
-.avatar-preview {
-    max-width: 150px;
-    border-radius: 50%;
-    margin-bottom: 10px;
-}
+    
