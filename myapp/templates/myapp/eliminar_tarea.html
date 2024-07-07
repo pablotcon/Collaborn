@@ -3,13 +3,15 @@
 {% block title %}Eliminar Tarea{% endblock %}
 
 {% block content %}
-<h1>Eliminar Tarea: {{ tarea.nombre }}</h1>
-
-<p>¿Estás seguro de que deseas eliminar esta tarea?</p>
-
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Eliminar</button>
-    <a href="{% url 'listar_tareas' tarea.proyecto.id %}" class="btn btn-secondary">Cancelar</a>
-</form>
+<div class="container mt-5">
+    <h1>Eliminar Tarea: {{ tarea.nombre }}</h1>
+    <p>¿Estás seguro de que deseas eliminar esta tarea?</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <button type="submit" name="confirm" class="btn btn-danger">Eliminar</button>
+        <button type="submit" name="cancel" class="btn btn-secondary">Cancelar</button>
+    </form>
+</div>
 {% endblock %}

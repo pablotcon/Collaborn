@@ -69,13 +69,20 @@ def admin_panel_tareas(request):
     return render(request, 'myapp/admin_panel_tareas.html', {'tareas': tareas})
 
 @login_required
-def confirmar_eliminar_tarea(request, tarea_id):
+def eliminar_tarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, id=tarea_id)
+    next_url = request.GET.get('next', 'proyecto_list')  # Por defecto redirige a 'proyecto_list' si 'next' no está presente
+
     if request.method == 'POST':
-        tarea.delete()
-        messages.success(request, 'Tarea eliminada exitosamente.')
-        return redirect('listar_tareas', proyecto_id=tarea.proyecto.id)
-    return render(request, 'myapp/tarea_confirm_delete.html', {'tarea': tarea})
+        if 'confirm' in request.POST:
+            tarea.delete()
+            messages.success(request, 'Tarea eliminada exitosamente.')
+            return redirect(next_url)
+        elif 'cancel' in request.POST:
+            messages.info(request, 'Eliminación cancelada.')
+            return redirect(next_url)
+
+    return render(request, 'myapp/eliminar_tarea.html', {'tarea': tarea, 'next': next_url})
 
 @login_required
 @permission_required('myapp.add_tarea', raise_exception=True)
@@ -87,6 +94,15 @@ def agregar_tarea(request, proyecto_id):
             tarea = form.save(commit=False)
             tarea.proyecto = proyecto
             tarea.save()
+            
+            # Crear una notificación para el usuario asignado a la tarea
+            if tarea.asignada_a:
+                Notificacion.objects.create(
+                    receptor=tarea.asignada_a,
+                    mensaje=f"Se te ha asignado una nueva tarea: {tarea.nombre}",
+                    url=f"/tareas/{tarea.id}/"
+                )
+            
             messages.success(request, 'Tarea agregada exitosamente.')
             return redirect('listar_tareas', proyecto_id=proyecto.id)
         else:
@@ -144,7 +160,16 @@ def eliminar_tarea(request, tarea_id):
         tarea.delete()
         messages.success(request, 'Tarea eliminada exitosamente.')
         return redirect('listar_tareas', proyecto_id=proyecto_id)
-    return render(request, 'myapp/tarea_confirm_delete.html', {'tarea': tarea, 'proyecto_id': proyecto_id})
+    return render(request, 'myapp/confirmar_eliminar_tarea.html', {'tarea': tarea, 'proyecto_id': proyecto_id})
+
+@login_required
+def confirmar_eliminar_tarea(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
+    if request.method == 'POST':
+        tarea.delete()
+        messages.success(request, 'Tarea eliminada exitosamente.')
+        return redirect('admin_panel_tareas')
+    return render(request, 'myapp/confirmar_eliminar_tarea.html', {'tarea': tarea})
 
 @login_required
 def seguir_tarea(request, tarea_id):
@@ -280,8 +305,8 @@ def listar_notificaciones(request):
 
 @login_required
 def marcar_notificacion_leida(request, notificacion_id):
-    notificacion = get_object_or_404(Notificacion, id=notificacion_id, usuario=request.user)
-    notificacion.leida = True
+    notificacion = get_object_or_404(Notificacion, id=notificacion_id, receptor=request.user)
+    notificacion.leido = True
     notificacion.save()
     messages.success(request, 'Notificación marcada como leída.')
     return redirect('listar_notificaciones')

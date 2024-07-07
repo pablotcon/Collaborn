@@ -25,7 +25,7 @@
                 <td>
                     <a href="{% url 'detalle_tarea' tarea.id %}" class="btn btn-outline-info btn-sm">Ver Detalles</a>
                     <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-outline-primary btn-sm">Editar</a>
-                    <a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-outline-danger btn-sm">Eliminar</a>
+                    <a href="{% url 'eliminar_tarea' tarea.id %}?next={% url 'admin_panel_tareas' %}" class="btn btn-danger">Eliminar</a>
                 </td>
             </tr>
             {% endfor %}
