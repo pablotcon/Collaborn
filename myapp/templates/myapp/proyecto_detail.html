@@ -4,45 +4,75 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>{{ proyecto.nombre }}</h1>
-    <p>{{ proyecto.descripcion }}</p>
-    <p>Fecha de Inicio: {{ proyecto.fecha_inicio }}</p>
-    <p>Fecha de Fin: {{ proyecto.fecha_fin }}</p>
-    <p>Ciudad: {{ proyecto.ciudad }}</p>
-    {% if proyecto.imagen %}
-    <img src="{{ proyecto.imagen.url }}" alt="{{ proyecto.nombre }}" class="img-fluid">
-    {% else %}
-    <p>No hay imagen disponible.</p>
-    {% endif %}
-    <p>Categoría: {{ proyecto.categoria }}</p>
+    <div class="mb-3">
+        <a href="{% url 'proyecto_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </div>
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <h1 class="card-title">{{ proyecto.nombre }}</h1>
+                {% if perms.myapp.change_proyecto %}
+                <div class="btn-group mt-2 mt-md-0" role="group" aria-label="Administrar Proyecto">
+                    <a href="{% url 'proyecto_edit' proyecto.id %}" class="btn btn-outline-warning">Editar</a>
+                    <a href="{% url 'confirmar_eliminar_proyecto' proyecto.id %}" class="btn btn-outline-danger">Eliminar</a>
+                    <a href="{% url 'listar_tareas' proyecto.id %}" class="btn btn-outline-info">Tareas</a>
+                </div>
+                {% endif %}
+            </div>
+            <hr>
+            <p class="card-text">{{ proyecto.descripcion }}</p>
+            <p class="card-text"><strong>Fecha de Inicio:</strong> {{ proyecto.fecha_inicio }}</p>
+            <p class="card-text"><strong>Fecha de Fin:</strong> {{ proyecto.fecha_fin }}</p>
+            <p class="card-text"><strong>Ciudad:</strong> {{ proyecto.ciudad }}</p>
+            {% if proyecto.imagen %}
+            <img src="{{ proyecto.imagen.url }}" alt="{{ proyecto.nombre }}" class="img-fluid mb-3">
+            {% else %}
+            <p>No hay imagen disponible.</p>
+            {% endif %}
+            <p class="card-text"><strong>Categoría:</strong> {{ proyecto.categoria }}</p>
+        </div>
+    </div>
 
-    <h2>Comentarios</h2>
-    <ul class="list-group">
-        {% for comentario in comentarios %}
-        <li class="list-group-item">
-            <strong>{{ comentario.autor.username }}:</strong> {{ comentario.texto }} <em>{{ comentario.fecha_creacion }}</em>
-        </li>
-        {% endfor %}
-    </ul>
+    <div class="card mb-3">
+        <div class="card-body">
+            <h2 class="card-title">Comentarios</h2>
+            <ul class="list-group list-group-flush">
+                {% for comentario in comentarios %}
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">{{ comentario.autor.username }}</div>
+                        {{ comentario.texto }}
+                    </div>
+                    <span class="badge bg-primary rounded-pill">{{ comentario.fecha_creacion }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 
-    <h2>Agregar Comentario</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Agregar Comentario</button>
-    </form>
+    <div class="card mb-3">
+        <div class="card-body">
+            <h2 class="card-title">Agregar Comentario</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form.as_p }}
+                </div>
+                <button type="submit" class="btn btn-primary">Agregar Comentario</button>
+            </form>
+        </div>
+    </div>
 
-    <h2>Postular al Proyecto</h2>
-    <form method="post" action="{% url 'postular_proyecto' proyecto.id %}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-success">Postular</button>
-    </form>
-
-    {% if perms.myapp.change_proyecto %}
-    <h2>Administrar Proyecto</h2>
-    <a href="{% url 'proyecto_edit' proyecto.id %}" class="btn btn-warning">Editar</a>
-    <a href="{% url 'proyecto_delete' proyecto.id %}" class="btn btn-danger">Eliminar</a>
-    <a href="{% url 'listar_tareas' proyecto.id %}" class="btn btn-info">Tareas</a>
-    {% endif %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h2 class="card-title">Postular al Proyecto</h2>
+            <form method="post" action="{% url 'postular_proyecto' proyecto.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Postular</button>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}
