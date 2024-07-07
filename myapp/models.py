@@ -1,8 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 def get_default_user():
     return User.objects.first().id if User.objects.exists() else None
+
+
 
 class Proyecto(models.Model):
     nombre = models.CharField(max_length=200)
@@ -24,6 +27,15 @@ class Tarea(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+# Definición del modelo SeguimientoTarea
+class SeguimientoTarea(models.Model):
+    tarea = models.ForeignKey(Tarea, on_delete=models.CASCADE, related_name='seguimientos')
+    comentario = models.TextField()
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.tarea.nombre} - {self.fecha}"
 
 class Actividad(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -111,3 +123,4 @@ class Educacion(models.Model):
 
     def __str__(self):
         return self.institucion
+    

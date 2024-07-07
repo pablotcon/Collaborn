@@ -1,26 +1,24 @@
 from django.forms import ModelForm
 from asgiref.sync import async_to_sync
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout,update_session_auth_hash
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.db.models import Q
 from django.contrib import messages
-from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad
-from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm
-from .forms import UserForm, PerfilForm, ExperienciaLaboralFormSet, EducacionFormSet
+from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad, SeguimientoTarea
+from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm, SeguimientoTareaForm,EducacionFormSet,ExperienciaLaboralFormSet
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Recurso
-from django.contrib.auth.models import Group, User
-
+from django.contrib.auth.models import Group
 from channels.layers import get_channel_layer
-
 
 @login_required
 def detalle_tarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, id=tarea_id)
-    return render(request, 'myapp/tarea_detail.html', {'tarea': tarea})
+    seguimientos = SeguimientoTarea.objects.filter(tarea=tarea).order_by('-fecha')
+    form = SeguimientoTareaForm()
+    return render(request, 'myapp/detalle_tarea.html', {'tarea': tarea, 'seguimientos': seguimientos, 'form': form})
 
 @user_passes_test(lambda u: u.is_staff)
 @permission_required('myapp.view_tarea', raise_exception=True)
@@ -28,12 +26,7 @@ def detalle_tarea(request, tarea_id):
 def admin_panel_tareas(request):
     tareas = Tarea.objects.all()
     return render(request, 'myapp/admin_panel_tareas.html', {'tareas': tareas})
-    
-def assign_role_to_user(user, role_name):
-    group = Group.objects.get(name=role_name)
-    user.groups.add(group)
-    user.save()
-    
+
 @login_required
 def confirmar_eliminar_tarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, id=tarea_id)
@@ -42,7 +35,6 @@ def confirmar_eliminar_tarea(request, tarea_id):
         messages.success(request, 'Tarea eliminada exitosamente.')
         return redirect('listar_tareas', proyecto_id=tarea.proyecto.id)
     return render(request, 'myapp/tarea_confirm_delete.html', {'tarea': tarea})
-
 
 @login_required
 def recurso_detail(request, pk):
@@ -66,7 +58,6 @@ def recurso_edit(request, pk):
     return render(request, 'myapp/recurso_form.html', {'form': form})
 
 @permission_required('myapp.can_delete_recurso', raise_exception=True)
-
 @login_required
 def recurso_delete(request, pk):
     recurso = get_object_or_404(Recurso, pk=pk)
@@ -76,33 +67,11 @@ def recurso_delete(request, pk):
         return redirect('listar_recursos')
     return render(request, 'myapp/recurso_confirm_delete.html', {'recurso': recurso})
 
-# Activiades
 @login_required
 def historial_actividades(request):
     actividades = Actividad.objects.filter(usuario=request.user).order_by('-fecha')
     return render(request, 'myapp/historial_actividades.html', {'actividades': actividades})
 
-# Modulo de Tareas
-@login_required
-@permission_required('myapp.add_tarea', raise_exception=True)
-def agregar_tarea(request, proyecto_id):
-    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
-    if request.method == 'POST':
-        form = TareaForm(request.POST)
-        if form.is_valid():
-            tarea = form.save(commit=False)
-            tarea.proyecto = proyecto
-            tarea.save()
-            messages.success(request, 'Tarea agregada exitosamente.')
-            return redirect('listar_tareas', proyecto_id=proyecto.id)
-        else:
-            messages.error(request, 'Error al agregar la tarea.')
-    else:
-        form = TareaForm()
-    return render(request, 'myapp/agregar_tarea.html', {'form': form, 'proyecto': proyecto})
-
-# Modulo Tarea
-# Modulo de Tareas
 @login_required
 @permission_required('myapp.add_tarea', raise_exception=True)
 def agregar_tarea(request, proyecto_id):
@@ -132,7 +101,6 @@ def listar_tareas(request, proyecto_id):
     
     return render(request, 'myapp/listar_tareas.html', {'proyecto': proyecto, 'tareas': tareas})
 
-
 @login_required
 def editar_tarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, id=tarea_id)
@@ -158,13 +126,12 @@ def eliminar_tarea(request, tarea_id):
         messages.success(request, 'Tarea eliminada exitosamente.')
         return redirect('listar_tareas', proyecto_id=proyecto_id)
     return render(request, 'myapp/tarea_confirm_delete.html', {'tarea': tarea, 'proyecto_id': proyecto_id})
-# Guardado Perfil ##############
+
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     if hasattr(instance, 'perfil'):
         instance.perfil.save()
 
-# Modulo Recursos
 @login_required
 def subir_recurso(request):
     if request.method == 'POST':
@@ -188,8 +155,6 @@ def listar_recursos(request):
 
     return render(request, 'myapp/listar_recursos.html', {'recursos': recursos})
 
-
-# Modulo Mensajes
 @login_required
 def listar_mensajes(request):
     query = request.GET.get('q')
@@ -200,7 +165,6 @@ def listar_mensajes(request):
         mensajes_recibidos = Mensaje.objects.filter(receptor=request.user).order_by('-fecha_envio')
         mensajes_enviados = Mensaje.objects.filter(emisor=request.user).order_by('-fecha_envio')
     
-    # Marca los mensajes recibidos como leídos
     mensajes_recibidos.update(leido=True)
 
     return render(request, 'myapp/listar_mensajes.html', {
@@ -248,7 +212,6 @@ def enviar_mensaje(request, receptor_id=None):
         form = MensajeForm(initial={'receptor': receptor_id})
     return render(request, 'myapp/enviar_mensaje.html', {'form': form})
 
-# Notificaciones
 def send_notification(user, message):
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
@@ -282,7 +245,6 @@ def marcar_notificacion_leida(request, notificacion_id):
     messages.success(request, 'Notificación marcada como leída.')
     return redirect('listar_notificaciones')
 
-# Modulo Proyectos
 @login_required
 def proyecto_list(request):
     query = request.GET.get('q')
@@ -337,7 +299,6 @@ def proyecto_detail(request, proyecto_id):
 
     return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto, 'comentarios': comentarios, 'form': form})
 
-
 @permission_required('myapp.can_edit_proyecto', raise_exception=True)
 @login_required
 def proyecto_edit(request, pk):
@@ -354,7 +315,6 @@ def proyecto_edit(request, pk):
         form = ProyectoForm(instance=proyecto)
     return render(request, 'myapp/proyecto_form.html', {'form': form})
 
-
 @permission_required('myapp.can_delete_proyecto', raise_exception=True)
 @login_required
 def proyecto_delete(request, pk):
@@ -369,7 +329,6 @@ def proyecto_delete(request, pk):
 def postular_proyecto(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
     if request.method == 'POST':
-        # Verificar si el usuario ya se ha postulado
         if Postulacion.objects.filter(proyecto=proyecto, usuario=request.user).exists():
             messages.error(request, 'Ya te has postulado a este proyecto.')
         else:
@@ -379,14 +338,14 @@ def postular_proyecto(request, proyecto_id):
                 mensaje=f'El usuario {request.user.username} se ha postulado a tu proyecto "{proyecto.nombre}".'
             )
             messages.success(request, 'Te has postulado al proyecto exitosamente.')
-        return redirect('proyecto_detail', proyecto_id=proyecto_id)  # Usando 'proyecto_id' en lugar de 'pk'    return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto})
+        return redirect('proyecto_detail', proyecto_id=proyecto_id)
+    return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto})
 
 @login_required
 def mis_postulaciones(request):
     postulaciones = Postulacion.objects.filter(usuario=request.user)
     return render(request, 'myapp/mis_postulaciones.html', {'postulaciones': postulaciones})
 
-# Modulo Perfil
 @login_required
 def editar_perfil(request):
     perfil = request.user.perfil
@@ -428,13 +387,14 @@ def ver_perfil(request):
         'experiencias': experiencias,
         'educaciones': educaciones,
     })
+
 @login_required
 def cambiar_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)  # Mantener la sesión después de cambiar la contraseña
+            update_session_auth_hash(request, user)
             messages.success(request, 'Su contraseña ha sido cambiada exitosamente.')
             return redirect('ver_perfil')
         else:
@@ -443,7 +403,6 @@ def cambiar_password(request):
         form = PasswordChangeForm(request.user)
     return render(request, 'myapp/cambiar_password.html', {'form': form})
 
-# Modulo de Login/Registro
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -455,13 +414,11 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'myapp/login.html', {'form': form})
 
-
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Asegurarse de que el perfil se crea si no existe
             Perfil.objects.get_or_create(user=user)
             login(request, user)
             return redirect('index')
@@ -479,3 +436,41 @@ def logout_view(request):
 def index(request):
     nuevos_mensajes = Mensaje.objects.filter(receptor=request.user, leido=False).count()
     return render(request, 'myapp/index.html', {'nuevos_mensajes': nuevos_mensajes})
+
+@login_required
+def seguir_tarea(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
+    seguimiento, created = SeguimientoTarea.objects.get_or_create(usuario=request.user, tarea=tarea)
+    if created:
+        messages.success(request, 'Ahora sigues esta tarea.')
+    else:
+        messages.info(request, 'Ya sigues esta tarea.')
+    return redirect('detalle_tarea', tarea_id=tarea_id)
+
+@login_required
+def dejar_seguir_tarea(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
+    seguimiento = get_object_or_404(SeguimientoTarea, usuario=request.user, tarea=tarea)
+    seguimiento.delete()
+    messages.success(request, 'Has dejado de seguir esta tarea.')
+    return redirect('detalle_tarea', tarea_id=tarea_id)
+
+@login_required
+def listar_seguimientos(request):
+    seguimientos = request.user.seguimientos.all()
+    return render(request, 'myapp/listar_seguimientos.html', {'seguimientos': seguimientos})
+
+@login_required
+def agregar_seguimiento(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
+    if request.method == 'POST':
+        form = SeguimientoTareaForm(request.POST)
+        if form.is_valid():
+            seguimiento = form.save(commit=False)
+            seguimiento.tarea = tarea
+            seguimiento.usuario = request.user
+            seguimiento.save()
+            return redirect('detalle_tarea', tarea_id=tarea.id)
+    else:
+        form = SeguimientoTareaForm()
+    return render(request, 'myapp/detalle_tarea.html', {'tarea': tarea, 'form': form})

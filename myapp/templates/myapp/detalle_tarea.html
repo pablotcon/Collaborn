@@ -12,5 +12,19 @@
     <p><strong>Completada:</strong> {{ tarea.completada }}</p>
     <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-primary">Editar Tarea</a>
     <a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-danger">Eliminar Tarea</a>
+
+    <h2>Seguimientos</h2>
+    <ul>
+        {% for seguimiento in seguimientos %}
+            <li>{{ seguimiento.fecha }} - {{ seguimiento.comentario }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Agregar Seguimiento</h3>
+    <form method="post" action="{% url 'agregar_seguimiento' tarea.id %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Agregar</button>
+    </form>
 </div>
 {% endblock %}
