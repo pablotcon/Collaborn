@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -15,15 +16,15 @@ urlpatterns = [
     path('proyectos/', views.proyecto_list, name='proyecto_list'),
     path('proyectos/<int:proyecto_id>/', views.proyecto_detail, name='proyecto_detail'),
     path('proyectos/crear/', views.crear_proyecto, name='crear_proyecto'),
-    path('proyectos/editar/<int:pk>/', views.proyecto_edit, name='proyecto_edit'),
-    path('proyectos/eliminar/<int:pk>/', views.proyecto_delete, name='proyecto_delete'),
-    path('proyectos/postular/<int:proyecto_id>/', views.postular_proyecto, name='postular_proyecto'),
+    path('proyectos/<int:pk>/editar/', views.proyecto_edit, name='proyecto_edit'),
+    path('proyectos/<int:pk>/eliminar/', views.proyecto_delete, name='proyecto_delete'),
+    path('proyectos/<int:proyecto_id>/postular/', views.postular_proyecto, name='postular_proyecto'),
     path('mis_postulaciones/', views.mis_postulaciones, name='mis_postulaciones'),
-
     path('admin_panel_tareas/', views.admin_panel_tareas, name='admin_panel_tareas'),
-    path('tareas/actualizar_estado/<int:tarea_id>/', views.actualizar_estado_tarea, name='actualizar_estado_tarea'),
+    path('tareas/<int:tarea_id>/actualizar_estado/', views.actualizar_estado_tarea, name='actualizar_estado_tarea'),
+
     path('tareas/agregar/<int:proyecto_id>/', views.agregar_tarea, name='agregar_tarea'),
-    path('tareas/agregar_subtarea/<int:tarea_id>/', views.agregar_subtarea, name='agregar_subtarea'),
+    path('tareas/<int:tarea_id>/agregar_subtarea/', views.agregar_subtarea, name='agregar_subtarea'),
     path('tareas/<int:tarea_id>/', views.detalle_tarea, name='detalle_tarea'),
     path('tareas/editar/<int:tarea_id>/', views.editar_tarea, name='editar_tarea'),
     path('tareas/eliminar/<int:tarea_id>/', views.eliminar_tarea, name='eliminar_tarea'),
@@ -32,7 +33,7 @@ urlpatterns = [
     path('tareas/seguir/<int:tarea_id>/', views.seguir_tarea, name='seguir_tarea'),
     path('tareas/dejar_seguir/<int:tarea_id>/', views.dejar_seguir_tarea, name='dejar_seguir_tarea'),
     path('tareas/seguimientos/', views.listar_seguimientos, name='listar_seguimientos'),
-    path('tareas/agregar_seguimiento/<int:tarea_id>/', views.agregar_seguimiento, name='agregar_seguimiento'),
+    path('tareas/seguimiento/agregar/<int:tarea_id>/', views.agregar_seguimiento, name='agregar_seguimiento'),
 
     path('notificaciones/', views.listar_notificaciones, name='listar_notificaciones'),
     path('notificaciones/marcar_leida/<int:notificacion_id>/', views.marcar_notificacion_leida, name='marcar_notificacion_leida'),
@@ -40,8 +41,8 @@ urlpatterns = [
     path('recursos/', views.listar_recursos, name='listar_recursos'),
     path('recursos/subir/', views.subir_recurso, name='subir_recurso'),
     path('recursos/<int:pk>/', views.recurso_detail, name='recurso_detail'),
-    path('recursos/editar/<int:pk>/', views.recurso_edit, name='recurso_edit'),
-    path('recursos/eliminar/<int:pk>/', views.recurso_delete, name='recurso_delete'),
+    path('recursos/<int:pk>/editar/', views.recurso_edit, name='recurso_edit'),
+    path('recursos/<int:pk>/eliminar/', views.recurso_delete, name='recurso_delete'),
 
     path('mensajes/', views.listar_mensajes, name='listar_mensajes'),
     path('mensajes/enviar/', views.enviar_mensaje, name='enviar_mensaje'),
@@ -51,4 +52,5 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

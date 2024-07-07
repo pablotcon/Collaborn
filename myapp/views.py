@@ -12,6 +12,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
 from channels.layers import get_channel_layer
+from django.urls import reverse
 
 # Functions related to Task Management
 
@@ -312,7 +313,6 @@ def marcar_notificacion_leida(request, notificacion_id):
     messages.success(request, 'Notificación marcada como leída.')
     return redirect('listar_notificaciones')
 
-# Functions related to Projects
 @login_required
 def proyecto_list(request):
     query = request.GET.get('q', '')
@@ -373,7 +373,6 @@ def proyecto_detail(request, proyecto_id):
     else:
         form = ComentarioForm()
     return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto, 'comentarios': comentarios, 'form': form})
-
 
 
 @permission_required('myapp.delete_proyecto', raise_exception=True)
