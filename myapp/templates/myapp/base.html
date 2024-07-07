@@ -37,12 +37,20 @@
                         <li class="nav-item"><a class="nav-link" href="{% url 'ver_perfil' %}">Perfil</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'proyecto_list' %}">Proyectos</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'listar_recursos' %}">Recursos</a></li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'listar_notificaciones' %}">Notificaciones
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="notificacionesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Notificaciones
                                 {% if notificaciones_no_leidas > 0 %}
                                     <span class="badge badge-danger">{{ notificaciones_no_leidas }}</span>
                                 {% endif %}
                             </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificacionesDropdown">
+                                {% for notificacion in request.user.notificaciones.all %}
+                                    <a class="dropdown-item{% if notificacion.leido %} text-muted{% endif %}" href="{% url 'marcar_notificacion_leida' notificacion.id %}">{{ notificacion.mensaje }}</a>
+                                {% empty %}
+                                    <a class="dropdown-item text-muted">No tienes notificaciones</a>
+                                {% endfor %}
+                            </div>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'listar_mensajes' %}">Mensajes

@@ -89,14 +89,14 @@ class Notificacion(models.Model):
         return f'Notificación para {self.receptor.username} - {self.mensaje}'
 
 class Mensaje(models.Model):
-    emisor = models.ForeignKey(User, related_name='mensajes_enviados', on_delete=models.CASCADE)
-    receptor = models.ForeignKey(User, related_name='mensajes_recibidos', on_delete=models.CASCADE)
+    emisor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mensajes_enviados')
+    receptor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mensajes_recibidos')
     contenido = models.TextField()
-    fecha_envio = models.DateTimeField(auto_now_add=True)
     leido = models.BooleanField(default=False)
+    fecha_envio = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Mensaje de {self.emisor} a {self.receptor}"
+        return f'Mensaje de {self.emisor.username} a {self.receptor.username}'
 
 class Recurso(models.Model):
     titulo = models.CharField(max_length=255)

@@ -309,7 +309,7 @@ def marcar_notificacion_leida(request, notificacion_id):
     notificacion.leido = True
     notificacion.save()
     messages.success(request, 'Notificación marcada como leída.')
-    return redirect('listar_notificaciones')
+    return redirect(notificacion.url)
 
 # Functions related to Projects
 @login_required
@@ -491,17 +491,27 @@ def listar_mensajes(request):
 @login_required
 def enviar_mensaje(request):
     if request.method == 'POST':
-        receptor_id = request.POST.get('receptor')
-        contenido = request.POST.get('contenido')
-        receptor = User.objects.get(id=receptor_id)
-        Mensaje.objects.create(
-            emisor=request.user,
-            receptor=receptor,
-            contenido=contenido
-        )
-        messages.success(request, 'Mensaje enviado exitosamente.')
-        return redirect('listar_mensajes')
-    return render(request, 'myapp/enviar_mensaje.html', {'users': User.objects.exclude(id=request.user.id)})
+        form = MensajeForm(request.POST)
+        if form.is_valid():
+            mensaje = form.save(commit=False)
+            mensaje.emisor = request.user  # Asigna el emisor aquí
+            mensaje.save()
+
+            # Crear notificación para el receptor
+            Notificacion.objects.create(
+                receptor=mensaje.receptor,
+                mensaje=f"Tienes un nuevo mensaje de {request.user.username}",
+                url=f"/mensajes/{mensaje.id}/"
+            )
+
+            messages.success(request, 'Mensaje enviado exitosamente.')
+            return redirect('listar_mensajes')
+        else:
+            messages.error(request, 'Error al enviar el mensaje.')
+    else:
+        form = MensajeForm()
+    
+    return render(request, 'myapp/enviar_mensaje.html', {'form': form})
 
 @login_required
 def eliminar_mensaje(request, mensaje_id):
@@ -512,19 +522,18 @@ def eliminar_mensaje(request, mensaje_id):
         return redirect('listar_mensajes')
     return render(request, 'myapp/confirm_delete_mensaje.html', {'mensaje': mensaje})
 
+
 @login_required
-def enviar_mensaje(request, receptor_id=None):
-    if request.method == 'POST':
-        form = MensajeForm(request.POST)
-        if form.is_valid():
-            mensaje = form.save(commit=False)
-            mensaje.emisor = request.user
-            mensaje.save()
-            messages.success(request, 'Mensaje enviado exitosamente.')
-            return redirect('listar_mensajes')
-    else:
-        form = MensajeForm(initial={'receptor': receptor_id})
-    return render(request, 'myapp/enviar_mensaje.html', {'form': form})
+def detalle_mensaje(request, mensaje_id):
+    mensaje = get_object_or_404(Mensaje, id=mensaje_id)
+
+    # Marcar la notificación como leída
+    notificacion = Notificacion.objects.filter(receptor=request.user, url=f"/mensajes/{mensaje_id}/").first()
+    if notificacion:
+        notificacion.leido = True
+        notificacion.save()
+
+    return render(request, 'myapp/detalle_mensaje.html', {'mensaje': mensaje})
 
 # Functions related to Activities
 @login_required
