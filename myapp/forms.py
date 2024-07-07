@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 from django.contrib.auth.models import User
-from .models import Recurso, Perfil, Comentario, Mensaje, Proyecto, Tarea, ExperienciaLaboral, Educacion,SeguimientoTarea,Subtarea, ComentarioTarea
+from .models import Recurso, Perfil, Comentario, Mensaje, Proyecto, Tarea, ExperienciaLaboral, Educacion,SeguimientoTarea,Subtarea, ComentarioTarea, Categoria
 
 class UserForm(forms.ModelForm):
     class Meta:
@@ -50,10 +50,25 @@ class ProyectoForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'id': 'id_fecha_fin', 'class': 'form-control'}),
         label='Fecha de cierre de postulaciones'
     )
+    ciudad = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label='Ciudad'
+    )
+    imagen = forms.ImageField(
+        required=False,
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+        label='Imagen del proyecto'
+    )
+    categoria = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label='Categoría'
+    )
 
     class Meta:
         model = Proyecto
-        fields = ['nombre', 'descripcion', 'fecha_inicio', 'fecha_fin']
+        fields = ['nombre', 'descripcion', 'fecha_inicio', 'fecha_fin', 'ciudad', 'imagen', 'categoria']
+
+
         
 class TareaForm(forms.ModelForm):
     class Meta:

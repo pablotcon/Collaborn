@@ -315,25 +315,19 @@ def marcar_notificacion_leida(request, notificacion_id):
 # Functions related to Projects
 @login_required
 def proyecto_list(request):
-    query = request.GET.get('q')
-    filter_by = request.GET.get('filter_by')
-    proyectos = Proyecto.objects.all()
-    
+    query = request.GET.get('q', '')
     if query:
-        proyectos = proyectos.filter(
-            Q(nombre__icontains=query) | Q(descripcion__icontains(query))
+        proyectos = Proyecto.objects.filter(
+            Q(nombre__icontains=query) | Q(descripcion__icontains=query)
         )
-
-    if filter_by:
-        if filter_by == 'mis_proyectos':
-            proyectos = proyectos.filter(creador=request.user)
-
+    else:
+        proyectos = Proyecto.objects.all()
     return render(request, 'myapp/proyecto_list.html', {'proyectos': proyectos})
 
 @login_required
 def crear_proyecto(request):
     if request.method == 'POST':
-        form = ProyectoForm(request.POST)
+        form = ProyectoForm(request.POST, request.FILES)
         if form.is_valid():
             proyecto = form.save(commit=False)
             proyecto.creador = request.user
@@ -347,10 +341,24 @@ def crear_proyecto(request):
     return render(request, 'myapp/crear_proyecto.html', {'form': form})
 
 @login_required
+def proyecto_edit(request, pk):
+    proyecto = get_object_or_404(Proyecto, pk=pk)
+    if request.method == 'POST':
+        form = ProyectoForm(request.POST, request.FILES, instance=proyecto)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Proyecto editado exitosamente.')
+            return redirect('proyecto_detail', proyecto_id=proyecto.id)
+        else:
+            messages.error(request, 'Error al editar el proyecto.')
+    else:
+        form = ProyectoForm(instance=proyecto)
+    return render(request, 'myapp/editar_proyecto.html', {'form': form})
+
+@login_required
 def proyecto_detail(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
     comentarios = proyecto.comentarios.all()
-
     if request.method == 'POST':
         form = ComentarioForm(request.POST)
         if form.is_valid():
@@ -364,26 +372,11 @@ def proyecto_detail(request, proyecto_id):
             messages.error(request, 'Error al agregar el comentario.')
     else:
         form = ComentarioForm()
-
     return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto, 'comentarios': comentarios, 'form': form})
 
-@permission_required('myapp.can_edit_proyecto', raise_exception=True)
-@login_required
-def proyecto_edit(request, pk):
-    proyecto = get_object_or_404(Proyecto, pk=pk)
-    if request.method == 'POST':
-        form = ProyectoForm(request.POST, instance=proyecto)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Proyecto editado exitosamente.')
-            return redirect('proyecto_list')
-        else:
-            messages.error(request, 'Error al editar el proyecto.')
-    else:
-        form = ProyectoForm(instance=proyecto)
-    return render(request, 'myapp/proyecto_form.html', {'form': form})
 
-@permission_required('myapp.can_delete_proyecto', raise_exception=True)
+
+@permission_required('myapp.delete_proyecto', raise_exception=True)
 @login_required
 def proyecto_delete(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
@@ -391,8 +384,7 @@ def proyecto_delete(request, pk):
         proyecto.delete()
         messages.success(request, 'Proyecto eliminado exitosamente.')
         return redirect('proyecto_list')
-    return render(request, 'myapp/proyecto_confirm_delete.html', {'proyecto': proyecto})
-
+    return render(request, 'myapp/confirmar_eliminar_proyecto.html', {'proyecto': proyecto})
 @login_required
 def postular_proyecto(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)

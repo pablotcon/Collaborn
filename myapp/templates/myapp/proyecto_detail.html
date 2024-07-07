@@ -7,6 +7,15 @@
 <p>{{ proyecto.descripcion }}</p>
 <p>Fecha de Inicio: {{ proyecto.fecha_inicio }}</p>
 <p>Fecha de Fin: {{ proyecto.fecha_fin }}</p>
+<p>Ciudad: {{ proyecto.ciudad }}</p>
+<p>Categoría: {{ proyecto.categoria }}</p>
+<p>Creador: {{ proyecto.creador.username }}</p>
+
+{% if proyecto.imagen %}
+    <img src="{{ proyecto.imagen.url }}" alt="{{ proyecto.nombre }}" class="img-fluid">
+{% else %}
+    <p>No hay imagen disponible para este proyecto.</p>
+{% endif %}
 
 <h2>Comentarios</h2>
 <ul class="list-group">

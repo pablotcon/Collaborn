@@ -1,10 +1,13 @@
 {% extends 'myapp/base.html' %}
 
-{% block title %}Crear Proyecto{% endblock %}
+{% load custom_filters %}
+
+
+{% block title %}Editar Proyecto{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>Crear Proyecto</h1>
+<div class="container mt-5">
+    <h1 class="mb-4">Editar Proyecto</h1>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-group">
@@ -35,26 +38,7 @@
             <label for="id_categoria">Categoría</label>
             {{ form.categoria|add_class:"form-control" }}
         </div>
-        <button type="submit" class="btn btn-primary">Crear Proyecto</button>
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
     </form>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script type="text/javascript">
-    $(document).ready(function(){
-        $('#id_fecha_inicio').datepicker({
-            format: 'yyyy-mm-dd',
-            autoclose: true,
-            todayHighlight: true,
-            language: 'es'
-        });
-        $('#id_fecha_fin').datepicker({
-            format: 'yyyy-mm-dd',
-            autoclose: true,
-            todayHighlight: true,
-            language: 'es'
-        });
-    });
-</script>
 {% endblock %}
