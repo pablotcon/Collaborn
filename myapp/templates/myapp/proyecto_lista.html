@@ -26,7 +26,7 @@
                 <img class="postcard__img" src="https://picsum.photos/1000/1000" alt="Project Image" />
             </a>
             <div class="postcard__text t-dark">
-                <h1 class="postcard__title blue"><a href="{% url 'proyecto_detail' proyecto.id %}">{{ proyecto.nombre }}</a></h1>
+                <h1 class="postcard__title blue"><a href="{% url 'proyecto_detalle' proyecto.id %}">{{ proyecto.nombre }}</a></h1>
                 <div class="postcard__subtitle small">
                     <time datetime="{{ proyecto.fecha_creacion }}">
                         <i class="fas fa-calendar-alt mr-2"></i>{{ proyecto.fecha_creacion }}

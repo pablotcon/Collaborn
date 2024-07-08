@@ -82,7 +82,7 @@ def detalle_tarea(request, tarea_id):
 @login_required
 def eliminar_tarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, id=tarea_id)
-    next_url = request.GET.get('next', 'proyecto_list')  # Por defecto redirige a 'proyecto_list' si 'next' no está presente
+    next_url = request.GET.get('next', 'proyecto_lista')  # Por defecto redirige a 'proyecto_lista' si 'next' no está presente
 
     if request.method == 'POST':
         if 'confirm' in request.POST:
@@ -366,7 +366,7 @@ def marcar_notificacion_leida(request, notificacion_id):
     return redirect('listar_notificaciones')
 
 @login_required
-def proyecto_list(request):
+def proyecto_lista(request):
     query = request.GET.get('q', '')
     if query:
         proyectos = Proyecto.objects.filter(
@@ -374,7 +374,7 @@ def proyecto_list(request):
         )
     else:
         proyectos = Proyecto.objects.all()
-    return render(request, 'myapp/proyecto_list.html', {'proyectos': proyectos})
+    return render(request, 'myapp/proyecto_lista.html', {'proyectos': proyectos})
 
 @login_required
 def crear_proyecto(request):
@@ -385,7 +385,7 @@ def crear_proyecto(request):
             proyecto.creador = request.user
             proyecto.save()
             messages.success(request, 'Proyecto creado exitosamente.')
-            return redirect('proyecto_detail', proyecto_id=proyecto.id)
+            return redirect('proyecto_detalle', proyecto_id=proyecto.id)
         else:
             messages.error(request, 'Error al crear el proyecto.')
     else:
@@ -400,7 +400,7 @@ def proyecto_edit(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'Proyecto editado exitosamente.')
-            return redirect('proyecto_detail', proyecto_id=proyecto.id)
+            return redirect('proyecto_detalle', proyecto_id=proyecto.id)
         else:
             messages.error(request, 'Error al editar el proyecto.')
     else:
@@ -408,7 +408,7 @@ def proyecto_edit(request, pk):
     return render(request, 'myapp/editar_proyecto.html', {'form': form})
 
 @login_required
-def proyecto_detail(request, proyecto_id):
+def proyecto_detalle(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
     comentarios = proyecto.comentarios.all()
     if request.method == 'POST':
@@ -419,12 +419,12 @@ def proyecto_detail(request, proyecto_id):
             comentario.autor = request.user
             comentario.save()
             messages.success(request, 'Comentario agregado exitosamente.')
-            return redirect('proyecto_detail', proyecto_id=proyecto.id)
+            return redirect('proyecto_detalle', proyecto_id=proyecto.id)
         else:
             messages.error(request, 'Error al agregar el comentario.')
     else:
         form = ComentarioForm()
-    return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto, 'comentarios': comentarios, 'form': form})
+    return render(request, 'myapp/proyecto_detalle.html', {'proyecto': proyecto, 'comentarios': comentarios, 'form': form})
 
 @permission_required('myapp.delete_proyecto', raise_exception=True)
 @login_required
@@ -433,7 +433,7 @@ def proyecto_delete(request, pk):
     if request.method == 'POST':
         proyecto.delete()
         messages.success(request, 'Proyecto eliminado exitosamente.')
-        return redirect('proyecto_list')
+        return redirect('proyecto_lista')
     return render(request, 'myapp/confirmar_eliminar_proyecto.html', {'proyecto': proyecto})
 
 @login_required
@@ -443,7 +443,7 @@ def confirmar_eliminar_proyecto(request, pk):
     if request.method == 'POST':
         proyecto.delete()
         messages.success(request, 'Proyecto eliminado exitosamente.')
-        return redirect('proyecto_list')
+        return redirect('proyecto_lista')
     return render(request, 'myapp/confirmar_eliminar_proyecto.html', {'proyecto': proyecto})
 
 @login_required
@@ -459,8 +459,8 @@ def postular_proyecto(request, proyecto_id):
                 mensaje=f'El usuario {request.user.username} se ha postulado a tu proyecto "{proyecto.nombre}".'
             )
             messages.success(request, 'Te has postulado al proyecto exitosamente.')
-        return redirect('proyecto_detail', proyecto_id=proyecto_id)
-    return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto})
+        return redirect('proyecto_detalle', proyecto_id=proyecto_id)
+    return render(request, 'myapp/proyecto_detalle.html', {'proyecto': proyecto})
 
 @login_required
 def mis_postulaciones(request):
@@ -641,8 +641,25 @@ def save_user_profile(sender, instance, **kwargs):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def admin_dashboard(request):
+    query = request.GET.get('q', '')
+    filtro = request.GET.get('filtro', 'todos')
+    
     proyectos = Proyecto.objects.all()
     tareas = Tarea.objects.all()
+
+    if query:
+        proyectos = proyectos.filter(
+            Q(nombre__icontains=query) | Q(descripcion__icontains=query)
+        )
+        tareas = tareas.filter(
+            Q(nombre__icontains=query) | Q(descripcion__icontains=query)
+        )
+
+    if filtro == 'activos':
+        proyectos = proyectos.filter(fecha_fin__gt=timezone.now())
+    elif filtro == 'completados':
+        proyectos = proyectos.filter(fecha_fin__lte=timezone.now())
+
     context = {
         'proyectos': proyectos,
         'tareas': tareas,
@@ -650,5 +667,7 @@ def admin_dashboard(request):
         'proyectos_completados': proyectos.filter(fecha_fin__lte=timezone.now()).count(),
         'tareas_pendientes': tareas.filter(completada=False).count(),
         'tareas_completadas': tareas.filter(completada=True).count(),
+        'query': query,
+        'filtro': filtro,
     }
     return render(request, 'myapp/admin_dashboard.html', context)

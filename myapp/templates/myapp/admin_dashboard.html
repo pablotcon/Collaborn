@@ -6,38 +6,25 @@
 {% block content %}
 <div class="container">
     <h1>Admin Dashboard</h1>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <form method="get" class="form-inline">
+                <input type="text" name="q" value="{{ query }}" class="form-control mr-2" placeholder="Buscar...">
+                <select name="filtro" class="form-control mr-2">
+                    <option value="todos" {% if filtro == 'todos' %}selected{% endif %}>Todos</option>
+                    <option value="activos" {% if filtro == 'activos' %}selected{% endif %}>Activos</option>
+                    <option value="completados" {% if filtro == 'completados' %}selected{% endif %}>Completados</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Buscar</button>
+            </form>
+        </div>
+    </div>
     <div class="row">
-        <div class="col-md-4">
-            <div class="card mb-3">
-                <div class="card-header">Proyectos Activos</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ proyectos_activos }}</h5>
-                </div>
-            </div>
+        <div class="col-md-6">
+            <canvas id="proyectosChart"></canvas>
         </div>
-        <div class="col-md-4">
-            <div class="card mb-3">
-                <div class="card-header">Proyectos Completados</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ proyectos_completados }}</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card mb-3">
-                <div class="card-header">Tareas Pendientes</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ tareas_pendientes }}</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card mb-3">
-                <div class="card-header">Tareas Completadas</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ tareas_completadas }}</h5>
-                </div>
-            </div>
+        <div class="col-md-6">
+            <canvas id="tareasChart"></canvas>
         </div>
     </div>
     <h2>Proyectos</h2>
@@ -54,17 +41,66 @@
         <tbody>
             {% for proyecto in proyectos %}
             <tr>
-                <td>{{ proyecto.nombre }}</td>
+                <td><a href="{% url 'proyecto_detalle' proyecto.id %}">{{ proyecto.nombre }}</a></td>
                 <td>{{ proyecto.descripcion }}</td>
                 <td>{{ proyecto.fecha_inicio }}</td>
                 <td>{{ proyecto.fecha_fin }}</td>
                 <td>
-                    <a href="{% url 'proyecto_edit' proyecto.pk %}" class="btn btn-primary btn-sm">Editar</a>
-                    <a href="{% url 'proyecto_delete' proyecto.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+                    <a href="{% url 'proyecto_edit' proyecto.pk %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a href="{% url 'proyecto_delete' proyecto.pk %}" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash-alt"></i> Eliminar
+                    </a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctxProyectos = document.getElementById('proyectosChart').getContext('2d');
+    var proyectosChart = new Chart(ctxProyectos, {
+        type: 'bar',
+        data: {
+            labels: ['Activos', 'Completados'],
+            datasets: [{
+                label: 'Proyectos',
+                data: [{{ proyectos_activos }}, {{ proyectos_completados }}],
+                backgroundColor: ['#007bff', '#28a745']
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    var ctxTareas = document.getElementById('tareasChart').getContext('2d');
+    var tareasChart = new Chart(ctxTareas, {
+        type: 'bar',
+        data: {
+            labels: ['Pendientes', 'Completadas'],
+            datasets: [{
+                label: 'Tareas',
+                data: [{{ tareas_pendientes }}, {{ tareas_completadas }}],
+                backgroundColor: ['#dc3545', '#ffc107']
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}
