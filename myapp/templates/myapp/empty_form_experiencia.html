@@ -1,26 +1,6 @@
-<div id="empty_form_educacion" style="display: none;">
+<div id="empty_form_experiencia" style="display: none;">
     <div class="formset">
-        <div class="form-group">
-            <label for="id_educaciones-__prefix__-institucion">Institución:</label>
-            <input type="text" name="educaciones-__prefix__-institucion" maxlength="200" class="form-control" id="id_educaciones-__prefix__-institucion">
-        </div>
-        <div class="form-group">
-            <label for="id_educaciones-__prefix__-fecha_inicio">Fecha inicio:</label>
-            <input type="text" name="educaciones-__prefix__-fecha_inicio" class="form-control" id="id_educaciones-__prefix__-fecha_inicio">
-        </div>
-        <div class="form-group">
-            <label for="id_educaciones-__prefix__-fecha_fin">Fecha fin:</label>
-            <input type="text" name="educaciones-__prefix__-fecha_fin" class="form-control" id="id_educaciones-__prefix__-fecha_fin">
-        </div>
-        <div class="form-group">
-            <label for="id_educaciones-__prefix__-descripcion">Descripción:</label>
-            <textarea name="educaciones-__prefix__-descripcion" class="form-control" id="id_educaciones-__prefix__-descripcion"></textarea>
-        </div>
+        {{ experiencia_formset.empty_form.as_p }}
+        <button type="button" class="btn btn-outline-danger btn-remove">Eliminar</button>
     </div>
-    <div id="empty_form_educacion" style="display: none;">
-        <div class="formset">
-            {{ form.as_p }}
-        </div>
-    </div>
-    
 </div>

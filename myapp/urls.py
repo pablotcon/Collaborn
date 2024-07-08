@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -9,15 +8,24 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('register/', views.register, name='register'),
+
     path('perfil/', views.ver_perfil, name='ver_perfil'),
     path('perfil/editar/', views.editar_perfil, name='editar_perfil'),
+
+    path('experiencia/<int:pk>/editar/', views.editar_experiencia, name='editar_experiencia'),
+    path('experiencia/<int:pk>/eliminar/', views.eliminar_experiencia, name='eliminar_experiencia'),
+
+    path('educacion/<int:pk>/editar/', views.editar_educacion, name='editar_educacion'),
+    path('educacion/<int:pk>/eliminar/', views.eliminar_educacion, name='eliminar_educacion'),
+    
     path('perfil/cambiar_password/', views.cambiar_password, name='cambiar_password'),
 
     path('proyectos/', views.proyecto_list, name='proyecto_list'),
     path('proyectos/<int:proyecto_id>/', views.proyecto_detail, name='proyecto_detail'),
     path('proyectos/crear/', views.crear_proyecto, name='crear_proyecto'),
     path('proyectos/<int:pk>/editar/', views.proyecto_edit, name='proyecto_edit'),
-    path('proyectos/<int:pk>/eliminar/', views.proyecto_delete, name='confirmar_eliminar_proyecto'),
+    path('proyectos/<int:pk>/confirmar_eliminar/', views.confirmar_eliminar_proyecto, name='confirmar_eliminar_proyecto'),
+    path('proyectos/<int:pk>/eliminar/', views.proyecto_delete, name='proyecto_delete'),
     path('proyectos/<int:proyecto_id>/postular/', views.postular_proyecto, name='postular_proyecto'),
     path('mis_postulaciones/', views.mis_postulaciones, name='mis_postulaciones'),
     path('admin_panel_tareas/', views.admin_panel_tareas, name='admin_panel_tareas'),

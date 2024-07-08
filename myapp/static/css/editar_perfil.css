@@ -1,67 +1,89 @@
+body {
+    margin-top: 20px;
+    background: #f5f5f5;
+    font-family: Arial, sans-serif;
+}
+
 .container {
-    max-width: 800px;
-}
-
-.card {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    padding: 30px;
     border-radius: 10px;
-    margin-bottom: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
-.card-title {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-}
-
-.btn-outline-secondary {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.form-group label {
-    font-weight: bold;
-    margin-top: 10px;
-}
-
-.form-control {
+.breadcrumb-container {
+    background: #e9ecef;
+    padding: 10px 20px;
     border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
 }
 
-.btn-outline-primary {
+.breadcrumb-item a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.breadcrumb-item.active {
+    color: #6c757d;
+}
+
+h3 {
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    color: #007bff;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 5px;
 }
 
-.btn-add {
-    width: 100%;
-    justify-content: center;
+.form-section {
+    margin-bottom: 30px;
 }
 
 .formset {
-    background: #f9f9f9;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.collapsible {
+    display: none;
+}
+
+.profile-form .btn-link {
+    color: #007bff;
+    text-decoration: none;
+    padding: 0;
+    margin-left: 10px;
+}
+
+.profile-form .btn-link:hover {
+    text-decoration: underline;
+}
+
+.btn-outline-primary {
+    color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-outline-primary:hover {
+    background-color: #007bff;
+    color: #fff;
 }
 
 .btn-success {
-    width: 100%;
-    padding: 15px;
-    font-size: 1.2rem;
+    background-color: #28a745;
+    border-color: #28a745;
 }
 
-.list-group-item {
-    border: none;
-    padding-left: 0;
-    padding-right: 0;
+.text-right {
+    text-align: right;
 }
 
-.list-group-item h5 {
-    font-size: 1.2rem;
-    margin-bottom: 5px;
+.remove-form {
+    margin-top: 10px;
 }
-
-.list-group-item small {
-    color: #6c757d;
-}
+    

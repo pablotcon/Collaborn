@@ -6,15 +6,30 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, User
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.db.models import Q
 from django.contrib import messages
-from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad, SeguimientoTarea, Subtarea
-from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm, SeguimientoTareaForm, EducacionFormSet, ExperienciaLaboralFormSet,SubtareaForm, ComentarioTareaForm
+from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad, SeguimientoTarea, Subtarea,Educacion, ExperienciaLaboral
+from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm, SeguimientoTareaForm, EducacionFormSet, ExperienciaLaboralFormSet, SubtareaForm, ComentarioTareaForm
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
 from channels.layers import get_channel_layer
 from django.urls import reverse
+import json
 
 # Functions related to Task Management
+login_required
+def admin_panel_tareas(request):
+    if not request.user.is_staff:
+        return redirect('index')
+    tareas = Tarea.objects.all()
+    return render(request, 'myapp/admin_panel_tareas.html', {'tareas': tareas})
+@login_required
+def actualizar_estado_tarea(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
+    if request.method == 'POST':
+        tarea.completada = not tarea.completada
+        tarea.save()
+        messages.success(request, 'El estado de la tarea ha sido actualizado.')
+    return redirect('detalle_tarea', tarea_id=tarea.id)
 
 @login_required
 def detalle_tarea(request, tarea_id):
@@ -61,13 +76,6 @@ def detalle_tarea(request, tarea_id):
         'seguimiento_form': seguimiento_form,
         'subtarea_form': subtarea_form
     })
-
-@login_required
-def admin_panel_tareas(request):
-    if not request.user.is_staff:
-        return redirect('index')
-    tareas = Tarea.objects.all()
-    return render(request, 'myapp/admin_panel_tareas.html', {'tareas': tareas})
 
 @login_required
 def eliminar_tarea(request, tarea_id):
@@ -154,16 +162,6 @@ def editar_tarea(request, tarea_id):
     return render(request, 'myapp/editar_tarea.html', {'form': form, 'proyecto_id': proyecto_id})
 
 @login_required
-def eliminar_tarea(request, tarea_id):
-    tarea = get_object_or_404(Tarea, id=tarea_id)
-    proyecto_id = tarea.proyecto.id
-    if request.method == 'POST':
-        tarea.delete()
-        messages.success(request, 'Tarea eliminada exitosamente.')
-        return redirect('listar_tareas', proyecto_id=proyecto_id)
-    return render(request, 'myapp/confirmar_eliminar_tarea.html', {'tarea': tarea, 'proyecto_id': proyecto_id})
-
-@login_required
 def confirmar_eliminar_tarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, id=tarea_id)
     if request.method == 'POST':
@@ -232,6 +230,7 @@ def send_notification(user, message):
 
 def user_notification(event):
     message = event['message']
+    # Note: 'self' is not defined in this function; this part needs to be adjusted
     self.send(text_data=json.dumps({
         'message': message
     }))
@@ -266,6 +265,50 @@ def editar_perfil(request):
         'experiencia_formset': experiencia_formset,
         'educacion_formset': educacion_formset,
     })
+
+@login_required
+def editar_experiencia(request, pk):
+    experiencia = get_object_or_404(ExperienciaLaboral, pk=pk)
+    if request.method == 'POST':
+        form = ExperienciaLaboralForm(request.POST, instance=experiencia)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Experiencia laboral actualizada exitosamente.')
+            return redirect('editar_perfil')
+    else:
+        form = ExperienciaLaboralForm(instance=experiencia)
+    return render(request, 'myapp/editar_experiencia.html', {'form': form})
+
+@login_required
+def eliminar_experiencia(request, pk):
+    experiencia = get_object_or_404(ExperienciaLaboral, pk=pk)
+    if request.method == 'POST':
+        experiencia.delete()
+        messages.success(request, 'Experiencia laboral eliminada exitosamente.')
+        return redirect('editar_perfil')
+    return render(request, 'myapp/eliminar_experiencia.html', {'experiencia': experiencia})
+
+@login_required
+def editar_educacion(request, pk):
+    educacion = get_object_or_404(Educacion, pk=pk)
+    if request.method == 'POST':
+        form = EducacionForm(request.POST, instance=educacion)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Educación actualizada exitosamente.')
+            return redirect('editar_perfil')
+    else:
+        form = EducacionForm(instance=educacion)
+    return render(request, 'myapp/editar_educacion.html', {'form': form})
+
+@login_required
+def eliminar_educacion(request, pk):
+    educacion = get_object_or_404(Educacion, pk=pk)
+    if request.method == 'POST':
+        educacion.delete()
+        messages.success(request, 'Educación eliminada exitosamente.')
+        return redirect('editar_perfil')
+    return render(request, 'myapp/eliminar_educacion.html', {'educacion': educacion})
 
 @login_required
 def ver_perfil(request):
@@ -378,6 +421,16 @@ def proyecto_detail(request, proyecto_id):
 @permission_required('myapp.delete_proyecto', raise_exception=True)
 @login_required
 def proyecto_delete(request, pk):
+    proyecto = get_object_or_404(Proyecto, pk=pk)
+    if request.method == 'POST':
+        proyecto.delete()
+        messages.success(request, 'Proyecto eliminado exitosamente.')
+        return redirect('proyecto_list')
+    return render(request, 'myapp/confirmar_eliminar_proyecto.html', {'proyecto': proyecto})
+
+@login_required
+@permission_required('myapp.delete_proyecto', raise_exception=True)
+def confirmar_eliminar_proyecto(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
     if request.method == 'POST':
         proyecto.delete()
@@ -514,7 +567,6 @@ def eliminar_mensaje(request, mensaje_id):
         messages.success(request, 'Mensaje eliminado exitosamente.')
         return redirect('listar_mensajes')
     return render(request, 'myapp/confirm_delete_mensaje.html', {'mensaje': mensaje})
-
 
 @login_required
 def detalle_mensaje(request, mensaje_id):

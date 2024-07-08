@@ -1,15 +1,15 @@
 {% extends 'myapp/base.html' %}
-{% block title %}Confirmar Eliminación{% endblock %}
+
+{% block title %}Confirmar eliminación del proyecto{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="text-danger">Confirmar Eliminación</h1>
-    <p>¿Estás seguro de que deseas eliminar el proyecto <strong>{{ proyecto.nombre }}</strong>? Esta acción no se puede deshacer.</p>
+    <h1>Confirmar eliminación del proyecto</h1>
+    <p>¿Estás seguro de que deseas eliminar el proyecto <strong>{{ proyecto.nombre }}</strong>?</p>
     <form method="post">
         {% csrf_token %}
         <button type="submit" class="btn btn-danger">Eliminar</button>
-        <a href="{% url 'proyecto_detail' proyecto.id %}" class="btn btn-secondary">Cancelar</a>
+        <a href="{% url 'proyecto_list' %}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 {% endblock %}
-

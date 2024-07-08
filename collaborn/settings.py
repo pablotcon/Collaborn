@@ -46,7 +46,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'myapp',
     'channels',
+    'crispy_bootstrap5',
+    'crispy_forms',
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
 # Configuración del canal
 ASGI_APPLICATION = 'collaborn.asgi.application'
 
