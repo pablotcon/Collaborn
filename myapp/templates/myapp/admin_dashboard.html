@@ -1,0 +1,70 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Admin Dashboard</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header">Proyectos Activos</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ proyectos_activos }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header">Proyectos Completados</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ proyectos_completados }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header">Tareas Pendientes</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ tareas_pendientes }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header">Tareas Completadas</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ tareas_completadas }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <h2>Proyectos</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Fecha de Inicio</th>
+                <th>Fecha de Fin</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for proyecto in proyectos %}
+            <tr>
+                <td>{{ proyecto.nombre }}</td>
+                <td>{{ proyecto.descripcion }}</td>
+                <td>{{ proyecto.fecha_inicio }}</td>
+                <td>{{ proyecto.fecha_fin }}</td>
+                <td>
+                    <a href="{% url 'proyecto_edit' proyecto.pk %}" class="btn btn-primary btn-sm">Editar</a>
+                    <a href="{% url 'proyecto_delete' proyecto.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -14,6 +14,7 @@ from django.contrib.auth.models import Group
 from channels.layers import get_channel_layer
 from django.urls import reverse
 import json
+from django.utils import timezone
 
 # Functions related to Task Management
 @login_required
@@ -633,3 +634,21 @@ def index(request):
 def save_user_profile(sender, instance, **kwargs):
     if hasattr(instance, 'perfil'):
         instance.perfil.save()
+
+
+#ADMIN DASHBOARD
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def admin_dashboard(request):
+    proyectos = Proyecto.objects.all()
+    tareas = Tarea.objects.all()
+    context = {
+        'proyectos': proyectos,
+        'tareas': tareas,
+        'proyectos_activos': proyectos.filter(fecha_fin__gt=timezone.now()).count(),
+        'proyectos_completados': proyectos.filter(fecha_fin__lte=timezone.now()).count(),
+        'tareas_pendientes': tareas.filter(completada=False).count(),
+        'tareas_completadas': tareas.filter(completada=True).count(),
+    }
+    return render(request, 'myapp/admin_dashboard.html', context)

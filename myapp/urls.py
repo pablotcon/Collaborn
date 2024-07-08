@@ -27,7 +27,6 @@ urlpatterns = [
     path('proyectos/<int:pk>/eliminar/', views.proyecto_delete, name='proyecto_delete'),
     path('proyectos/<int:proyecto_id>/postular/', views.postular_proyecto, name='postular_proyecto'),
     path('mis_postulaciones/', views.mis_postulaciones, name='mis_postulaciones'),
-    path('admin_panel_tareas/', views.admin_panel_tareas, name='admin_panel_tareas'),
     path('tareas/<int:tarea_id>/actualizar_estado/', views.actualizar_estado_tarea, name='actualizar_estado_tarea'),
 
     path('tareas/agregar/<int:proyecto_id>/', views.agregar_tarea, name='agregar_tarea'),
@@ -56,6 +55,10 @@ urlpatterns = [
     path('mensajes/eliminar/<int:mensaje_id>/', views.eliminar_mensaje, name='eliminar_mensaje'),
 
     path('actividades/historial/', views.historial_actividades, name='historial_actividades'),
+
+    path('admin_panel/dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin_panel_tareas/', views.admin_panel_tareas, name='admin_panel_tareas'),
+
 ]
 
 if settings.DEBUG:
