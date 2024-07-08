@@ -8,13 +8,40 @@
 <link rel="stylesheet" href="{% static 'css/ver_perfil.css' %}">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@icon/entypo@1.0.3/entypo.css" rel="stylesheet">
+<style>
+    .btn-group-custom {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .btn-custom {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .btn-custom i {
+        font-size: 1.2em;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="container bootstrap snippet">
     <div class="row">
         <div class="col-md-12">
-           
+            <div class="btn-group-custom">
+                <a href="{% url 'editar_perfil' %}" class="btn btn-primary btn-custom">
+                    <i class="fa fa-edit"></i> Editar Perfil
+                </a>
+                <a href="{% url 'cambiar_password' %}" class="btn btn-secondary btn-custom">
+                    <i class="fa fa-key"></i> Cambiar Contraseña
+                </a>
+                <a href="{% url 'historial_actividades' %}" class="btn btn-info btn-custom">
+                    <i class="fa fa-history"></i> Historial de Actividades
+                </a>
+            </div>
         </div>
     </div>
     <div class="row">
@@ -37,13 +64,12 @@
                             <li><i class="entypo-phone"></i>{{ perfil.telefono }}</li>
                             <li><i class="entypo-calendar"></i>{{ perfil.birth_date }}</li>
                             <li><i class="entypo-globe"></i>{{ perfil.website }}</li>
-                            <li><i class="entypo-mail"></i>{{ perfil.twitter }}</li>
-                            <li><i class="entypo-mail"></i>{{ perfil.facebook }}</li>
-                            <li><i class="entypo-mail"></i>{{ perfil.linkedin }}</li>
+                            <li><i class="entypo-twitter"></i>{{ perfil.twitter }}</li>
+                            <li><i class="entypo-facebook"></i>{{ perfil.facebook }}</li>
+                            <li><i class="entypo-linkedin"></i>{{ perfil.linkedin }}</li>
                         </ul>
                     </div>
                 </div>
-                
             </div>
         </div>
         <div class="col-md-8">
@@ -64,7 +90,6 @@
                                     <time class="timeline-time" datetime="{{ experiencia.fecha_inicio }}">{{ experiencia.fecha_inicio }} - {{ experiencia.fecha_fin }}</time>
                                 </div>
                             </article>
-                            
                         {% endfor %}
                     </div>
                     <h3>Educación</h3>
@@ -83,14 +108,10 @@
                                 </div>
                             </article>
                         {% endfor %}
-                   
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-</div>
-<a href="{% url 'editar_perfil' %}" class="btn btn-primary">Editar Perfil</a>
-<a href="{% url 'cambiar_password' %}" class="btn btn-secondary">Cambiar Contraseña</a>
-<a href="{% url 'historial_actividades' %}" class="btn btn-info">Historial de Actividades</a>
 </div>
 {% endblock %}
