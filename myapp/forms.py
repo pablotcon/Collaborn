@@ -66,16 +66,30 @@ class RecursoForm(forms.ModelForm):
         fields = ['titulo', 'descripcion', 'archivo']
 
 class ProyectoForm(forms.ModelForm):
+    CIUDADES_CHOICES = [
+        ('santiago', 'Santiago'),
+        ('valparaiso', 'Valparaíso'),
+        ('concepcion', 'Concepción'),
+        ('la_serena', 'La Serena'),
+        ('antofagasta', 'Antofagasta'),
+        ('temuco', 'Temuco'),
+        ('rancagua', 'Rancagua'),
+        ('iquique', 'Iquique'),
+        ('puerto_montt', 'Puerto Montt'),
+        # Añadir más ciudades según sea necesario
+    ]
+
     fecha_inicio = forms.DateField(
-        widget=forms.TextInput(attrs={'id': 'id_fecha_inicio', 'class': 'form-control'}),
+        widget=forms.DateInput(attrs={'id': 'id_fecha_inicio', 'class': 'form-control', 'type': 'date'}),
         label='Fecha de inicio de postulaciones'
     )
     fecha_fin = forms.DateField(
-        widget=forms.TextInput(attrs={'id': 'id_fecha_fin', 'class': 'form-control'}),
+        widget=forms.DateInput(attrs={'id': 'id_fecha_fin', 'class': 'form-control', 'type': 'date'}),
         label='Fecha de cierre de postulaciones'
     )
-    ciudad = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
+    ciudad = forms.ChoiceField(
+        choices=CIUDADES_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'}),
         label='Ciudad'
     )
     imagen = forms.ImageField(
@@ -91,7 +105,6 @@ class ProyectoForm(forms.ModelForm):
     class Meta:
         model = Proyecto
         fields = ['nombre', 'descripcion', 'fecha_inicio', 'fecha_fin', 'ciudad', 'imagen', 'categoria']
-
 class TareaForm(forms.ModelForm):
     class Meta:
         model = Tarea
