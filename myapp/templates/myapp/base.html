@@ -15,7 +15,7 @@
     {% block extra_css %}{% endblock %}
     <style>
         body {
-            background-color: #dcc4fa; /* Asegura que el fondo sea claro */
+            background-color: #cfbc0b; /* Asegura que el fondo sea claro */
         }
         main.container {
             margin-top: 80px; /* Ajusta esto según la altura de tu navbar */
@@ -24,12 +24,36 @@
             max-height: 400px;
             overflow-y: auto;
         }
+        .navbar.custom-navbar {
+            background-color: #000000; /* Fondo negro */
+        }
+        .navbar.custom-navbar .navbar-nav .nav-link {
+            color: #800080; /* Letras moradas */
+        }
+        .navbar.custom-navbar .navbar-nav .nav-link:hover {
+            color: #DA70D6; /* Letras moradas más claras al pasar el mouse */
+        }
+        .navbar.custom-navbar .navbar-brand {
+            color: #800080; /* Letras moradas */
+        }
+        .navbar.custom-navbar .navbar-brand:hover {
+            color: #DA70D6; /* Letras moradas más claras al pasar el mouse */
+        }
+        .dropdown-menu {
+            background-color: #000000; /* Fondo negro del dropdown */
+        }
+        .dropdown-menu .dropdown-item {
+            color: #800080; /* Letras moradas del dropdown */
+        }
+        .dropdown-menu .dropdown-item:hover {
+            color: #DA70D6; /* Letras moradas más claras del dropdown al pasar el mouse */
+        }
     </style>
 </head>
 <body>
     {% if user.is_authenticated %}
     <header>
-        <nav class="navbar navbar-expand-lg fixed-top custom-navbar bg-light">
+        <nav class="navbar navbar-expand-lg fixed-top custom-navbar">
             <div class="container">
                 <a class="navbar-brand" href="{% url 'index' %}">Collaborn</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -120,7 +144,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.es.min.js"></script>
     <!-- ScrollReveal -->
     <script src="https://unpkg.com/scrollreveal"></script>
-    <script src="{% static 'js\script.js' %}"></script>
+    <script src="{% static 'js/script.js' %}"></script>
     <!-- WebSocket para notificaciones -->
     <script>
         const userId = {{ user.id }};
