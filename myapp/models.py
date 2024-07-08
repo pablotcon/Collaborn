@@ -24,6 +24,10 @@ class Proyecto(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+    def clean(self):
+        if self.fecha_fin <= self.fecha_inicio:
+            raise ValidationError('La fecha de fin debe ser posterior a la fecha de inicio.')
 
 class Tarea(models.Model):
     proyecto = models.ForeignKey(Proyecto, related_name='tareas', on_delete=models.CASCADE)
