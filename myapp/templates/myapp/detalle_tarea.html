@@ -11,7 +11,7 @@
     <p><strong>Completada:</strong> {{ tarea.completada }}</p>
     <div class="btn-group mb-4" role="group">
         <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-outline-primary">Editar Tarea</a>
-        <a href="{% url 'eliminar_tarea' tarea.id %}?next={% url 'proyecto_list' %}" class="btn btn-danger">Eliminar</a>
+        <a href="{% url 'eliminar_tarea' tarea.id %}?next={% url 'proyecto_lista' %}" class="btn btn-danger">Eliminar</a>
     </div>
 
     <h2>Subtareas</h2>
