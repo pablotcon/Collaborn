@@ -2,8 +2,11 @@
 {% load static %}
 {% block title %}Home - Colaborize{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+{% endblock %}
+
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/index.css.css' %}">
 <section class="hero">
     <div class="hero-text">
         <h5>#2 Trending</h5>
@@ -14,7 +17,7 @@
         <a href="#" class="ctaa"><i class="ri-play-fill"></i>Aprende Como</a>
     </div>
     <div class="hero-img">
-        <img src="{% static 'img/main.png.png' %}" alt="Main Image">
+        <img src="{% static 'img/main.png' %}" alt="Main Image">
     </div>
 </section>
 

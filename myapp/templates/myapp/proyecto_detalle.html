@@ -1,78 +1,110 @@
 {% extends 'myapp/base.html' %}
+{% load static %}
 
-{% block title %}Detalles del Proyecto{% endblock %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'myapp/css/admin_dashboard.css' %}">
+{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="mb-3">
-        <a href="{% url 'proyecto_list' %}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Volver
-        </a>
-    </div>
-    <div class="card mb-3">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <h1 class="card-title">{{ proyecto.nombre }}</h1>
-                {% if perms.myapp.change_proyecto %}
-                <div class="btn-group mt-2 mt-md-0" role="group" aria-label="Administrar Proyecto">
-                    <a href="{% url 'proyecto_edit' proyecto.id %}" class="btn btn-outline-warning">Editar</a>
-                    <a href="{% url 'confirmar_eliminar_proyecto' proyecto.id %}" class="btn btn-outline-danger">Eliminar</a>
-                    <a href="{% url 'listar_tareas' proyecto.id %}" class="btn btn-outline-info">Tareas</a>
-                </div>
-                {% endif %}
-            </div>
-            <hr>
-            <p class="card-text">{{ proyecto.descripcion }}</p>
-            <p class="card-text"><strong>Fecha de Inicio:</strong> {{ proyecto.fecha_inicio }}</p>
-            <p class="card-text"><strong>Fecha de Fin:</strong> {{ proyecto.fecha_fin }}</p>
-            <p class="card-text"><strong>Ciudad:</strong> {{ proyecto.ciudad }}</p>
-            {% if proyecto.imagen %}
-            <img src="{{ proyecto.imagen.url }}" alt="{{ proyecto.nombre }}" class="img-fluid mb-3">
-            {% else %}
-            <p>No hay imagen disponible.</p>
-            {% endif %}
-            <p class="card-text"><strong>Categoría:</strong> {{ proyecto.categoria }}</p>
-        </div>
-    </div>
-
-    <div class="card mb-3">
-        <div class="card-body">
-            <h2 class="card-title">Comentarios</h2>
-            <ul class="list-group list-group-flush">
-                {% for comentario in comentarios %}
-                <li class="list-group-item d-flex justify-content-between align-items-start">
-                    <div class="ms-2 me-auto">
-                        <div class="fw-bold">{{ comentario.autor.username }}</div>
-                        {{ comentario.texto }}
-                    </div>
-                    <span class="badge bg-primary rounded-pill">{{ comentario.fecha_creacion }}</span>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-
-    <div class="card mb-3">
-        <div class="card-body">
-            <h2 class="card-title">Agregar Comentario</h2>
-            <form method="post">
-                {% csrf_token %}
-                <div class="form-group">
-                    {{ form.as_p }}
-                </div>
-                <button type="submit" class="btn btn-primary">Agregar Comentario</button>
+<div class="container">
+    <h1 class="mt-4">Admin Dashboard</h1>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <form method="get" class="form-inline">
+                <input type="text" name="q" value="{{ query }}" class="form-control mr-2" placeholder="Buscar...">
+                <select name="filtro" class="form-control mr-2">
+                    <option value="todos" {% if filtro == 'todos' %}selected{% endif %}>Todos</option>
+                    <option value="activos" {% if filtro == 'activos' %}selected{% endif %}>Activos</option>
+                    <option value="completados" {% if filtro == 'completados' %}selected{% endif %}>Completados</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Buscar</button>
             </form>
         </div>
     </div>
-
-    <div class="card mb-3">
-        <div class="card-body">
-            <h2 class="card-title">Postular al Proyecto</h2>
-            <form method="post" action="{% url 'postular_proyecto' proyecto.id %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-success">Postular</button>
-            </form>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <canvas id="proyectosChart"></canvas>
+        </div>
+        <div class="col-md-6">
+            <canvas id="tareasChart"></canvas>
         </div>
     </div>
+    <h2>Proyectos</h2>
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Fecha de Inicio</th>
+                <th>Fecha de Fin</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for proyecto in proyectos %}
+            <tr>
+                <td><a href="{% url 'proyecto_detalle' proyecto.id %}">{{ proyecto.nombre }}</a></td>
+                <td>{{ proyecto.descripcion }}</td>
+                <td>{{ proyecto.fecha_inicio }}</td>
+                <td>{{ proyecto.fecha_fin }}</td>
+                <td>
+                    <a href="{% url 'proyecto_edit' proyecto.pk %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a href="{% url 'proyecto_delete' proyecto.pk %}" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash-alt"></i> Eliminar
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctxProyectos = document.getElementById('proyectosChart').getContext('2d');
+    var proyectosChart = new Chart(ctxProyectos, {
+        type: 'bar',
+        data: {
+            labels: ['Activos', 'Completados'],
+            datasets: [{
+                label: 'Proyectos',
+                data: [{{ proyectos_activos }}, {{ proyectos_completados }}],
+                backgroundColor: ['#007bff', '#28a745']
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    var ctxTareas = document.getElementById('tareasChart').getContext('2d');
+    var tareasChart = new Chart(ctxTareas, {
+        type: 'bar',
+        data: {
+            labels: ['Pendientes', 'Completadas'],
+            datasets: [{
+                label: 'Tareas',
+                data: [{{ tareas_pendientes }}, {{ tareas_completadas }}],
+                backgroundColor: ['#dc3545', '#ffc107']
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}
