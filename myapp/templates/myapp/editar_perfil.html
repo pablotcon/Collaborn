@@ -1,11 +1,13 @@
 {% extends 'myapp/base.html' %}
-{% load static %}
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block title %}Editar Perfil{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/editar_perfil.css' %}">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@icon/entypo@1.0.3/entypo.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -15,7 +17,7 @@
             <div class="top-breadcrumb">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'ver_perfil' %}">Perfil</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Editar Perfil</li>
                     </ol>
                 </nav>
@@ -24,110 +26,95 @@
     </div>
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ user_form|crispy }}
-        {{ perfil_form|crispy }}
+        <div class="form-row">
+
+            <!-- Perfil Form -->
+            <div class="col-md-6">
+                {{ perfil_form.nombre|as_crispy_field }}
+                {{ perfil_form.apellido|as_crispy_field }}
+                {{ perfil_form.telefono|as_crispy_field }}
+                {{ perfil_form.fecha_nacimiento|as_crispy_field }}
+                {{ perfil_form.avatar|as_crispy_field }}
+                {{ perfil_form.website|as_crispy_field }}
+                {{ perfil_form.twitter|as_crispy_field }}
+                {{ perfil_form.facebook|as_crispy_field }}
+                {{ perfil_form.linkedin|as_crispy_field }}
+            </div>
+        </div>
+        {% if user_form.errors %}
+            <div class="alert alert-danger">
+                {{ user_form.errors }}
+            </div>
+        {% endif %}
+        {% if perfil_form.errors %}
+            <div class="alert alert-danger">
+                {{ perfil_form.errors }}
+            </div>
+        {% endif %}
+        {% if experiencia_formset.errors %}
+            <div class="alert alert-danger">
+                {{ experiencia_formset.errors }}
+            </div>
+        {% endif %}
+        {% if educacion_formset.errors %}
+            <div class="alert alert-danger">
+                {{ educacion_formset.errors }}
+            </div>
+        {% endif %}
+        
         <h3>Experiencia Laboral</h3>
-        {{ experiencia_formset.management_form|crispy }}
-        <div id="experiencias">
+        <div id="experiencia-formset">
+            {{ experiencia_formset.management_form }}
             {% for form in experiencia_formset %}
-                <div class="formset">
-                    {{ form|crispy }}
-                    {% if form.instance.pk %}
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editarExperienciaModal{{ form.instance.pk }}">Editar</button>
-                    <a href="{% url 'eliminar_experiencia' form.instance.pk %}" class="btn btn-danger">Eliminar</a>
-                    {% endif %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        {{ form|crispy }}
+                    </div>
                 </div>
             {% endfor %}
         </div>
         <button type="button" class="btn btn-primary" id="add-experiencia">Agregar Experiencia</button>
+
         <h3>Educación</h3>
-        {{ educacion_formset.management_form|crispy }}
-        <div id="educaciones">
+        <div id="educacion-formset">
+            {{ educacion_formset.management_form }}
             {% for form in educacion_formset %}
-                <div class="formset">
-                    {{ form|crispy }}
-                    {% if form.instance.pk %}
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editarEducacionModal{{ form.instance.pk }}">Editar</button>
-                    <a href="{% url 'eliminar_educacion' form.instance.pk %}" class="btn btn-danger">Eliminar</a>
-                    {% endif %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        {{ form|crispy }}
+                    </div>
                 </div>
             {% endfor %}
         </div>
         <button type="button" class="btn btn-primary" id="add-educacion">Agregar Educación</button>
+
         <button type="submit" class="btn btn-success">Guardar Cambios</button>
     </form>
 </div>
-
-{% for form in experiencia_formset %}
-{% if form.instance.pk %}
-<div class="modal fade" id="editarExperienciaModal{{ form.instance.pk }}" tabindex="-1" role="dialog" aria-labelledby="editarExperienciaModalLabel{{ form.instance.pk }}" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editarExperienciaModalLabel{{ form.instance.pk }}">Editar Experiencia</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="post" action="{% url 'editar_experiencia' form.instance.pk %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                    {{ form|crispy }}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-{% endif %}
-{% endfor %}
-
-{% for form in educacion_formset %}
-{% if form.instance.pk %}
-<div class="modal fade" id="editarEducacionModal{{ form.instance.pk }}" tabindex="-1" role="dialog" aria-labelledby="editarEducacionModalLabel{{ form.instance.pk }}" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editarEducacionModalLabel{{ form.instance.pk }}">Editar Educación</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="post" action="{% url 'editar_educacion' form.instance.pk %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                    {{ form|crispy }}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-{% endif %}
-{% endfor %}
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
     $(document).ready(function() {
+        var experienciaFormCount = {{ experiencia_formset.total_form_count }};
+        var educacionFormCount = {{ educacion_formset.total_form_count }};
+        
         $('#add-experiencia').click(function() {
-            var form_idx = $('#id_experiencias-TOTAL_FORMS').val();
-            $('#experiencias').append($('#empty_form_experiencia').html().replace(/__prefix__/g, form_idx));
-            $('#id_experiencias-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+            var form_idx = experienciaFormCount;
+            var formHtml = $('#empty_form_experiencia').html().replace(/__prefix__/g, form_idx);
+            $('#experiencia-formset').append(formHtml);
+            experienciaFormCount++;
         });
+        
         $('#add-educacion').click(function() {
-            var form_idx = $('#id_educaciones-TOTAL_FORMS').val();
-            $('#educaciones').append($('#empty_form_educacion').html().replace(/__prefix__/g, form_idx));
-            $('#id_educaciones-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+            var form_idx = educacionFormCount;
+            var formHtml = $('#empty_form_educacion').html().replace(/__prefix__/g, form_idx);
+            $('#educacion-formset').append(formHtml);
+            educacionFormCount++;
         });
     });
 </script>
+
 {% include 'myapp/empty_form_experiencia.html' %}
 {% include 'myapp/empty_form_educacion.html' %}
 {% endblock %}

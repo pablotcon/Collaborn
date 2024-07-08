@@ -1,4 +1,4 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, modelform_factory
 from asgiref.sync import async_to_sync
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
@@ -6,8 +6,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, User
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.db.models import Q
 from django.contrib import messages
-from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad, SeguimientoTarea, Subtarea,Educacion, ExperienciaLaboral
-from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm, SeguimientoTareaForm, EducacionFormSet, ExperienciaLaboralFormSet, SubtareaForm, ComentarioTareaForm
+from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad, SeguimientoTarea, Subtarea, Educacion, ExperienciaLaboral
+from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm, SeguimientoTareaForm, EducacionFormSet, ExperienciaLaboralFormSet, EducacionForm, SubtareaForm, ComentarioTareaForm, ExperienciaLaboralForm
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
@@ -16,12 +16,13 @@ from django.urls import reverse
 import json
 
 # Functions related to Task Management
-login_required
+@login_required
 def admin_panel_tareas(request):
     if not request.user.is_staff:
         return redirect('index')
     tareas = Tarea.objects.all()
     return render(request, 'myapp/admin_panel_tareas.html', {'tareas': tareas})
+
 @login_required
 def actualizar_estado_tarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, id=tarea_id)
@@ -243,8 +244,8 @@ def editar_perfil(request):
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=request.user)
         perfil_form = PerfilForm(request.POST, request.FILES, instance=perfil)
-        experiencia_formset = ExperienciaLaboralFormSet(request.POST, instance=perfil)
-        educacion_formset = EducacionFormSet(request.POST, instance=perfil)
+        experiencia_formset = ExperienciaLaboralFormSet(request.POST, request.FILES, instance=perfil)
+        educacion_formset = EducacionFormSet(request.POST, request.FILES, instance=perfil)
         
         if user_form.is_valid() and perfil_form.is_valid() and experiencia_formset.is_valid() and educacion_formset.is_valid():
             user_form.save()
@@ -253,6 +254,12 @@ def editar_perfil(request):
             educacion_formset.save()
             messages.success(request, 'Perfil actualizado exitosamente')
             return redirect('ver_perfil')
+        else:
+            # Para depuración, puedes imprimir los errores aquí.
+            print(user_form.errors)
+            print(perfil_form.errors)
+            print(experiencia_formset.errors)
+            print(educacion_formset.errors)
     else:
         user_form = UserForm(instance=request.user)
         perfil_form = PerfilForm(instance=perfil)
@@ -264,6 +271,8 @@ def editar_perfil(request):
         'perfil_form': perfil_form,
         'experiencia_formset': experiencia_formset,
         'educacion_formset': educacion_formset,
+        'experiencias': perfil.experiencias.all(),
+        'educaciones': perfil.educaciones.all(),
     })
 
 @login_required
@@ -273,7 +282,7 @@ def editar_experiencia(request, pk):
         form = ExperienciaLaboralForm(request.POST, instance=experiencia)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Experiencia laboral actualizada exitosamente.')
+            messages.success(request, 'Experiencia actualizada exitosamente.')
             return redirect('editar_perfil')
     else:
         form = ExperienciaLaboralForm(instance=experiencia)
@@ -284,7 +293,7 @@ def eliminar_experiencia(request, pk):
     experiencia = get_object_or_404(ExperienciaLaboral, pk=pk)
     if request.method == 'POST':
         experiencia.delete()
-        messages.success(request, 'Experiencia laboral eliminada exitosamente.')
+        messages.success(request, 'Experiencia eliminada exitosamente.')
         return redirect('editar_perfil')
     return render(request, 'myapp/eliminar_experiencia.html', {'experiencia': experiencia})
 
@@ -346,7 +355,6 @@ def listar_notificaciones(request):
         'notificaciones': notificaciones,
         'notificaciones_no_leidas': notificaciones_no_leidas,
     })
-
 
 @login_required
 def marcar_notificacion_leida(request, notificacion_id):
@@ -417,7 +425,6 @@ def proyecto_detail(request, proyecto_id):
         form = ComentarioForm()
     return render(request, 'myapp/proyecto_detail.html', {'proyecto': proyecto, 'comentarios': comentarios, 'form': form})
 
-
 @permission_required('myapp.delete_proyecto', raise_exception=True)
 @login_required
 def proyecto_delete(request, pk):
@@ -447,7 +454,7 @@ def postular_proyecto(request, proyecto_id):
         else:
             Postulacion.objects.create(proyecto=proyecto, usuario=request.user)
             Notificacion.objects.create(
-                usuario=proyecto.creador,
+                receptor=proyecto.creador,
                 mensaje=f'El usuario {request.user.username} se ha postulado a tu proyecto "{proyecto.nombre}".'
             )
             messages.success(request, 'Te has postulado al proyecto exitosamente.')

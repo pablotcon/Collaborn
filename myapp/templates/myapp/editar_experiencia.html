@@ -1,0 +1,15 @@
+{% extends 'myapp/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Editar Experiencia{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Editar Experiencia</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    </form>
+</div>
+{% endblock %}

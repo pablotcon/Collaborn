@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 from django.contrib.auth.models import User
-from .models import Recurso, Perfil, Comentario, Mensaje, Proyecto, Tarea, ExperienciaLaboral, Educacion,SeguimientoTarea,Subtarea, ComentarioTarea, Categoria
+from .models import Recurso, Perfil, Comentario, Mensaje, Proyecto, Tarea, ExperienciaLaboral, Educacion, SeguimientoTarea, Subtarea, ComentarioTarea, Categoria
 
 class UserForm(forms.ModelForm):
     class Meta:
@@ -11,17 +11,41 @@ class UserForm(forms.ModelForm):
 class PerfilForm(forms.ModelForm):
     class Meta:
         model = Perfil
-        fields = ['nombre', 'apellido','telefono', 'birth_date','avatar', 'website', 'twitter', 'facebook', 'linkedin']
+        fields = ['nombre', 'apellido', 'telefono', 'fecha_nacimiento', 'avatar', 'website', 'twitter', 'facebook', 'linkedin']
 
 class ExperienciaLaboralForm(forms.ModelForm):
     class Meta:
         model = ExperienciaLaboral
         fields = ['titulo', 'fecha_inicio', 'fecha_fin', 'descripcion']
 
+    def clean_fecha_inicio(self):
+        fecha_inicio = self.cleaned_data.get('fecha_inicio')
+        if not fecha_inicio:
+            raise forms.ValidationError('Este campo es obligatorio.')
+        return fecha_inicio
+
+    def clean_fecha_fin(self):
+        fecha_fin = self.cleaned_data.get('fecha_fin')
+        if not fecha_fin:
+            raise forms.ValidationError('Este campo es obligatorio.')
+        return fecha_fin
+
 class EducacionForm(forms.ModelForm):
     class Meta:
         model = Educacion
-        fields = ['institucion', 'fecha_inicio', 'fecha_fin', 'descripcion']
+        fields = ['titulo', 'institucion', 'fecha_inicio', 'fecha_fin']
+
+    def clean_fecha_inicio(self):
+        fecha_inicio = self.cleaned_data.get('fecha_inicio')
+        if not fecha_inicio:
+            raise forms.ValidationError('Este campo es obligatorio.')
+        return fecha_inicio
+
+    def clean_fecha_fin(self):
+        fecha_fin = self.cleaned_data.get('fecha_fin')
+        if not fecha_fin:
+            raise forms.ValidationError('Este campo es obligatorio.')
+        return fecha_fin
 
 ExperienciaLaboralFormSet = inlineformset_factory(Perfil, ExperienciaLaboral, form=ExperienciaLaboralForm, extra=1, can_delete=True)
 EducacionFormSet = inlineformset_factory(Perfil, Educacion, form=EducacionForm, extra=1, can_delete=True)
@@ -68,8 +92,6 @@ class ProyectoForm(forms.ModelForm):
         model = Proyecto
         fields = ['nombre', 'descripcion', 'fecha_inicio', 'fecha_fin', 'ciudad', 'imagen', 'categoria']
 
-
-        
 class TareaForm(forms.ModelForm):
     class Meta:
         model = Tarea

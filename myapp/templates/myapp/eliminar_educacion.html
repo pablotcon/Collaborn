@@ -1,6 +1,6 @@
 {% extends 'myapp/base.html' %}
 
-{% block title %}Confirmar Eliminación de Experiencia{% endblock %}
+{% block title %}Confirmar Eliminación de Educación{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -9,9 +9,9 @@
             Confirmar Eliminación
         </div>
         <div class="card-body">
-            <p>¿Estás seguro de que deseas eliminar esta experiencia laboral?</p>
-            <h5>{{ experiencia.titulo }}</h5>
-            <p>{{ experiencia.descripcion }}</p>
+            <p>¿Estás seguro de que deseas eliminar esta educación?</p>
+            <h5>{{ educacion.titulo }}</h5>
+            <p>{{ educacion.institucion }}</p>
             <form method="POST">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">Eliminar</button>

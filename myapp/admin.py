@@ -55,10 +55,10 @@ class RecursoAdmin(admin.ModelAdmin):
     search_fields = ('titulo',)
     list_filter = ('fecha_subida',)
 
-@admin.register(Perfil)
 class PerfilAdmin(admin.ModelAdmin):
-    list_display = ['user', 'telefono', 'birth_date', 'descripcion']
-    list_filter = ['birth_date', 'user']
+    list_display = ('nombre', 'apellido', 'fecha_nacimiento', 'telefono', 'website', 'twitter', 'facebook', 'linkedin')
+    list_filter = ('fecha_nacimiento', 'nombre', 'apellido')
+
 
 @admin.register(Tarea)
 class TareaAdmin(admin.ModelAdmin):

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 def get_default_user():
@@ -23,6 +24,7 @@ class Proyecto(models.Model):
 
     def __str__(self):
         return self.nombre
+
 class Tarea(models.Model):
     proyecto = models.ForeignKey(Proyecto, related_name='tareas', on_delete=models.CASCADE)
     nombre = models.CharField(max_length=200)
@@ -33,18 +35,17 @@ class Tarea(models.Model):
 
     def __str__(self):
         return self.nombre
-    
+
 class Subtarea(models.Model):
     tarea = models.ForeignKey(Tarea, on_delete=models.CASCADE, related_name='subtareas')
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     fecha_limite = models.DateTimeField()
     completada = models.BooleanField(default=False)
-    
+
     def __str__(self):
         return self.nombre
-    
-# Definición del modelo SeguimientoTarea
+
 class SeguimientoTarea(models.Model):
     tarea = models.ForeignKey(Tarea, on_delete=models.CASCADE, related_name='seguimientos')
     comentario = models.TextField()
@@ -115,34 +116,35 @@ class Recurso(models.Model):
 
 class Perfil(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    nombre = models.CharField(max_length=30, blank=True, null=True)
+    apellido = models.CharField(max_length=30, blank=True, null=True)
     telefono = models.CharField(max_length=15, blank=True, null=True)
-    birth_date = models.DateField(null=True, blank=True)
-    descripcion = models.TextField(blank=True, null=True, default='')
+    fecha_nacimiento = models.DateField(null=True, blank=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
-    website = models.URLField(blank=True, null=True)
-    twitter = models.URLField(blank=True, null=True)
-    facebook = models.URLField(blank=True, null=True)
-    linkedin = models.URLField(blank=True, null=True)
-    nombre = models.CharField(max_length=30, blank=True, null=True, default='')
-    apellido = models.CharField(max_length=30, blank=True, null=True, default='')
+    website = models.URLField(max_length=200, blank=True, null=True)
+    twitter = models.URLField(max_length=200, blank=True, null=True)
+    facebook = models.URLField(max_length=200, blank=True, null=True)
+    linkedin = models.URLField(max_length=200, blank=True, null=True)
 
     def __str__(self):
-        return self.user.username
+        return f'{self.nombre} {self.apellido or ""}'
 
 class ExperienciaLaboral(models.Model):
     perfil = models.ForeignKey(Perfil, related_name='experiencias', on_delete=models.CASCADE)
-    titulo = models.CharField(max_length=200)
-    fecha_inicio = models.DateField()
-    fecha_fin = models.DateField(blank=True, null=True)
+    titulo = models.CharField(max_length=100, blank=True, null=True)
     descripcion = models.TextField(blank=True, null=True)
+    fecha_inicio = models.DateField(default=timezone.now)
+    fecha_fin = models.DateField(default=timezone.now)
+
+    def __str__(self):
+        return self.titulo
 
 class Educacion(models.Model):
     perfil = models.ForeignKey(Perfil, related_name='educaciones', on_delete=models.CASCADE)
-    institucion = models.CharField(max_length=200)
-    fecha_inicio = models.DateField()
-    fecha_fin = models.DateField(blank=True, null=True)
-    descripcion = models.TextField(blank=True, null=True)
+    titulo = models.CharField(max_length=100, blank=True, null=True)
+    institucion = models.CharField(max_length=100, blank=True, null=True)
+    fecha_inicio = models.DateField(default=timezone.now)
+    fecha_fin = models.DateField(default=timezone.now)
 
     def __str__(self):
-        return self.institucion
-    
+        return self.titulo
