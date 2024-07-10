@@ -20,7 +20,7 @@
                 <div class="intro-content-wrapper">
                     <h1 class="intro-title">Únete a Nosotros</h1>
                     <p class="intro-text">Colabora y crece con nosotros.</p>
-                    <img src="{% static 'img/main.png.png' %}" alt="Colaborize Logo" class="img-fluid"> <!-- Asegúrate de usar la ruta correcta -->
+                    <img src="{% static 'img/main.png' %}" alt="Colaborize Logo" class="img-fluid"> <!-- Asegúrate de usar la ruta correcta -->
                     <a href="#!" class="btn btn-read-more">Leer más</a>
                 </div>
                 <div class="intro-section-footer">
@@ -36,13 +36,20 @@
                     <h2 class="login-title">Inicia Aquí</h2>
                     <form method="post">
                         {% csrf_token %}
-                        {{ form.as_p }}
+                        <div class="form-group">
+                            <label for="id_username">Usuario</label>
+                            {{ form.username }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_password">Contraseña</label>
+                            {{ form.password }}
+                        </div>
                         <div class="d-flex justify-content-between align-items-center mb-5">
                             <button type="submit" class="btn login-btn">Iniciar Sesión</button>
-                            <a href="#!" class="forgot-password-link">Contraseña?</a>
+                            <a href="#!" class="forgot-password-link">¿Olvidaste tu contraseña?</a>
                         </div>
                     </form>
-                    <p class="login-wrapper-footer-text">No tienes Cuenta? <a href="{% url 'register' %}" class="text-reset">Regístrate Aquí</a></p>
+                    <p class="login-wrapper-footer-text">¿No tienes cuenta? <a href="{% url 'register' %}" class="text-reset">Regístrate Aquí</a></p>
                 </div>
             </div>
         </div>

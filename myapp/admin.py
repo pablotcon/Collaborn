@@ -27,15 +27,15 @@ def create_groups(sender, **kwargs):
 
 @admin.register(Proyecto)
 class ProyectoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'fecha_inicio', 'fecha_fin')  # Removido 'creador' si no está definido en el modelo
+    list_display = ('nombre', 'fecha_inicio', 'fecha_fin')
     search_fields = ('nombre', 'descripcion')
-    list_filter = ('fecha_inicio', 'fecha_fin')  # Removido 'creador'
+    list_filter = ('fecha_inicio', 'fecha_fin')
 
 @admin.register(Comentario)
 class ComentarioAdmin(admin.ModelAdmin):
-    list_display = ('proyecto', 'autor', 'fecha_creacion')  # Cambiado 'usuario' a 'autor'
-    search_fields = ('texto',)  # Cambiado 'contenido' a 'texto'
-    list_filter = ('fecha_creacion', 'autor')  # Cambiado 'usuario' a 'autor'
+    list_display = ('proyecto', 'autor', 'fecha_creacion')
+    search_fields = ('texto',)
+    list_filter = ('fecha_creacion', 'autor')
 
 @admin.register(Mensaje)
 class MensajeAdmin(admin.ModelAdmin):
@@ -45,9 +45,19 @@ class MensajeAdmin(admin.ModelAdmin):
 
 @admin.register(Notificacion)
 class NotificacionAdmin(admin.ModelAdmin):
-    list_display = ('receptor', 'mensaje', 'fecha_creacion', 'leido')
-    search_fields = ('mensaje',)
-    list_filter = ('fecha_creacion', 'leido', 'receptor')
+    list_display = ('receptor_username', 'mensaje', 'fecha_creacion', 'leido')
+    list_filter = ('leido', 'fecha_creacion', 'receptor__username')
+
+    def receptor_username(self, obj):
+        return obj.receptor.username
+    receptor_username.admin_order_field = 'receptor'
+    receptor_username.short_description = 'Receptor Username'
+
+@admin.register(Tarea)
+class TareaAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'proyecto', 'completada', 'fecha_limite', 'asignada_a')
+    list_filter = ('proyecto', 'completada', 'fecha_limite', 'asignada_a')
+    search_fields = ('nombre', 'descripcion')
 
 @admin.register(Recurso)
 class RecursoAdmin(admin.ModelAdmin):
@@ -55,13 +65,8 @@ class RecursoAdmin(admin.ModelAdmin):
     search_fields = ('titulo',)
     list_filter = ('fecha_subida',)
 
+@admin.register(Perfil)
 class PerfilAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'apellido', 'fecha_nacimiento', 'telefono', 'website', 'twitter', 'facebook', 'linkedin')
-    list_filter = ('fecha_nacimiento', 'nombre', 'apellido')
-
-
-@admin.register(Tarea)
-class TareaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'proyecto', 'completada', 'fecha_limite', 'asignada_a')
-    list_filter = ('proyecto', 'completada', 'fecha_limite', 'asignada_a')
-    search_fields = ('nombre', 'descripcion')
+    list_display = ('user', 'telefono', 'fecha_nacimiento', 'website', 'twitter', 'facebook', 'linkedin')
+    list_filter = ('fecha_nacimiento', 'user')
+    search_fields = ('user__username', 'telefono')

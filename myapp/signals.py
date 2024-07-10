@@ -36,12 +36,11 @@ def enviar_notificacion_mensaje(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Tarea)
 def notificar_asignacion_tarea(sender, instance, created, **kwargs):
     if created and instance.asignada_a:
-        mensaje = f'Has sido asignado a la tarea: {instance.nombre}'
         Notificacion.objects.create(
-            usuario=instance.asignada_a,
-            mensaje=mensaje
+            receptor=instance.asignada_a,
+            mensaje=f"Se te ha asignado una nueva tarea: {instance.nombre}",
+            url=f"/tareas/{instance.id}/"
         )
-        
 @receiver(post_save, sender=Tarea)
 def registrar_actividad_tarea(sender, instance, created, **kwargs):
     if created:

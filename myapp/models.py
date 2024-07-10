@@ -90,15 +90,14 @@ class Postulacion(models.Model):
         return f'{self.usuario.username} en {self.proyecto.nombre}'
 
 class Notificacion(models.Model):
-    receptor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificaciones')
-    mensaje = models.CharField(max_length=255)
-    url = models.CharField(max_length=200, default='/')
-    leido = models.BooleanField(default=False)
+    receptor = models.ForeignKey(User, on_delete=models.CASCADE)
+    mensaje = models.TextField()
+    url = models.URLField(null=True, blank=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    leido = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'Notificación para {self.receptor.username} - {self.mensaje}'
-
+        return f'Notificación para {self.receptor.username}'
 class Mensaje(models.Model):
     emisor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mensajes_enviados')
     receptor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mensajes_recibidos')

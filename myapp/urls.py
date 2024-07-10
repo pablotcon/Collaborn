@@ -40,6 +40,7 @@ urlpatterns = [
     path('tareas/dejar_seguir/<int:tarea_id>/', views.dejar_seguir_tarea, name='dejar_seguir_tarea'),
     path('tareas/seguimientos/', views.listar_seguimientos, name='listar_seguimientos'),
     path('tareas/seguimiento/agregar/<int:tarea_id>/', views.agregar_seguimiento, name='agregar_seguimiento'),
+    path('tareas/<int:tarea_id>/agregar_subtarea/', views.agregar_subtarea, name='agregar_subtarea'),
 
     path('notificaciones/', views.listar_notificaciones, name='listar_notificaciones'),
     path('notificaciones/marcar_leida/<int:notificacion_id>/', views.marcar_notificacion_leida, name='marcar_notificacion_leida'),

@@ -105,7 +105,7 @@ def agregar_tarea(request, proyecto_id):
             tarea = form.save(commit=False)
             tarea.proyecto = proyecto
             tarea.save()
-            
+
             # Crear una notificación para el usuario asignado a la tarea
             if tarea.asignada_a:
                 Notificacion.objects.create(
@@ -113,7 +113,7 @@ def agregar_tarea(request, proyecto_id):
                     mensaje=f"Se te ha asignado una nueva tarea: {tarea.nombre}",
                     url=f"/tareas/{tarea.id}/"
                 )
-            
+
             messages.success(request, 'Tarea agregada exitosamente.')
             return redirect('listar_tareas', proyecto_id=proyecto.id)
         else:
@@ -123,6 +123,7 @@ def agregar_tarea(request, proyecto_id):
     return render(request, 'myapp/agregar_tarea.html', {'form': form, 'proyecto': proyecto})
 
 @login_required
+
 def agregar_subtarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, id=tarea_id)
     if request.method == 'POST':
@@ -131,10 +132,14 @@ def agregar_subtarea(request, tarea_id):
             subtarea = form.save(commit=False)
             subtarea.tarea = tarea
             subtarea.save()
+            messages.success(request, 'Subtarea agregada exitosamente.')
             return redirect('detalle_tarea', tarea_id=tarea.id)
+        else:
+            messages.error(request, 'Error al agregar la subtarea.')
     else:
         form = SubtareaForm()
     return render(request, 'myapp/agregar_subtarea.html', {'form': form, 'tarea': tarea})
+
 
 @login_required
 def listar_tareas(request, proyecto_id):
