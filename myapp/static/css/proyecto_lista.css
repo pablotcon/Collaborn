@@ -1,19 +1,19 @@
 @import url("https://fonts.googleapis.com/css2?family=Baloo+2&display=swap");
-/* Añade aquí el contenido CSS proporcionado */
+
 body {
     font-family: "Baloo 2", cursive;
     font-size: 16px;
-    color: #ffffff;
+    color: #000000; /* Texto negro */
     text-rendering: optimizeLegibility;
     font-weight: initial;
 }
 
 .dark {
-    background: #110f16;
+    background: #f5f378;
 }
 
 .light {
-    background: #f3f5f7;
+    background: #f5f378;
 }
 
 a, a:hover {
@@ -37,19 +37,19 @@ a, a:hover {
     margin: 0 0 2rem 0;
     overflow: hidden;
     position: relative;
-    color: #ffffff;
+    color: #000000; /* Texto negro */
 }
 
 .postcard.dark {
-    background-color: #18151f;
+    background-color: #110f16;
 }
 
 .postcard.light {
-    background-color: #d8ff61;
+    background-color: #f5f378; /* Fondo del color principal */
 }
 
 .t-dark {
-    color: #18151f;
+    color: #000000; /* Texto negro */
 }
 
 .postcard__title {
@@ -147,7 +147,7 @@ a, a:hover {
         content: "";
         position: absolute;
         display: block;
-        background: #18151f;
+        background: #000000; /* Línea vertical negra */
         top: -20%;
         height: 130%;
         width: 55px;
@@ -191,10 +191,10 @@ a, a:hover {
     }
 
     .postcard.dark .postcard__text::before {
-        background: #18151f;
+        background: #110f16;
     }
 
     .postcard.light .postcard__text::before {
-        background: #e1e5ea;
+        background: #f5f378; /* Línea vertical del color principal */
     }
 }

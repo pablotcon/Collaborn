@@ -1,6 +1,8 @@
-body {
-    margin-top: 20px;
-    background: #dcdcdc;
+
+.card-body {
+
+    background: #f5f378;
+
 }
 
 /* profile page */
@@ -11,50 +13,63 @@ body {
     margin: auto;
     display: block;
     margin-bottom: 20px;
+    background: #f5f378;
 }
 
+/* nombre de usuario */
 .left-profile-card h3 {
-    font-size: 18px;
+    font-size: 20px;
     margin-bottom: 0;
     font-weight: 700;
     text-align: center;
+    color: #000000; /* Color de acento */
+    background: #f5f378;
 }
 
+/* Nombre usuario Real */
 .left-profile-card p {
     margin-bottom: 5px;
     text-align: center;
+    background: #f5f378;
 }
 
 .personal-info {
     margin-bottom: 30px;
+    background: #f5f378;
 }
 
 .personal-info .personal-list {
     list-style-type: none;
     margin: 0;
     padding: 0;
+    background: #f5f378;
 }
 
 .personal-list li {
     margin-bottom: 5px;
     display: flex;
     align-items: center;
+    background: #f5f378;
 }
 
 .personal-info h3 {
     margin-bottom: 10px;
+    color: #000000; /* Color de acento */
+    background: #f5f378;
 }
 
 .personal-info p {
     margin-bottom: 5px;
     font-size: 14px;
+    background: #f5f378;
 }
 
 .personal-info i {
     font-size: 15px;
-    color: var(--main-color);
+    color: #000000; /* Color de acento */
     margin-right: 15px;
     width: 18px;
+    background: #f5f378;
 }
 
 /* timeline */
@@ -68,7 +83,7 @@ body {
     position: absolute;
     display: block;
     width: 4px;
-    background: #0000ad;
+    background: #000000; /* Color de acento */
     top: 20px;
     bottom: 20px;
     margin-left: 30px;
@@ -84,21 +99,21 @@ body {
 
 .timeline-centered .timeline-entry .timeline-entry-inner {
     display: flex;
-    align-items: center; /* Alinea los íconos y el contenido */
+    align-items: center;
     margin-left: -20px;
     position: relative;
 }
 
 .timeline-centered .timeline-entry .timeline-entry-inner .timeline-time {
-    position: relative; /* Cambiado de absolute a relative */
+    position: relative;
     text-align: right;
     padding: 10px;
     box-sizing: border-box;
-    font-size: 14px; /* Ajustar el tamaño de la fuente si es necesario */
-    z-index: 1000; /* Asegura que esté por encima de otros elementos */
-  /* Fondo para mayor visibilidad */
-    border-radius: 4px; /* Bordes redondeados para una mejor estética */
-    margin-top: 10px; /* Espacio entre el timeline-label y el timeline-time */
+    font-size: 14px;
+    z-index: 1000;
+    background: #fff9c4; /* Fondo más claro para contraste */
+    border-radius: 4px;
+    margin-top: 10px;
 }
 
 .timeline-centered .timeline-entry .timeline-entry-inner .timeline-time > span {
@@ -107,27 +122,28 @@ body {
 }
 
 .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon {
-    background: #fff;
+    background: #f5f378;
     width: 40px;
     height: 40px;
     text-align: center;
     line-height: 40px;
     border-radius: 50%;
-    box-shadow: 0 0 0 5px #2b2bff;
+    box-shadow: 0 0 0 5px #f5f378; /* Color de acento */
     color: #00d512;
     border: 1px solid #ff0000;
-    font-size: 16px;
-    margin-right: 15px; /* Añade espacio entre el ícono y el texto */
-    flex-shrink: 0; /* Evita que el ícono se reduzca de tamaño */
+    font-size: 26px;
+    margin-right: 15px;
+    flex-shrink: 0;
 }
 
 .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label {
-    background: #f5f5f6;
+    background: #fff9c4; /* Fondo blanco para legibilidad */
     padding: 1.5em;
-    margin-left: 0; /* Ajustado a 0 para eliminar espacio innecesario */
+    margin-left: 0;
     border-radius: 3px;
-    flex-grow: 1; /* Permite que el contenido del label ocupe el espacio disponible */
-    width: 351.44px;/* Permite que el contenido del label ocupe el espacio disponible */
+    flex-grow: 1;
+    width: 351.44px;
+    color: #333; /* Texto en color oscuro */
 }
 
 .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label h2 {
@@ -135,7 +151,8 @@ body {
     font-size: 1.5em;
     margin-bottom: 5px;
     display: flex;
-    align-items: center; /* Alinea verticalmente el ícono y el texto */
+    align-items: center;
+    color: #000000; /* Color de acento */
 }
 
 .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label p {
@@ -153,7 +170,7 @@ body {
     width: 0;
     height: 0;
     border: 9px solid transparent;
-    border-right-color: #f5f5f6;
+    border-right-color: #f5f378; /* Fondo blanco para legibilidad */
     margin-left: -9px;
 }
 
@@ -166,17 +183,18 @@ body {
     background: #3c8dbc !important;
     border: none;
 }
-/* Asegúrate de que el div .card-body tenga overflow hidden */
+
+/* Modificación para la clase card-body */
 .right-profile-card .card-body {
     overflow: hidden;
+    background: #f5f378; /* Color de fondo actualizado */
 }
 
-/* Ajusta el ancho del contenedor de la línea de tiempo */
 .timeline-centered {
     position: relative;
     margin-bottom: 30px;
     max-width: 100%;
-    overflow: hidden; /* Asegúrate de que el contenido no se desborde */
+    overflow: hidden;
 }
 
 .timeline-centered .timeline-entry {
@@ -185,7 +203,7 @@ body {
     margin-left: 30px;
     margin-bottom: 10px;
     clear: both;
-    max-width: calc(100% - 60px); /* Ajusta el ancho para que no se desborde */
+    max-width: calc(100% - 60px);
 }
 
 .timeline-centered .timeline-entry .timeline-entry-inner {
@@ -197,34 +215,35 @@ body {
 }
 
 .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label {
-    
     padding: 1.5em;
     margin-left: 0;
     border-radius: 3px;
     flex-grow: 1;
     max-width: 100%;
-    overflow: hidden; /* Asegúrate de que el contenido no se desborde */
+    overflow: hidden;
 }
+
 .formset {
     margin-bottom: 20px;
     padding: 10px;
     border: 1px solid #dee2e6;
     border-radius: 5px;
-    background: #f8f9fa;
+    background: #ffffff; /* Fondo blanco para mayor legibilidad */
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
 }
 
 .formset .form-group {
-    flex: 1 1 45%; /* Ajusta la proporción para que quepan dos campos por fila */
-    min-width: 200px; /* Ancho mínimo para los campos */
+    flex: 1 1 45%;
+    min-width: 200px;
 }
 
 .formset label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
+    color: #f5f378; /* Color de acento */
 }
 
 .formset input,
@@ -235,5 +254,7 @@ body {
     margin: 5px 0 10px;
     border: 1px solid #ced4da;
     border-radius: 5px;
-    box-sizing: border-box; /* Asegura que el padding no afecte al ancho total */
+    box-sizing: border-box;
+    background: #ffffff; /* Fondo blanco para mayor legibilidad */
+    color: #333; /* Texto en color oscuro */
 }
