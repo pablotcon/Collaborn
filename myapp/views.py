@@ -21,8 +21,11 @@ from django.utils import timezone
 def admin_panel_tareas(request):
     if not request.user.is_staff:
         return redirect('index')
-    tareas = Tarea.objects.all()
-    return render(request, 'myapp/admin_panel_tareas.html', {'tareas': tareas})
+    
+    proyectos = Proyecto.objects.all()
+    tareas_por_proyecto = {proyecto: Tarea.objects.filter(proyecto=proyecto) for proyecto in proyectos}
+    
+    return render(request, 'myapp/admin_panel_tareas.html', {'tareas_por_proyecto': tareas_por_proyecto})
 
 @login_required
 def actualizar_estado_tarea(request, tarea_id):

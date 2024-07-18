@@ -5,31 +5,46 @@
 {% block content %}
 <div class="container mt-5">
     <h1 class="mb-4">Panel de Tareas</h1>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Fecha Límite</th>
-                <th>Asignada a</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for tarea in tareas %}
-            <tr>
-                <td>{{ tarea.nombre }}</td>
-                <td>{{ tarea.descripcion }}</td>
-                <td>{{ tarea.fecha_limite }}</td>
-                <td>{{ tarea.asignada_a.username }}</td>
-                <td>
-                    <a href="{% url 'detalle_tarea' tarea.id %}" class="btn btn-outline-info btn-sm">Ver Detalles</a>
-                    <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-outline-primary btn-sm">Editar</a>
-                    <a href="{% url 'eliminar_tarea' tarea.id %}?next={% url 'admin_panel_tareas' %}" class="btn btn-danger">Eliminar</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% for proyecto, tareas_proyecto in tareas_por_proyecto.items %}
+    <div class="project-section mb-5">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h2>{{ proyecto.nombre }}</h2>
+            </div>
+            <div class="card-body">
+                {% if tareas_proyecto %}
+                <table class="table table-striped table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Fecha Límite</th>
+                            <th>Asignada a</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tarea in tareas_proyecto %}
+                        <tr>
+                            <td>{{ tarea.nombre }}</td>
+                            <td>{{ tarea.descripcion }}</td>
+                            <td>{{ tarea.fecha_limite }}</td>
+                            <td>{{ tarea.asignada_a.username }}</td>
+                            <td>
+                                <a href="{% url 'detalle_tarea' tarea.id %}" class="btn btn-outline-info btn-sm">Ver Detalles</a>
+                                <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-outline-primary btn-sm">Editar</a>
+                                <a href="{% url 'eliminar_tarea' tarea.id %}?next={% url 'admin_panel_tareas' %}" class="btn btn-danger btn-sm">Eliminar</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No hay tareas para este proyecto.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}
