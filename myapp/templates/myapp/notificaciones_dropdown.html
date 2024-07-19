@@ -1,0 +1,10 @@
+{% for notificacion in notificaciones %}
+<a class="dropdown-item {% if notificacion.leido %}list-group-item-light{% else %}list-group-item-info{% endif %}" href="{{ notificacion.url }}">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <p class="mb-1">{{ notificacion.mensaje }}</p>
+            <small class="text-muted">{{ notificacion.fecha_creacion|date:"d M Y, H:i" }}</small>
+        </div>
+    </div>
+</a>
+{% endfor %}

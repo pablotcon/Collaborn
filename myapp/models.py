@@ -79,7 +79,7 @@ class Comentario(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.texto
+        return f'Comentario por {self.autor} en {self.proyecto}'
 
 
 
@@ -101,12 +101,12 @@ class Postulacion(models.Model):
 class Notificacion(models.Model):
     receptor = models.ForeignKey(User, on_delete=models.CASCADE)
     mensaje = models.TextField()
-    url = models.URLField(null=True, blank=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    url = models.URLField(blank=True, null=True)  # Permitir valores nulos y vacíos    
     leido = models.BooleanField(default=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'Notificación para {self.receptor.username}'
+        return f'Notificación para {self.receptor.username}: {self.mensaje}'
     
 class Mensaje(models.Model):
     emisor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mensajes_enviados')

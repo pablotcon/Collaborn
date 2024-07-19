@@ -15,7 +15,8 @@ from channels.layers import get_channel_layer
 from django.urls import reverse
 import json
 from django.utils import timezone
-
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 # Functions related to Task Management
 @login_required
 def admin_panel_tareas(request):
@@ -245,6 +246,9 @@ def user_notification(event):
         'message': message
     }))
 
+
+
+
 # Functions related to User Profile
 @login_required
 def editar_perfil(request):
@@ -357,6 +361,20 @@ def cambiar_password(request):
 
 # Funciones de Notificaciones
 @login_required
+def notificaciones_ajax(request):
+    notificaciones = request.user.notificacion_set.all().order_by('-fecha_creacion')[:5]  # Obtener las últimas 5 notificaciones
+    notificaciones_no_leidas = request.user.notificacion_set.filter(leido=False).count()
+    
+    html = render_to_string('myapp/notificaciones_dropdown.html', {'notificaciones': notificaciones})
+    
+    return JsonResponse({
+        'html': html,
+        'count': notificaciones_no_leidas,
+    })
+
+
+
+@login_required
 def listar_notificaciones(request):
     notificaciones_no_leidas = request.user.notificacion_set.filter(leido=False).count()
     notificaciones = request.user.notificacion_set.all().order_by('-fecha_creacion')
@@ -439,6 +457,7 @@ def proyecto_detalle(request, proyecto_id):
         'form': form,
         'postulaciones': postulaciones,
     })
+
 
 @permission_required('myapp.delete_proyecto', raise_exception=True)
 @login_required
