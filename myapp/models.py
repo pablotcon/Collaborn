@@ -81,14 +81,23 @@ class Comentario(models.Model):
     def __str__(self):
         return self.texto
 
+
+
 class Postulacion(models.Model):
+    ESTADO_CHOICES = [
+        ('pendiente', 'Pendiente'),
+        ('aceptada', 'Aceptada'),
+        ('rechazada', 'Rechazada'),
+    ]
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='pendiente')
     fecha_postulacion = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f'{self.usuario.username} en {self.proyecto.nombre}'
-
+    class Meta:
+        unique_together = ('proyecto', 'usuario')
+        
+# Modelo Notificaciones
 class Notificacion(models.Model):
     receptor = models.ForeignKey(User, on_delete=models.CASCADE)
     mensaje = models.TextField()
@@ -98,6 +107,7 @@ class Notificacion(models.Model):
 
     def __str__(self):
         return f'Notificación para {self.receptor.username}'
+    
 class Mensaje(models.Model):
     emisor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mensajes_enviados')
     receptor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mensajes_recibidos')

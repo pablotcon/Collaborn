@@ -1,3 +1,4 @@
+# forms.py
 from django import forms
 from django.forms import inlineformset_factory
 from django.contrib.auth.models import User
@@ -76,7 +77,6 @@ class ProyectoForm(forms.ModelForm):
         ('rancagua', 'Rancagua'),
         ('iquique', 'Iquique'),
         ('puerto_montt', 'Puerto Montt'),
-        # Añadir más ciudades según sea necesario
     ]
 
     fecha_inicio = forms.DateField(
@@ -105,6 +105,7 @@ class ProyectoForm(forms.ModelForm):
     class Meta:
         model = Proyecto
         fields = ['nombre', 'descripcion', 'fecha_inicio', 'fecha_fin', 'ciudad', 'imagen', 'categoria']
+
 class TareaForm(forms.ModelForm):
     class Meta:
         model = Tarea

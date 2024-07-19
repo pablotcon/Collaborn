@@ -25,9 +25,15 @@ urlpatterns = [
     path('proyectos/<int:pk>/editar/', views.proyecto_edit, name='proyecto_edit'),
     path('proyectos/<int:pk>/confirmar_eliminar/', views.confirmar_eliminar_proyecto, name='confirmar_eliminar_proyecto'),
     path('proyectos/<int:pk>/eliminar/', views.proyecto_delete, name='proyecto_delete'),
+    
+    # postulaciones
     path('proyectos/<int:proyecto_id>/postular/', views.postular_proyecto, name='postular_proyecto'),
+    path('postulacion/aceptar/<int:postulacion_id>/', views.aceptar_postulacion, name='aceptar_postulacion'),
+    path('postulacion/rechazar/<int:postulacion_id>/', views.rechazar_postulacion, name='rechazar_postulacion'),
     path('mis_postulaciones/', views.mis_postulaciones, name='mis_postulaciones'),
+
     path('tareas/<int:tarea_id>/actualizar_estado/', views.actualizar_estado_tarea, name='actualizar_estado_tarea'),
+
 
     path('tareas/agregar/<int:proyecto_id>/', views.agregar_tarea, name='agregar_tarea'),
     path('tareas/<int:tarea_id>/agregar_subtarea/', views.agregar_subtarea, name='agregar_subtarea'),

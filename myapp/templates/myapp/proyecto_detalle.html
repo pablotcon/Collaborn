@@ -72,6 +72,34 @@
 
     <div class="card mb-3">
         <div class="card-body">
+            <h2 class="card-title">Postulaciones</h2>
+            <ul class="list-group list-group-flush">
+                {% for postulacion in postulaciones %}
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">{{ postulacion.usuario.username }}</div>
+                        Estado: {{ postulacion.get_estado_display }}
+                    </div>
+                    {% if postulacion.estado == 'pendiente' and perms.myapp.change_postulacion %}
+                    <div class="btn-group" role="group" aria-label="Acciones de Postulación">
+                        <form method="post" action="{% url 'aceptar_postulacion' postulacion.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Aceptar</button>
+                        </form>
+                        <form method="post" action="{% url 'rechazar_postulacion' postulacion.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Rechazar</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
             <h2 class="card-title">Postular al Proyecto</h2>
             <form method="post" action="{% url 'postular_proyecto' proyecto.id %}">
                 {% csrf_token %}

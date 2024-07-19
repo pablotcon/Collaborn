@@ -355,11 +355,11 @@ def cambiar_password(request):
         form = PasswordChangeForm(request.user)
     return render(request, 'myapp/cambiar_password.html', {'form': form})
 
-# Functions related to Notifications
+# Funciones de Notificaciones
 @login_required
 def listar_notificaciones(request):
-    notificaciones_no_leidas = request.user.notificaciones.filter(leido=False).count()
-    notificaciones = request.user.notificaciones.all().order_by('-fecha_creacion')
+    notificaciones_no_leidas = request.user.notificacion_set.filter(leido=False).count()
+    notificaciones = request.user.notificacion_set.all().order_by('-fecha_creacion')
     return render(request, 'myapp/listar_notificaciones.html', {
         'notificaciones': notificaciones,
         'notificaciones_no_leidas': notificaciones_no_leidas,
@@ -432,7 +432,13 @@ def proyecto_detalle(request, proyecto_id):
             messages.error(request, 'Error al agregar el comentario.')
     else:
         form = ComentarioForm()
-    return render(request, 'myapp/proyecto_detalle.html', {'proyecto': proyecto, 'comentarios': comentarios, 'form': form})
+    postulaciones = proyecto.postulacion_set.all()
+    return render(request, 'myapp/proyecto_detalle.html', {
+        'proyecto': proyecto, 
+        'comentarios': comentarios, 
+        'form': form,
+        'postulaciones': postulaciones,
+    })
 
 @permission_required('myapp.delete_proyecto', raise_exception=True)
 @login_required
@@ -458,10 +464,10 @@ def confirmar_eliminar_proyecto(request, pk):
 def postular_proyecto(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
     if request.method == 'POST':
-        if Postulacion.objects.filter(proyecto=proyecto, usuario=request.user).exists():
+        postulacion, created = Postulacion.objects.get_or_create(proyecto=proyecto, usuario=request.user)
+        if not created:
             messages.error(request, 'Ya te has postulado a este proyecto.')
         else:
-            Postulacion.objects.create(proyecto=proyecto, usuario=request.user)
             Notificacion.objects.create(
                 receptor=proyecto.creador,
                 mensaje=f'El usuario {request.user.username} se ha postulado a tu proyecto "{proyecto.nombre}".'
@@ -469,6 +475,34 @@ def postular_proyecto(request, proyecto_id):
             messages.success(request, 'Te has postulado al proyecto exitosamente.')
         return redirect('proyecto_detalle', proyecto_id=proyecto_id)
     return render(request, 'myapp/proyecto_detalle.html', {'proyecto': proyecto})
+
+@login_required
+@permission_required('myapp.change_postulacion', raise_exception=True)
+def aceptar_postulacion(request, postulacion_id):
+    postulacion = get_object_or_404(Postulacion, id=postulacion_id)
+    if request.method == 'POST':
+        postulacion.estado = 'aceptada'
+        postulacion.save()
+        messages.success(request, 'La postulación ha sido aceptada.')
+        Notificacion.objects.create(
+            receptor=postulacion.usuario,
+            mensaje=f'Tu postulación al proyecto "{postulacion.proyecto.nombre}" ha sido aceptada.'
+        )
+    return redirect('proyecto_detalle', proyecto_id=postulacion.proyecto.id)
+
+@login_required
+@permission_required('myapp.change_postulacion', raise_exception=True)
+def rechazar_postulacion(request, postulacion_id):
+    postulacion = get_object_or_404(Postulacion, id=postulacion_id)
+    if request.method == 'POST':
+        postulacion.estado = 'rechazada'
+        postulacion.save()
+        messages.success(request, 'La postulación ha sido rechazada.')
+        Notificacion.objects.create(
+            receptor=postulacion.usuario,
+            mensaje=f'Tu postulación al proyecto "{postulacion.proyecto.nombre}" ha sido rechazada.'
+        )
+    return redirect('proyecto_detalle', proyecto_id=postulacion.proyecto.id)
 
 @login_required
 def mis_postulaciones(request):
