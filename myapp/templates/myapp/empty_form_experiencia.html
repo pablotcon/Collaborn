@@ -1,6 +1,10 @@
-<div id="empty_form_experiencia" style="display: none;">
-    <div class="formset">
-        {{ experiencia_formset.empty_form.as_p }}
-        <button type="button" class="btn btn-outline-danger btn-remove">Eliminar</button>
+{% load crispy_forms_tags %}
+<div class="card mb-3" id="empty_form_experiencia" style="display: none;">
+    <div class="card-body">
+        <div class="form-row">
+            {{ experiencia_form.management_form }}
+            {{ experiencia_form.empty_form|crispy }}
+        </div>
     </div>
 </div>
+    

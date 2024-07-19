@@ -27,7 +27,6 @@
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-row">
-
             <!-- Perfil Form -->
             <div class="col-md-6">
                 {{ perfil_form.nombre|as_crispy_field }}
@@ -63,7 +62,8 @@
         {% endif %}
         
         <h3>Experiencia Laboral</h3>
-        <div id="experiencia-formset">
+        <button type="button" class="btn btn-secondary" id="toggle-experiencia">Mostrar/Ocultar Experiencia</button>
+        <div id="experiencia-formset" style="display: none;">
             {{ experiencia_formset.management_form }}
             {% for form in experiencia_formset %}
                 <div class="card mb-3">
@@ -76,7 +76,8 @@
         <button type="button" class="btn btn-primary" id="add-experiencia">Agregar Experiencia</button>
 
         <h3>Educación</h3>
-        <div id="educacion-formset">
+        <button type="button" class="btn btn-secondary" id="toggle-educacion">Mostrar/Ocultar Educación</button>
+        <div id="educacion-formset" style="display: none;">
             {{ educacion_formset.management_form }}
             {% for form in educacion_formset %}
                 <div class="card mb-3">
@@ -98,23 +99,54 @@
     $(document).ready(function() {
         var experienciaFormCount = {{ experiencia_formset.total_form_count }};
         var educacionFormCount = {{ educacion_formset.total_form_count }};
+        var emptyFormExperiencia = $('#empty_form_experiencia').html();
+        var emptyFormEducacion = $('#empty_form_educacion').html();
+        
+        $('#toggle-experiencia').click(function() {
+            $('#experiencia-formset').toggle();
+        });
+        
+        $('#toggle-educacion').click(function() {
+            $('#educacion-formset').toggle();
+        });
         
         $('#add-experiencia').click(function() {
-            var form_idx = experienciaFormCount;
-            var formHtml = $('#empty_form_experiencia').html().replace(/__prefix__/g, form_idx);
+            var formHtml = emptyFormExperiencia.replace(/__prefix__/g, experienciaFormCount);
             $('#experiencia-formset').append(formHtml);
             experienciaFormCount++;
+            $('#id_experiencias-TOTAL_FORMS').val(experienciaFormCount);
         });
         
         $('#add-educacion').click(function() {
-            var form_idx = educacionFormCount;
-            var formHtml = $('#empty_form_educacion').html().replace(/__prefix__/g, form_idx);
+            var formHtml = emptyFormEducacion.replace(/__prefix__/g, educacionFormCount);
             $('#educacion-formset').append(formHtml);
             educacionFormCount++;
+            $('#id_educaciones-TOTAL_FORMS').val(educacionFormCount);
         });
     });
 </script>
 
-{% include 'myapp/empty_form_experiencia.html' %}
-{% include 'myapp/empty_form_educacion.html' %}
+<!-- Placeholder for empty form -->
+<div id="empty_form_experiencia" style="display: none;">
+    {% load crispy_forms_tags %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="form-row">
+                {{ experiencia_formset.empty_form|crispy }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="empty_form_educacion" style="display: none;">
+    {% load crispy_forms_tags %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="form-row">
+                {{ educacion_formset.empty_form|crispy }}
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

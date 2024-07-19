@@ -268,7 +268,6 @@ def editar_perfil(request):
             messages.success(request, 'Perfil actualizado exitosamente')
             return redirect('ver_perfil')
         else:
-            # Para depuración, puedes imprimir los errores aquí.
             print(user_form.errors)
             print(perfil_form.errors)
             print(experiencia_formset.errors)

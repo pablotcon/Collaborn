@@ -48,8 +48,8 @@ class EducacionForm(forms.ModelForm):
             raise forms.ValidationError('Este campo es obligatorio.')
         return fecha_fin
 
-ExperienciaLaboralFormSet = inlineformset_factory(Perfil, ExperienciaLaboral, form=ExperienciaLaboralForm, extra=1, can_delete=True)
-EducacionFormSet = inlineformset_factory(Perfil, Educacion, form=EducacionForm, extra=1, can_delete=True)
+ExperienciaLaboralFormSet = inlineformset_factory(Perfil, ExperienciaLaboral, form=ExperienciaLaboralForm, extra=0, can_delete=True)
+EducacionFormSet = inlineformset_factory(Perfil, Educacion, form=EducacionForm, extra=0, can_delete=True)
 
 class ComentarioForm(forms.ModelForm):
     class Meta:
