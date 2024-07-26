@@ -25,6 +25,7 @@ class ExperienciaLaboralForm(forms.ModelForm):
         widget=forms.DateInput(format='%d-%m-%Y', attrs={'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'})
     )
     fecha_fin = forms.DateField(
+        required=False,
         input_formats=['%d-%m-%Y'],
         widget=forms.DateInput(format='%d-%m-%Y', attrs={'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'})
     )

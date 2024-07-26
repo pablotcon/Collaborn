@@ -332,10 +332,13 @@ def eliminar_educacion(request, pk):
     return render(request, 'myapp/eliminar_educacion.html', {'educacion': educacion})
 
 @login_required
+
+
+@login_required
 def ver_perfil(request):
     perfil = request.user.perfil
-    experiencias = perfil.experiencias.all()
-    educaciones = perfil.educaciones.all()
+    experiencias = perfil.experiencias.all().order_by('-fecha_inicio')
+    educaciones = perfil.educaciones.all().order_by('-fecha_inicio')
 
     return render(request, 'myapp/ver_perfil.html', {
         'perfil': perfil,

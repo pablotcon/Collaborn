@@ -1,7 +1,5 @@
 {% extends 'myapp/base.html' %}
-
 {% load static %}
-
 {% block title %}Perfil de {{ user.username }}{% endblock %}
 
 {% block extra_css %}
@@ -87,7 +85,13 @@
                                         <h2>{{ experiencia.titulo }}</h2>
                                         <p>{{ experiencia.descripcion }}</p>
                                     </div>
-                                    <time class="timeline-time" datetime="{{ experiencia.fecha_inicio }}">{{ experiencia.fecha_inicio }} - {{ experiencia.fecha_fin }}</time>
+                                    <time class="timeline-time" datetime="{{ experiencia.fecha_inicio }}">{{ experiencia.fecha_inicio|date:"d-m-Y" }} - 
+                                        {% if experiencia.fecha_fin %}
+                                            {{ experiencia.fecha_fin|date:"d-m-Y" }}
+                                        {% else %}
+                                            Actualmente
+                                        {% endif %}
+                                    </time>
                                 </div>
                             </article>
                         {% endfor %}
@@ -104,7 +108,13 @@
                                         <h2>{{ educacion.institucion }}</h2>
                                         <p>{{ educacion.descripcion }}</p>
                                     </div>
-                                    <time class="timeline-time" datetime="{{ educacion.fecha_inicio }}">{{ educacion.fecha_inicio }} - {{ educacion.fecha_fin }}</time>
+                                    <time class="timeline-time" datetime="{{ educacion.fecha_inicio }}">{{ educacion.fecha_inicio|date:"d-m-Y" }} - 
+                                        {% if educacion.fecha_fin %}
+                                            {{ educacion.fecha_fin|date:"d-m-Y" }}
+                                        {% else %}
+                                            Actualmente
+                                        {% endif %}
+                                    </time>
                                 </div>
                             </article>
                         {% endfor %}
