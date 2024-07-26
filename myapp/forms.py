@@ -3,6 +3,8 @@ from django import forms
 from django.forms import inlineformset_factory
 from django.contrib.auth.models import User
 from .models import Recurso, Perfil, Comentario, Mensaje, Proyecto, Tarea, ExperienciaLaboral, Educacion, SeguimientoTarea, Subtarea, ComentarioTarea, Categoria
+from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 class UserForm(forms.ModelForm):
     class Meta:
@@ -30,9 +32,17 @@ class ExperienciaLaboralForm(forms.ModelForm):
         widget=forms.DateInput(format='%d-%m-%Y', attrs={'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'})
     )
 
+    
     class Meta:
         model = ExperienciaLaboral
         fields = ['titulo', 'fecha_inicio', 'fecha_fin', 'descripcion']
+
+    def clean_fecha_inicio(self):
+        fecha_inicio = self.cleaned_data['fecha_inicio']
+        if fecha_inicio > timezone.now().date():
+            raise ValidationError("La fecha de inicio no puede ser una fecha futura.")
+        return fecha_inicio
+
 
 class EducacionForm(forms.ModelForm):
     fecha_inicio = forms.DateField(
@@ -40,6 +50,7 @@ class EducacionForm(forms.ModelForm):
         widget=forms.DateInput(format='%d-%m-%Y', attrs={'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'})
     )
     fecha_fin = forms.DateField(
+        required=False,
         input_formats=['%d-%m-%Y'],
         widget=forms.DateInput(format='%d-%m-%Y', attrs={'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'})
     )
@@ -47,6 +58,12 @@ class EducacionForm(forms.ModelForm):
     class Meta:
         model = Educacion
         fields = ['titulo', 'institucion', 'fecha_inicio', 'fecha_fin']
+
+    def clean_fecha_inicio(self):
+        fecha_inicio = self.cleaned_data['fecha_inicio']
+        if fecha_inicio > timezone.now().date():
+            raise ValidationError("La fecha de inicio no puede ser una fecha futura.")
+        return fecha_inicio
 
 ExperienciaLaboralFormSet = inlineformset_factory(Perfil, ExperienciaLaboral, form=ExperienciaLaboralForm, extra=0, can_delete=True)
 EducacionFormSet = inlineformset_factory(Perfil, Educacion, form=EducacionForm, extra=0, can_delete=True)
