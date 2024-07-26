@@ -60,13 +60,13 @@
                     <div class="personal-info">
                         <h3>Información Personal</h3>
                         <ul class="personal-list">
-                            <li><i class="entypo-mail"></i>{{ user.email }}</li>
-                            <li><i class="entypo-phone"></i>{{ perfil.telefono }}</li>
-                            <li><i class="entypo-calendar"></i>{{ perfil.birth_date }}</li>
+                            <br>
+                            <li><i class="entypo-phone"></i>(+56) {{ perfil.telefono }}</li>
+                            <li><i class="entypo-calendar"></i>{{ perfil.fecha_nacimiento }}</li>
                             <li><i class="entypo-globe"></i>{{ perfil.website }}</li>
-                            <li><i class="entypo-twitter"></i>{{ perfil.twitter }}</li>
-                            <li><i class="entypo-facebook"></i>{{ perfil.facebook }}</li>
-                            <li><i class="entypo-linkedin"></i>{{ perfil.linkedin }}</li>
+                            <li class="list-group-item text-right"><span class="pull-left"><strong></strong></span> <i class="fab fa-twitter"></i> {{ perfil.twitter }}</li>
+                            <li class="list-group-item text-right"><span class="pull-left"><strong></strong></span> <i class="fab fa-facebook-f"></i> {{ perfil.facebook }}</li>
+                            <li class="list-group-item text-right"><span class="pull-left"><strong></strong></span> <i class="fab fa-linkedin-in"></i> {{ perfil.linkedin }}</li>
                         </ul>
                     </div>
                 </div>
