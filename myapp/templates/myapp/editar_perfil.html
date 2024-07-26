@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="{% static 'css/editar_perfil.css' %}">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@icon/entypo@1.0.3/entypo.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -95,8 +96,15 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script>
     $(document).ready(function() {
+        $('.datepicker').datepicker({
+            format: 'dd-mm-yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+
         var experienciaFormCount = {{ experiencia_formset.total_form_count }};
         var educacionFormCount = {{ educacion_formset.total_form_count }};
         var emptyFormExperiencia = $('#empty_form_experiencia').html();
@@ -115,6 +123,11 @@
             $('#experiencia-formset').append(formHtml);
             experienciaFormCount++;
             $('#id_experiencias-TOTAL_FORMS').val(experienciaFormCount);
+            $('.datepicker').datepicker({
+                format: 'dd-mm-yyyy',
+                autoclose: true,
+                todayHighlight: true
+            });
         });
         
         $('#add-educacion').click(function() {
@@ -122,6 +135,11 @@
             $('#educacion-formset').append(formHtml);
             educacionFormCount++;
             $('#id_educaciones-TOTAL_FORMS').val(educacionFormCount);
+            $('.datepicker').datepicker({
+                format: 'dd-mm-yyyy',
+                autoclose: true,
+                todayHighlight: true
+            });
         });
     });
 </script>

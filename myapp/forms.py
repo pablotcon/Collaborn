@@ -10,43 +10,42 @@ class UserForm(forms.ModelForm):
         fields = ['first_name', 'last_name', 'email']
 
 class PerfilForm(forms.ModelForm):
+    fecha_nacimiento = forms.DateField(
+        input_formats=['%d-%m-%Y'],
+        widget=forms.DateInput(format='%d-%m-%Y', attrs={'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'})
+    )
+
     class Meta:
         model = Perfil
         fields = ['nombre', 'apellido', 'telefono', 'fecha_nacimiento', 'avatar', 'website', 'twitter', 'facebook', 'linkedin']
 
 class ExperienciaLaboralForm(forms.ModelForm):
+    fecha_inicio = forms.DateField(
+        input_formats=['%d-%m-%Y'],
+        widget=forms.DateInput(format='%d-%m-%Y', attrs={'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'})
+    )
+    fecha_fin = forms.DateField(
+        input_formats=['%d-%m-%Y'],
+        widget=forms.DateInput(format='%d-%m-%Y', attrs={'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'})
+    )
+
     class Meta:
         model = ExperienciaLaboral
         fields = ['titulo', 'fecha_inicio', 'fecha_fin', 'descripcion']
 
-    def clean_fecha_inicio(self):
-        fecha_inicio = self.cleaned_data.get('fecha_inicio')
-        if not fecha_inicio:
-            raise forms.ValidationError('Este campo es obligatorio.')
-        return fecha_inicio
-
-    def clean_fecha_fin(self):
-        fecha_fin = self.cleaned_data.get('fecha_fin')
-        if not fecha_fin:
-            raise forms.ValidationError('Este campo es obligatorio.')
-        return fecha_fin
-
 class EducacionForm(forms.ModelForm):
+    fecha_inicio = forms.DateField(
+        input_formats=['%d-%m-%Y'],
+        widget=forms.DateInput(format='%d-%m-%Y', attrs={'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'})
+    )
+    fecha_fin = forms.DateField(
+        input_formats=['%d-%m-%Y'],
+        widget=forms.DateInput(format='%d-%m-%Y', attrs={'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'})
+    )
+
     class Meta:
         model = Educacion
         fields = ['titulo', 'institucion', 'fecha_inicio', 'fecha_fin']
-
-    def clean_fecha_inicio(self):
-        fecha_inicio = self.cleaned_data.get('fecha_inicio')
-        if not fecha_inicio:
-            raise forms.ValidationError('Este campo es obligatorio.')
-        return fecha_inicio
-
-    def clean_fecha_fin(self):
-        fecha_fin = self.cleaned_data.get('fecha_fin')
-        if not fecha_fin:
-            raise forms.ValidationError('Este campo es obligatorio.')
-        return fecha_fin
 
 ExperienciaLaboralFormSet = inlineformset_factory(Perfil, ExperienciaLaboral, form=ExperienciaLaboralForm, extra=0, can_delete=True)
 EducacionFormSet = inlineformset_factory(Perfil, Educacion, form=EducacionForm, extra=0, can_delete=True)
@@ -80,11 +79,13 @@ class ProyectoForm(forms.ModelForm):
     ]
 
     fecha_inicio = forms.DateField(
-        widget=forms.DateInput(attrs={'id': 'id_fecha_inicio', 'class': 'form-control', 'type': 'date'}),
+        input_formats=['%d-%m-%Y'],
+        widget=forms.DateInput(format='%d-%m-%Y', attrs={'id': 'id_fecha_inicio', 'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'}),
         label='Fecha de inicio de postulaciones'
     )
     fecha_fin = forms.DateField(
-        widget=forms.DateInput(attrs={'id': 'id_fecha_fin', 'class': 'form-control', 'type': 'date'}),
+        input_formats=['%d-%m-%Y'],
+        widget=forms.DateInput(format='%d-%m-%Y', attrs={'id': 'id_fecha_fin', 'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'}),
         label='Fecha de cierre de postulaciones'
     )
     ciudad = forms.ChoiceField(
@@ -107,14 +108,21 @@ class ProyectoForm(forms.ModelForm):
         fields = ['nombre', 'descripcion', 'fecha_inicio', 'fecha_fin', 'ciudad', 'imagen', 'categoria']
 
 class TareaForm(forms.ModelForm):
+    fecha_limite = forms.DateField(
+        input_formats=['%d-%m-%Y'],
+        widget=forms.DateInput(format='%d-%m-%Y', attrs={'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'})
+    )
+
     class Meta:
         model = Tarea
         fields = ['nombre', 'descripcion', 'fecha_limite', 'asignada_a']
-        widgets = {
-            'fecha_limite': forms.DateInput(attrs={'type': 'date'}),
-        }
 
 class SubtareaForm(forms.ModelForm):
+    fecha_limite = forms.DateField(
+        input_formats=['%d-%m-%Y'],
+        widget=forms.DateInput(format='%d-%m-%Y', attrs={'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'})
+    )
+
     class Meta:
         model = Subtarea
         fields = ['nombre', 'descripcion', 'fecha_limite', 'completada']
