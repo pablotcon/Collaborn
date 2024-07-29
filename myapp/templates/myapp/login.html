@@ -38,15 +38,17 @@
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="id_username">Usuario</label>
+                            <br>
                             {{ form.username }}
                         </div>
                         <div class="form-group">
                             <label for="id_password">Contraseña</label>
+                            <br>
                             {{ form.password }}
                         </div>
-                        <div class="d-flex justify-content-between align-items-center mb-5">
+                        <div class="d-flex flex-column align-items-start mb-5">
                             <button type="submit" class="btn login-btn">Iniciar Sesión</button>
-                            <a href="#!" class="forgot-password-link">¿Olvidaste tu contraseña?</a>
+                            <a href="#!" class="forgot-password-link mt-3">¿Olvidaste tu contraseña?</a>
                         </div>
                     </form>
                     <p class="login-wrapper-footer-text">¿No tienes cuenta? <a href="{% url 'register' %}" class="text-reset">Regístrate Aquí</a></p>

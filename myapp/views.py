@@ -676,7 +676,7 @@ def register(request):
             user = form.save()
             Perfil.objects.get_or_create(user=user)
             login(request, user)
-            return redirect('index')
+            return redirect('editar_perfil')
     else:
         form = UserCreationForm()
     return render(request, 'myapp/register.html', {'form': form})
