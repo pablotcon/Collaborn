@@ -616,10 +616,11 @@ def listar_mensajes(request):
         'all_users': all_users,
         'query': query
     })
-
+from .models import Mensaje, Notificacion
 import logging
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
+@login_required
 def enviar_mensaje(request):
     if request.method == 'POST':
         logger.info("Datos del formulario recibidos: %s", request.POST)

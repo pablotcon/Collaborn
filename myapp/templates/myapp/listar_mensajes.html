@@ -63,13 +63,14 @@
                         </div>
                     </div>
                     <div class="chat-input mt-3">
-                        <form id="send-message-form" method="post" action="{% url 'enviar_mensaje' %}" enctype="multipart/form-data">
+                        <form id="send-message-form-{{ usuario.id }}" class="send-message-form" method="post" action="{% url 'enviar_mensaje' %}" enctype="multipart/form-data">
                             {% csrf_token %}
-                            <input type="hidden" name="receptor_username" id="receptor_username" value="{{ usuario.username }}">
-                            <textarea name="contenido" id="contenido" class="form-control mb-2 mr-2" placeholder="Escribe tu mensaje..." rows="3"></textarea>
-                            <input type="file" name="imagen" id="imagen" class="form-control mb-2 mr-2">
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Enviar</button>
+                            <input type="hidden" name="receptor_username" class="receptor-username" value="{{ usuario.username }}">
+                            <textarea name="contenido" class="form-control mb-2 mr-2" placeholder="Escribe tu mensaje..." rows="3"></textarea>
+                            <input type="file" name="imagen" class="form-control mb-2 mr-2">
+                            <button type="submit" class="btn btn-primary send-message-button"><i class="fas fa-paper-plane"></i> Enviar</button>
                         </form>
+                        <div class="error-message text-danger"></div>
                     </div>
                 </div>
                 {% endfor %}
@@ -108,7 +109,7 @@
             $('.chat-user-link').on('click', function(event) {
                 event.preventDefault();
                 var username = $(this).data('username');
-                $('#receptor_username').val(username);
+                $('.receptor-username').val(username);
                 $('.chat-window').hide();
                 $($(this).attr('href')).show();
             });
@@ -117,25 +118,26 @@
                 event.preventDefault();
                 var username = $('#new_chat_username').val();
                 if (username) {
-                    $('#receptor_username').val(username);
+                    $('.receptor-username').val(username);
                     $('.chat-window').hide();
                     $('#send-message-form textarea').focus();
                 }
             });
 
-            $('#send-message-form').on('submit', function(event) {
+            $('.send-message-button').on('click', function(event) {
                 event.preventDefault();
-                var form = $(this);
-                var formData = new FormData(form[0]);
-                
+                var form = $(this).closest('form')[0];
+                var formData = new FormData(form);
+                var chatWindowId = $(this).closest('.chat-window').attr('id');
+                var chatWindowMessages = $(this).closest('.chat-window').find('.messages');
+
                 $.ajax({
                     type: 'POST',
-                    url: form.attr('action'),
+                    url: form.action,
                     data: formData,
                     processData: false,
                     contentType: false,
                     success: function(response) {
-                        var chatId = $('#receptor_username').val();
                         var messageHtml = '<div class="chat-message sent">' +
                             '<div>' +
                             '<strong>Tú</strong>: ' + (response.contenido ? response.contenido : '') + '<br>' +
@@ -147,13 +149,14 @@
                         messageHtml += '<div class="mt-2">' +
                             '<button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="' + response.id + '"><i class="fas fa-trash"></i> Eliminar</button>' +
                             '</div>';
-                        $('#chat-' + chatId + ' .messages').append(messageHtml);
-                        form.find('textarea').val('');
-                        form.find('input[type="file"]').val('');
+                        chatWindowMessages.append(messageHtml);
+                        $(form).find('textarea').val('');
+                        $(form).find('input[type="file"]').val('');
+                        chatWindowMessages.scrollTop(chatWindowMessages[0].scrollHeight);
                     },
                     error: function(response) {
-                        console.log(response.responseJSON);
-                        alert('Error al enviar el mensaje.');
+                        var errorMessage = $(form).closest('.chat-input').find('.error-message');
+                        errorMessage.text('Error al enviar el mensaje.');
                     }
                 });
             });
@@ -161,9 +164,9 @@
             $('.responder-btn').on('click', function(event) {
                 event.preventDefault();
                 var emisorUsername = $(this).data('emisor-username');
-                $('#receptor_username').val(emisorUsername);
+                $('.receptor-username').val(emisorUsername);
                 $('html, body').animate({
-                    scrollTop: $("#receptor_username").offset().top
+                    scrollTop: $(".receptor-username").offset().top
                 }, 1000);
             });
 
@@ -179,7 +182,7 @@
                 var firstChatWindow = $('.chat-window').first();
                 firstChatWindow.show();
                 var firstUsername = firstChatWindow.attr('id').split('-')[1];
-                $('#receptor_username').val(firstUsername);
+                $('.receptor-username').val(firstUsername);
             }
         });
     </script>
