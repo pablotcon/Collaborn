@@ -617,7 +617,8 @@ def listar_mensajes(request):
         'query': query
     })
 
-
+import logging
+logger = logging.getLogger(__name__)
 
 def enviar_mensaje(request):
     if request.method == 'POST':
