@@ -586,49 +586,72 @@ def listar_recursos(request):
     return render(request, 'myapp/listar_recursos.html', {'recursos': recursos})
 
 # Functions related to Messages
+# views.py
 @login_required
 def listar_mensajes(request):
     query = request.GET.get('q')
+    mensajes_recibidos = Mensaje.objects.filter(receptor=request.user).order_by('fecha_envio')  # Cambiado a orden ascendente
+    mensajes_enviados = Mensaje.objects.filter(emisor=request.user).order_by('fecha_envio')  # Cambiado a orden ascendente
+
     if query:
-        mensajes_recibidos = Mensaje.objects.filter(receptor=request.user, contenido__icontains=query).order_by('-fecha_envio')
-        mensajes_enviados = Mensaje.objects.filter(emisor=request.user, contenido__icontains=query).order_by('-fecha_envio')
-    else:
-        mensajes_recibidos = Mensaje.objects.filter(receptor=request.user).order_by('-fecha_envio')
-        mensajes_enviados = Mensaje.objects.filter(emisor=request.user).order_by('-fecha_envio')
-    
-    mensajes_recibidos.update(leido=True)
+        mensajes_recibidos = mensajes_recibidos.filter(contenido__icontains=query)
+        mensajes_enviados = mensajes_enviados.filter(contenido__icontains=query)
+
+    # Agrupar mensajes por usuario
+    usuarios = {}
+    for mensaje in mensajes_recibidos:
+        if mensaje.emisor not in usuarios:
+            usuarios[mensaje.emisor] = []
+        usuarios[mensaje.emisor].append(mensaje)
+    for mensaje in mensajes_enviados:
+        if mensaje.receptor not in usuarios:
+            usuarios[mensaje.receptor] = []
+        usuarios[mensaje.receptor].append(mensaje)
+
+    all_users = User.objects.exclude(id=request.user.id)
 
     return render(request, 'myapp/listar_mensajes.html', {
-        'mensajes_recibidos': mensajes_recibidos,
-        'mensajes_enviados': mensajes_enviados,
-        'users': User.objects.exclude(id=request.user.id),
+        'usuarios': usuarios,
+        'all_users': all_users,
         'query': query
     })
 
-@login_required
+
+
 def enviar_mensaje(request):
     if request.method == 'POST':
-        form = MensajeForm(request.POST)
+        logger.info("Datos del formulario recibidos: %s", request.POST)
+        logger.info("Archivos recibidos: %s", request.FILES)
+        form = MensajeForm(request.POST, request.FILES)
         if form.is_valid():
             mensaje = form.save(commit=False)
-            mensaje.emisor = request.user  # Asigna el emisor aquí
-            mensaje.save()
-
-            # Crear notificación para el receptor
-            Notificacion.objects.create(
-                receptor=mensaje.receptor,
-                mensaje=f"Tienes un nuevo mensaje de {request.user.username}",
-                url=f"/mensajes/{mensaje.id}/"
-            )
-
-            messages.success(request, 'Mensaje enviado exitosamente.')
-            return redirect('listar_mensajes')
+            receptor_username = form.cleaned_data['receptor_username']
+            try:
+                receptor = User.objects.get(username=receptor_username)
+                mensaje.receptor = receptor
+                mensaje.emisor = request.user
+                mensaje.save()
+                # Crear notificación para el receptor
+                Notificacion.objects.create(
+                    receptor=receptor,
+                    mensaje=f"Tienes un nuevo mensaje de {request.user.username}",
+                    url=f"/mensajes/{mensaje.id}/"
+                )
+                response_data = {
+                    'id': mensaje.id,
+                    'contenido': mensaje.contenido,
+                    'fecha_envio': mensaje.fecha_envio.strftime("%d-%m-%Y %H:%M"),
+                    'receptor_username': receptor.username,
+                    'imagen_url': mensaje.imagen.url if mensaje.imagen else None
+                }
+                return JsonResponse(response_data, status=200)
+            except User.DoesNotExist:
+                logger.error("Usuario no encontrado: %s", receptor_username)
+                return JsonResponse({'error': 'Usuario no encontrado.'}, status=400)
         else:
-            messages.error(request, 'Error al enviar el mensaje.')
-    else:
-        form = MensajeForm()
-    
-    return render(request, 'myapp/enviar_mensaje.html', {'form': form})
+            logger.error("Error al enviar el mensaje: %s", form.errors)
+            return JsonResponse({'error': 'Error al enviar el mensaje.', 'form_errors': form.errors}, status=400)
+    return JsonResponse({'error': 'Método no permitido.'}, status=405)
 
 @login_required
 def eliminar_mensaje(request, mensaje_id):

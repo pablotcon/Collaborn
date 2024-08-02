@@ -74,10 +74,24 @@ class ComentarioForm(forms.ModelForm):
         fields = ['texto']
 
 class MensajeForm(forms.ModelForm):
+    receptor_username = forms.CharField(
+        max_length=150, 
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de usuario del destinatario'})
+    )
+    imagen = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={'class': 'form-control-file'}))
+
     class Meta:
         model = Mensaje
-        fields = ['receptor', 'contenido']
+        fields = ['receptor_username', 'contenido', 'imagen']
 
+    def clean(self):
+        cleaned_data = super().clean()
+        contenido = cleaned_data.get("contenido")
+        imagen = cleaned_data.get("imagen")
+
+        if not contenido and not imagen:
+            raise forms.ValidationError("Debe proporcionar al menos un mensaje o una imagen.")
+        
 class RecursoForm(forms.ModelForm):
     class Meta:
         model = Recurso

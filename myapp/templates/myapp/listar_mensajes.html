@@ -1,136 +1,187 @@
 {% extends 'myapp/base.html' %}
+{% load static %}
 
 {% block title %}Mensajes{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
-    <h1>Mensajes</h1>
+    <h1 class="text-center">Mensajes</h1>
 
-    <!-- Formulario de Búsqueda -->
-    <form method="get" class="form-inline mb-4">
-        <input type="text" name="q" class="form-control mr-2" placeholder="Buscar mensajes" value="{{ query|default:'' }}">
-        <button type="submit" class="btn btn-primary">Buscar</button>
-    </form>
-
-    <!-- Formulario para enviar un nuevo mensaje -->
-    <div class="card mb-4">
-        <div class="card-header">
-            Enviar Nuevo Mensaje
-        </div>
-        <div class="card-body">
-            <form method="post" action="{% url 'enviar_mensaje' %}">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="receptor">Para:</label>
-                    <select name="receptor" id="receptor" class="form-control">
-                        {% for user in users %}
-                        <option value="{{ user.id }}">{{ user.username }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="contenido">Mensaje:</label>
-                    <textarea name="contenido" id="contenido" class="form-control" rows="3" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Enviar</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Mensajes Recibidos -->
-    <h2 class="mb-3">Mensajes Recibidos</h2>
-    {% if mensajes_recibidos %}
-    <div class="list-group mb-4">
-        {% for mensaje in mensajes_recibidos %}
-        <div class="list-group-item {% if not mensaje.leido %}font-weight-bold{% endif %}">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <strong>De:</strong> {{ mensaje.emisor.username }}<br>
-                    <strong>Mensaje:</strong> {{ mensaje.contenido }}<br>
-                    <small class="text-muted">Enviado: {{ mensaje.fecha_envio }}</small>
-                </div>
-                <div>
-                    <a href="#" class="btn btn-sm btn-primary responder-btn" data-emisor-id="{{ mensaje.emisor.id }}">Responder</a>
-                    <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="{{ mensaje.id }}">Eliminar</button>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="alert alert-info">No tienes mensajes recibidos.</div>
-    {% endif %}
-
-    <!-- Mensajes Enviados -->
-    <h2 class="mb-3">Mensajes Enviados</h2>
-    {% if mensajes_enviados %}
-    <div class="list-group mb-4">
-        {% for mensaje in mensajes_enviados %}
-        <div class="list-group-item">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <strong>Para:</strong> {{ mensaje.receptor.username }}<br>
-                    <strong>Mensaje:</strong> {{ mensaje.contenido }}<br>
-                    <small class="text-muted">Enviado: {{ mensaje.fecha_envio }}</small>
-                </div>
-                <div>
-                    <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="{{ mensaje.id }}">Eliminar</button>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="alert alert-info">No has enviado mensajes.</div>
-    {% endif %}
-</div>
-
-<!-- Modal de Confirmación de Eliminación -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                ¿Estás seguro de que deseas eliminar este mensaje?
-            </div>
-            <div class="modal-footer">
-                <form id="deleteForm" method="post" action="">
-                    {% csrf_token %}
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="user-list">
+                <h3><i class="fas fa-comments"></i> Conversaciones</h3>
+                <ul class="list-group">
+                    {% for usuario in usuarios.keys %}
+                    <li class="list-group-item">
+                        <a href="#chat-{{ usuario.id }}" class="chat-user-link" data-username="{{ usuario.username }}">
+                            <i class="fas fa-user"></i> {{ usuario.username }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <h3><i class="fas fa-plus-circle"></i> Iniciar nuevo chat</h3>
+                <form id="start-new-chat-form">
+                    <input type="text" id="new_chat_username" class="form-control mb-2" placeholder="Nombre de usuario">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Iniciar Chat</button>
                 </form>
             </div>
         </div>
+
+        <div class="col-md-9">
+            <div class="tab-content">
+                {% for usuario, mensajes in usuarios.items %}
+                <div class="tab-pane chat-window" id="chat-{{ usuario.id }}">
+                    <div class="chat-box">
+                        <h4><i class="fas fa-user-circle"></i> Conversación con {{ usuario.username }}</h4>
+                        <div class="messages">
+                            {% for mensaje in mensajes %}
+                            <div class="chat-message {% if mensaje.emisor == request.user %}sent{% else %}received{% endif %}">
+                                <div>
+                                    <strong>{% if mensaje.emisor == request.user %}<i class="fas fa-user"></i> Tú{% else %}<i class="fas fa-user"></i> {{ mensaje.emisor.username }}{% endif %}</strong>: 
+                                    {% if mensaje.contenido %}{{ mensaje.contenido }}{% endif %}<br>
+                                    <small>{{ mensaje.fecha_envio|date:"d-m-Y H:i" }}</small>
+                                </div>
+                                {% if mensaje.imagen %}
+                                <div>
+                                    <img src="{{ mensaje.imagen.url }}" alt="Imagen del mensaje">
+                                </div>
+                                {% endif %}
+                                <div class="mt-2">
+                                    {% if mensaje.emisor != request.user %}
+                                    <a href="#" class="btn btn-sm btn-primary responder-btn" data-emisor-username="{{ mensaje.emisor.username }}"><i class="fas fa-reply"></i> Responder</a>
+                                    {% endif %}
+                                    <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="{{ mensaje.id }}"><i class="fas fa-trash"></i> Eliminar</button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="chat-input mt-3">
+                        <form id="send-message-form" method="post" action="{% url 'enviar_mensaje' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="receptor_username" id="receptor_username" value="{{ usuario.username }}">
+                            <textarea name="contenido" id="contenido" class="form-control mb-2 mr-2" placeholder="Escribe tu mensaje..." rows="3"></textarea>
+                            <input type="file" name="imagen" id="imagen" class="form-control mb-2 mr-2">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Enviar</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar este mensaje?
+                </div>
+                <div class="modal-footer">
+                    <form id="deleteForm" method="post" action="">
+                        {% csrf_token %}
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('.chat-user-link').on('click', function(event) {
+                event.preventDefault();
+                var username = $(this).data('username');
+                $('#receptor_username').val(username);
+                $('.chat-window').hide();
+                $($(this).attr('href')).show();
+            });
+
+            $('#start-new-chat-form').on('submit', function(event) {
+                event.preventDefault();
+                var username = $('#new_chat_username').val();
+                if (username) {
+                    $('#receptor_username').val(username);
+                    $('.chat-window').hide();
+                    $('#send-message-form textarea').focus();
+                }
+            });
+
+            $('#send-message-form').on('submit', function(event) {
+                event.preventDefault();
+                var form = $(this);
+                var formData = new FormData(form[0]);
+                
+                $.ajax({
+                    type: 'POST',
+                    url: form.attr('action'),
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        var chatId = $('#receptor_username').val();
+                        var messageHtml = '<div class="chat-message sent">' +
+                            '<div>' +
+                            '<strong>Tú</strong>: ' + (response.contenido ? response.contenido : '') + '<br>' +
+                            '<small>' + response.fecha_envio + '</small>' +
+                            '</div>';
+                        if (response.imagen_url) {
+                            messageHtml += '<div><img src="' + response.imagen_url + '" alt="Imagen del mensaje"></div>';
+                        }
+                        messageHtml += '<div class="mt-2">' +
+                            '<button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="' + response.id + '"><i class="fas fa-trash"></i> Eliminar</button>' +
+                            '</div>';
+                        $('#chat-' + chatId + ' .messages').append(messageHtml);
+                        form.find('textarea').val('');
+                        form.find('input[type="file"]').val('');
+                    },
+                    error: function(response) {
+                        console.log(response.responseJSON);
+                        alert('Error al enviar el mensaje.');
+                    }
+                });
+            });
+
+            $('.responder-btn').on('click', function(event) {
+                event.preventDefault();
+                var emisorUsername = $(this).data('emisor-username');
+                $('#receptor_username').val(emisorUsername);
+                $('html, body').animate({
+                    scrollTop: $("#receptor_username").offset().top
+                }, 1000);
+            });
+
+            $('#confirmDeleteModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var mensajeId = button.data('mensaje-id');
+                var action = "{% url 'eliminar_mensaje' 0 %}".slice(0, -2) + mensajeId + "/";
+                var modal = $(this);
+                modal.find('#deleteForm').attr('action', action);
+            });
+
+            if ($('.chat-window').length) {
+                var firstChatWindow = $('.chat-window').first();
+                firstChatWindow.show();
+                var firstUsername = firstChatWindow.attr('id').split('-')[1];
+                $('#receptor_username').val(firstUsername);
+            }
+        });
+    </script>
 </div>
-
-<!-- Incluir jQuery primero -->
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<!-- Incluir Bootstrap JS después de jQuery -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-<script>
-    $('#confirmDeleteModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget) 
-        var mensajeId = button.data('mensaje-id') 
-        var action = "{% url 'eliminar_mensaje' 0 %}".slice(0, -2) + mensajeId + "/";
-        var modal = $(this)
-        modal.find('#deleteForm').attr('action', action);
-    })
-
-    // Preseleccionar el usuario para responder
-    $('.responder-btn').on('click', function (event) {
-        event.preventDefault();
-        var emisorId = $(this).data('emisor-id');
-        $('#receptor').val(emisorId);
-        $('html, body').animate({
-            scrollTop: $("#receptor").offset().top
-        }, 1000);
-    });
-</script>
 {% endblock %}
