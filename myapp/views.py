@@ -17,6 +17,7 @@ import json
 from django.utils import timezone
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+
 # Functions related to Task Management
 @login_required
 def admin_panel_tareas(request):
@@ -699,7 +700,7 @@ def register(request):
             user = form.save()
             Perfil.objects.get_or_create(user=user)
             login(request, user)
-            return redirect('index')
+            return redirect('editar_perfil')
     else:
         form = UserCreationForm()
     return render(request, 'myapp/register.html', {'form': form})
