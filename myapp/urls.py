@@ -64,7 +64,9 @@ urlpatterns = [
     path('mensajes/', views.listar_mensajes, name='listar_mensajes'),
     path('mensajes/enviar/', views.enviar_mensaje, name='enviar_mensaje'),
     path('mensajes/eliminar/<int:mensaje_id>/', views.eliminar_mensaje, name='eliminar_mensaje'),
-
+    path('mensajes/iniciar_nuevo_chat/', views.iniciar_nuevo_chat, name='iniciar_nuevo_chat'),
+    path('mensajes/ocultar_conversacion/', views.ocultar_conversacion, name='ocultar_conversacion'),
+    path('mensajes/cargar_mensajes/', views.cargar_mensajes, name='cargar_mensajes'),
     # Actividades
     path('actividades/historial/', views.historial_actividades, name='historial_actividades'),
 

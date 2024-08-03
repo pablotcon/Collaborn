@@ -162,3 +162,13 @@ class Educacion(models.Model):
 
     def __str__(self):
         return self.titulo
+    
+class ConversacionOculta(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    usuario_oculto = models.ForeignKey(User, related_name='ocultado_por', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('usuario', 'usuario_oculto')
+
+    def __str__(self):
+        return f"{self.usuario.username} oculta {self.usuario_oculto.username}"

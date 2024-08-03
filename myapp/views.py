@@ -591,8 +591,9 @@ def listar_recursos(request):
 @login_required
 def listar_mensajes(request):
     query = request.GET.get('q')
-    mensajes_recibidos = Mensaje.objects.filter(receptor=request.user).order_by('fecha_envio')  # Cambiado a orden ascendente
-    mensajes_enviados = Mensaje.objects.filter(emisor=request.user).order_by('fecha_envio')  # Cambiado a orden ascendente
+    ocultas = ConversacionOculta.objects.filter(usuario=request.user).values_list('usuario_oculto', flat=True)
+    mensajes_recibidos = Mensaje.objects.filter(receptor=request.user).exclude(emisor__in=ocultas).order_by('fecha_envio')
+    mensajes_enviados = Mensaje.objects.filter(emisor=request.user).exclude(receptor__in=ocultas).order_by('fecha_envio')
 
     if query:
         mensajes_recibidos = mensajes_recibidos.filter(contenido__icontains=query)
@@ -676,6 +677,83 @@ def detalle_mensaje(request, mensaje_id):
         notificacion.save()
 
     return render(request, 'myapp/detalle_mensaje.html', {'mensaje': mensaje})
+
+from django.shortcuts import get_object_or_404
+
+
+
+
+
+from django.db.models import Q
+
+@login_required
+def ocultar_conversacion(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        try:
+            usuario_oculto = User.objects.get(username=username)
+            ConversacionOculta.objects.get_or_create(usuario=request.user, usuario_oculto=usuario_oculto)
+            response_data = {
+                'success': True,
+                'user_id': usuario_oculto.id
+            }
+        except User.DoesNotExist:
+            response_data = {
+                'success': False,
+                'error': 'Usuario no encontrado.'
+            }
+        return JsonResponse(response_data)
+    return JsonResponse({'success': False, 'error': 'Método no permitido.'}, status=405)
+
+
+from .models import ConversacionOculta
+@login_required
+def iniciar_nuevo_chat(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        try:
+            user = User.objects.get(username=username)
+            ConversacionOculta.objects.filter(usuario=request.user, usuario_oculto=user).delete()
+            response_data = {
+                'success': True,
+                'user': {
+                    'id': user.id,
+                    'username': user.username
+                }
+            }
+        except User.DoesNotExist:
+            response_data = {
+                'success': False,
+                'error': 'Usuario no encontrado.'
+            }
+        return JsonResponse(response_data)
+    return JsonResponse({'success': False, 'error': 'Método no permitido.'}, status=405)
+
+login_required
+def cargar_mensajes(request):
+    if request.method == 'GET':
+        username = request.GET.get('username')
+        try:
+            user = User.objects.get(username=username)
+            mensajes_recibidos = Mensaje.objects.filter(receptor=request.user, emisor=user).order_by('fecha_envio')
+            mensajes_enviados = Mensaje.objects.filter(emisor=request.user, receptor=user).order_by('fecha_envio')
+
+            mensajes = list(mensajes_recibidos) + list(mensajes_enviados)
+            mensajes.sort(key=lambda x: x.fecha_envio)
+
+            mensajes_data = []
+            for mensaje in mensajes:
+                mensajes_data.append({
+                    'emisor': mensaje.emisor.username,
+                    'contenido': mensaje.contenido,
+                    'fecha_envio': mensaje.fecha_envio.strftime("%d-%m-%Y %H:%M"),
+                    'imagen_url': mensaje.imagen.url if mensaje.imagen else None
+                })
+
+            return JsonResponse({'success': True, 'mensajes': mensajes_data})
+        except User.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Usuario no encontrado.'})
+    return JsonResponse({'success': False, 'error': 'Método no permitido.'}, status=405)
 
 # Functions related to Activities
 @login_required

@@ -16,12 +16,15 @@
         <div class="col-md-3">
             <div class="user-list">
                 <h3><i class="fas fa-comments"></i> Conversaciones</h3>
-                <ul class="list-group">
+                <ul class="list-group" id="conversaciones-list">
                     {% for usuario in usuarios.keys %}
-                    <li class="list-group-item">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
                         <a href="#chat-{{ usuario.id }}" class="chat-user-link" data-username="{{ usuario.username }}">
                             <i class="fas fa-user"></i> {{ usuario.username }}
                         </a>
+                        <button type="button" class="btn btn-sm btn-danger ocultar-conversation-button" data-username="{{ usuario.username }}">
+                            <i class="fas fa-eye-slash"></i>
+                        </button>
                     </li>
                     {% endfor %}
                 </ul>
@@ -30,11 +33,12 @@
                     <input type="text" id="new_chat_username" class="form-control mb-2" placeholder="Nombre de usuario">
                     <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Iniciar Chat</button>
                 </form>
+                <div class="new-chat-error text-danger"></div>
             </div>
         </div>
 
         <div class="col-md-9">
-            <div class="tab-content">
+            <div class="tab-content" id="chat-content">
                 {% for usuario, mensajes in usuarios.items %}
                 <div class="tab-pane chat-window" id="chat-{{ usuario.id }}">
                     <div class="chat-box">
@@ -117,10 +121,150 @@
             $('#start-new-chat-form').on('submit', function(event) {
                 event.preventDefault();
                 var username = $('#new_chat_username').val();
+                var errorMessage = $('.new-chat-error');
+
                 if (username) {
-                    $('.receptor-username').val(username);
-                    $('.chat-window').hide();
-                    $('#send-message-form textarea').focus();
+                    $.ajax({
+                        type: 'POST',
+                        url: '{% url "iniciar_nuevo_chat" %}',
+                        data: {
+                            'username': username,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                var newUser = response.user;
+                                var newUserHtml = '<li class="list-group-item d-flex justify-content-between align-items-center">' +
+                                    '<a href="#chat-' + newUser.id + '" class="chat-user-link" data-username="' + newUser.username + '">' +
+                                    '<i class="fas fa-user"></i> ' + newUser.username +
+                                    '</a>' +
+                                    '<button type="button" class="btn btn-sm btn-danger ocultar-conversation-button" data-username="' + newUser.username + '">' +
+                                    '<i class="fas fa-eye-slash"></i></button></li>';
+                                $('#conversaciones-list').append(newUserHtml);
+
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '{% url "cargar_mensajes" %}',  // Nueva URL para cargar mensajes
+                                    data: { 'username': newUser.username },
+                                    success: function(response) {
+                                        var newChatHtml = '<div class="tab-pane chat-window" id="chat-' + newUser.id + '">' +
+                                            '<div class="chat-box">' +
+                                            '<h4><i class="fas fa-user-circle"></i> Conversación con ' + newUser.username + '</h4>' +
+                                            '<div class="messages">';
+                                        response.mensajes.forEach(function(mensaje) {
+                                            var messageClass = (mensaje.emisor == '{{ request.user.username }}') ? 'sent' : 'received';
+                                            newChatHtml += '<div class="chat-message ' + messageClass + '">' +
+                                                '<div>' +
+                                                '<strong>' + (messageClass == 'sent' ? 'Tú' : mensaje.emisor) + '</strong>: ' +
+                                                mensaje.contenido + '<br>' +
+                                                '<small>' + mensaje.fecha_envio + '</small>' +
+                                                '</div>';
+                                            if (mensaje.imagen_url) {
+                                                newChatHtml += '<div><img src="' + mensaje.imagen_url + '" alt="Imagen del mensaje"></div>';
+                                            }
+                                            newChatHtml += '</div>';
+                                        });
+                                        newChatHtml += '</div></div>' +
+                                            '<div class="chat-input mt-3">' +
+                                            '<form id="send-message-form-' + newUser.id + '" class="send-message-form" method="post" action="{% url "enviar_mensaje" %}" enctype="multipart/form-data">' +
+                                            '{% csrf_token %}' +
+                                            '<input type="hidden" name="receptor_username" class="receptor-username" value="' + newUser.username + '">' +
+                                            '<textarea name="contenido" class="form-control mb-2 mr-2" placeholder="Escribe tu mensaje..." rows="3"></textarea>' +
+                                            '<input type="file" name="imagen" class="form-control mb-2 mr-2">' +
+                                            '<button type="submit" class="btn btn-primary send-message-button"><i class="fas fa-paper-plane"></i> Enviar</button>' +
+                                            '</form>' +
+                                            '<div class="error-message text-danger"></div>' +
+                                            '</div></div>';
+                                        $('#chat-content').append(newChatHtml);
+                                        // Aquí se añade la funcionalidad de manejo de clicks para los nuevos elementos
+                                        $('.chat-user-link').on('click', function(event) {
+                                            event.preventDefault();
+                                            var username = $(this).data('username');
+                                            $('.receptor-username').val(username);
+                                            $('.chat-window').hide();
+                                            $($(this).attr('href')).show();
+                                        });
+
+                                        $('.send-message-button').on('click', function(event) {
+                                            event.preventDefault();
+                                            var form = $(this).closest('form')[0];
+                                            var formData = new FormData(form);
+                                            var chatWindowId = $(this).closest('.chat-window').attr('id');
+                                            var chatWindowMessages = $(this).closest('.chat-window').find('.messages');
+
+                                            $.ajax({
+                                                type: 'POST',
+                                                url: form.action,
+                                                data: formData,
+                                                processData: false,
+                                                contentType: false,
+                                                success: function(response) {
+                                                    var messageHtml = '<div class="chat-message sent">' +
+                                                        '<div>' +
+                                                        '<strong>Tú</strong>: ' + (response.contenido ? response.contenido : '') + '<br>' +
+                                                        '<small>' + response.fecha_envio + '</small>' +
+                                                        '</div>';
+                                                    if (response.imagen_url) {
+                                                        messageHtml += '<div><img src="' + response.imagen_url + '" alt="Imagen del mensaje"></div>';
+                                                    }
+                                                    messageHtml += '<div class="mt-2">' +
+                                                        '<button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="' + response.id + '"><i class="fas fa-trash"></i> Eliminar</button>' +
+                                                        '</div>';
+                                                    chatWindowMessages.append(messageHtml);
+                                                    $(form).find('textarea').val('');
+                                                    $(form).find('input[type="file"]').val('');
+                                                    chatWindowMessages.scrollTop(chatWindowMessages[0].scrollHeight);
+                                                },
+                                                error: function(response) {
+                                                    var errorMessage = $(form).closest('.chat-input').find('.error-message');
+                                                    errorMessage.text('Error al enviar el mensaje.');
+                                                }
+                                            });
+                                        });
+
+                                        $('.ocultar-conversation-button').on('click', function(event) {
+                                            event.preventDefault();
+                                            var username = $(this).data('username');
+                                            if (confirm('¿Estás seguro de que deseas ocultar esta conversación?')) {
+                                                $.ajax({
+                                                    type: 'POST',
+                                                    url: '{% url "ocultar_conversacion" %}',
+                                                    data: {
+                                                        'username': username,
+                                                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                                    },
+                                                    success: function(response) {
+                                                        if (response.success) {
+                                                            $('a[data-username="' + username + '"]').closest('li').remove();
+                                                            $('#chat-' + response.user_id).remove();
+                                                        } else {
+                                                            alert(response.error);
+                                                        }
+                                                    },
+                                                    error: function(response) {
+                                                        alert('Error al ocultar la conversación.');
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    },
+                                    error: function(response) {
+                                        alert('Error al cargar los mensajes.');
+                                    }
+                                });
+
+                                errorMessage.text('');
+                                $('#new_chat_username').val('');
+                            } else {
+                                errorMessage.text(response.error);
+                            }
+                        },
+                        error: function(response) {
+                            errorMessage.text('Error al iniciar el chat.');
+                        }
+                    });
+                } else {
+                    errorMessage.text('Por favor, introduce un nombre de usuario.');
                 }
             });
 
@@ -159,6 +303,32 @@
                         errorMessage.text('Error al enviar el mensaje.');
                     }
                 });
+            });
+
+            $('.ocultar-conversation-button').on('click', function(event) {
+                event.preventDefault();
+                var username = $(this).data('username');
+                if (confirm('¿Estás seguro de que deseas ocultar esta conversación?')) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '{% url "ocultar_conversacion" %}',
+                        data: {
+                            'username': username,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                $('a[data-username="' + username + '"]').closest('li').remove();
+                                $('#chat-' + response.user_id).remove();
+                            } else {
+                                alert(response.error);
+                            }
+                        },
+                        error: function(response) {
+                            alert('Error al ocultar la conversación.');
+                        }
+                    });
+                }
             });
 
             $('.responder-btn').on('click', function(event) {
