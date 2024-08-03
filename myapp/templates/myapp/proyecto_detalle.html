@@ -1,6 +1,6 @@
 {% extends "myapp/base.html" %}
-{% load custom_filters %}
 {% load static %}
+{% load custom_filters %}
 
 {% block title %}Detalles del Proyecto{% endblock %}
 
@@ -10,45 +10,48 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="mb-3">
+    <div class="back-button">
         <a href="{% url 'proyecto_lista' %}" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left"></i> Volver
         </a>
     </div>
     <div class="card mb-3">
         <div class="card-header d-flex justify-content-between align-items-center">
-            {{ proyecto.nombre }}
+            <div class="card-title">{{ proyecto.nombre }}</div>
             {% if perms.myapp.change_proyecto %}
             <div class="btn-group" role="group" aria-label="Administrar Proyecto">
                 <a href="{% url 'proyecto_edit' proyecto.id %}" class="btn btn-outline-warning">Editar</a>
                 <a href="{% url 'confirmar_eliminar_proyecto' proyecto.id %}" class="btn btn-outline-danger">Eliminar</a>
                 <a href="{% url 'listar_tareas' proyecto.id %}" class="btn btn-outline-info">Tareas</a>
                 <a href="{% url 'gestionar_postulaciones' proyecto.id %}" class="btn btn-outline-primary">Gestionar Postulaciones</a>
+                <a href="{% url 'recomendar_especialistas' proyecto.id %}" class="btn btn-outline-success">Recomendar Especialistas</a>
             </div>
             {% endif %}
         </div>
-        <div class="card-body">
-            {% if proyecto.imagen %}
-            <img src="{{ proyecto.imagen.url }}" alt="{{ proyecto.nombre }}" class="img-fluid mb-3">
-            {% else %}
-            <p>No hay imagen disponible.</p>
-            {% endif %}
-            <p class="card-text">{{ proyecto.descripcion }}</p>
-            <hr>
-            <p class="card-text"><strong>Fecha de Inicio:</strong> {{ proyecto.fecha_inicio }}</p>
-            <p class="card-text"><strong>Fecha de Fin:</strong> {{ proyecto.fecha_fin }}</p>
-            <p class="card-text"><strong>Ciudad:</strong> {{ proyecto.ciudad }}</p>
-            <p class="card-text"><strong>Categoría:</strong> {{ proyecto.categoria }}</p>
-            <div class="mt-4">
-                <form method="post" action="{% url 'postular_proyecto' proyecto.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-success btn-block">Postular al Proyecto</button>
-                </form>
+        <div class="card-body project-details">
+            <div class="project-image">
+                {% if proyecto.imagen %}
+                <img src="{{ proyecto.imagen.url }}" alt="{{ proyecto.nombre }}">
+                {% else %}
+                <p>No hay imagen disponible.</p>
+                {% endif %}
+                <div class="postulaciones-counter">
+                    <i class="fas fa-users postulaciones-icon"></i> Postulaciones: <span>{{ proyecto.postulaciones.count }}</span>
+                </div>
             </div>
-        </div>
-        <div class="card-footer d-flex justify-content-between align-items-center">
-            <div class="postulaciones-counter">
-                Postulaciones: <span>{{ proyecto.postulaciones.count }}</span>
+            <div class="project-description">
+                <p class="card-text">{{ proyecto.descripcion }}</p>
+                <hr>
+                <p class="card-text"><strong>Fecha de Inicio:</strong> {{ proyecto.fecha_inicio }}</p>
+                <p class="card-text"><strong>Fecha de Fin:</strong> {{ proyecto.fecha_fin }}</p>
+                <p class="card-text"><strong>Ciudad:</strong> {{ proyecto.ciudad }}</p>
+                <p class="card-text"><strong>Categoría:</strong> {{ proyecto.categoria }}</p>
+                <div class="mt-4">
+                    <form method="post" action="{% url 'postular_proyecto' proyecto.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-block">Postular al Proyecto</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

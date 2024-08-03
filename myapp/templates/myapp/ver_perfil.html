@@ -1,5 +1,7 @@
 {% extends 'myapp/base.html' %}
 {% load static %}
+{% load custom_filters %}  <!-- Cargar los filtros personalizados -->
+
 {% block title %}Perfil de {{ user.username }}{% endblock %}
 
 {% block extra_css %}
@@ -21,6 +23,17 @@
 
     .btn-custom i {
         font-size: 1.2em;
+    }
+
+    .left-profile-card .user-profile img {
+        width: 100%;
+        max-width: 150px;
+        margin: 0 auto;
+        display: block;
+    }
+
+    .timeline-entry-inner {
+        margin-bottom: 20px;
     }
 </style>
 {% endblock %}
@@ -66,6 +79,14 @@
                             <li class="list-group-item text-right"><span class="pull-left"><strong></strong></span> <i class="fab fa-facebook-f"></i> {{ perfil.facebook }}</li>
                             <li class="list-group-item text-right"><span class="pull-left"><strong></strong></span> <i class="fab fa-linkedin-in"></i> {{ perfil.linkedin }}</li>
                         </ul>
+                    </div>
+                    <div class="personal-info mt-4">
+                        <h3>Habilidades</h3>
+                        <p>{{ perfil.habilidades }}</p>
+                    </div>
+                    <div class="personal-info mt-4">
+                        <h3>Experiencia</h3>
+                        <p>{{ perfil.experiencia }}</p>
                     </div>
                 </div>
             </div>

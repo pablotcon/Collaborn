@@ -1,0 +1,18 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Recomendar Especialistas{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Especialistas recomendados para {{ proyecto.nombre }}</h1>
+    <ul class="list-group">
+        {% for especialista in especialistas %}
+        <li class="list-group-item">
+            <h5>{{ especialista.nombre }} {{ especialista.apellido }}</h5>
+            <p>{{ especialista.habilidades }}</p>
+            <a href="{% url 'ver_perfil_especialista' especialista.user.id %}" class="btn btn-primary">Ver Perfil</a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

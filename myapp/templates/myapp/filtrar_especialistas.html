@@ -1,0 +1,36 @@
+{% extends 'myapp/base.html' %}
+{% block title %}Filtrar Especialistas{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Filtrar Especialistas</h1>
+    <form method="get" class="mb-4">
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <input type="text" name="q" class="form-control" placeholder="Buscar por nombre o apellido" value="{{ request.GET.q }}">
+            </div>
+            <div class="form-group col-md-4">
+                <input type="text" name="habilidades" class="form-control" placeholder="Buscar por habilidades" value="{{ request.GET.habilidades }}">
+            </div>
+            <div class="form-group col-md-4">
+                <input type="text" name="ciudad" class="form-control" placeholder="Buscar por ciudad" value="{{ request.GET.ciudad }}">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+    <ul class="list-group">
+        {% for especialista in especialistas %}
+        <li class="list-group-item">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h5>{{ especialista.nombre }} {{ especialista.apellido }}</h5>
+                    <p>{{ especialista.habilidades }}</p>
+                    <p>{{ especialista.ciudad }}</p>
+                </div>
+                <a href="{% url 'ver_perfil_especialista' especialista.user.id %}" class="btn btn-primary">Ver Perfil</a>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

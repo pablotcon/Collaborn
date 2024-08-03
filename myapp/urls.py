@@ -15,6 +15,11 @@ urlpatterns = [
     path('perfil/editar/', views.editar_perfil, name='editar_perfil'),
     path('perfil/cambiar_password/', views.cambiar_password, name='cambiar_password'),
 
+
+    path('especialistas/', views.filtrar_especialistas, name='filtrar_especialistas'),
+    path('especialistas/<int:especialista_id>/valorar/', views.valorar_especialista, name='valorar_especialista'),
+    path('proyectos/<int:proyecto_id>/recomendar/', views.recomendar_especialistas, name='recomendar_especialistas'),
+
     # Experiencia y educación ###
     path('experiencia/<int:pk>/editar/', views.editar_experiencia, name='editar_experiencia'),
     path('experiencia/<int:pk>/eliminar/', views.eliminar_experiencia, name='eliminar_experiencia'),

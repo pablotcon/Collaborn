@@ -26,7 +26,7 @@ class Proyecto(models.Model):
         ('finanzas', 'Finanzas'),
         ('energia', 'Energía'),
         ('animales', 'Animales'),
-    ])
+    ], default='tecnologia')
     creador = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -146,9 +146,12 @@ class Perfil(models.Model):
     twitter = models.URLField(max_length=200, blank=True, null=True)
     facebook = models.URLField(max_length=200, blank=True, null=True)
     linkedin = models.URLField(max_length=200, blank=True, null=True)
+    habilidades = models.TextField(blank=True, null=True)
+    experiencia = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f'{self.nombre} {self.apellido or ""}'
+
 
 class ExperienciaLaboral(models.Model):
     perfil = models.ForeignKey(Perfil, related_name='experiencias', on_delete=models.CASCADE)
@@ -170,6 +173,18 @@ class Educacion(models.Model):
     def __str__(self):
         return self.titulo
     
+
+class Valoracion(models.Model):
+    especialista = models.ForeignKey(Perfil, on_delete=models.CASCADE, related_name='valoraciones')
+    autor = models.ForeignKey(User, on_delete=models.CASCADE)
+    puntuacion = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    comentario = models.TextField()
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.puntuacion} - {self.especialista.nombre}'
+
+
 class ConversacionOculta(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     usuario_oculto = models.ForeignKey(User, related_name='ocultado_por', on_delete=models.CASCADE)
@@ -179,3 +194,4 @@ class ConversacionOculta(models.Model):
 
     def __str__(self):
         return f"{self.usuario.username} oculta {self.usuario_oculto.username}"
+    

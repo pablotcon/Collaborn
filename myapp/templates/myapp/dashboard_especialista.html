@@ -1,0 +1,26 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Dashboard de Especialista{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Dashboard de Especialista</h1>
+    <h2>Mis Postulaciones</h2>
+    <ul class="list-group mb-4">
+        {% for postulacion in postulaciones %}
+        <li class="list-group-item">
+            <a href="{% url 'proyecto_detalle' postulacion.proyecto.id %}">{{ postulacion.proyecto.nombre }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Mis Proyectos</h2>
+    <ul class="list-group mb-4">
+        {% for proyecto in proyectos %}
+        <li class="list-group-item">
+            <a href="{% url 'proyecto_detalle' proyecto.id %}">{{ proyecto.nombre }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

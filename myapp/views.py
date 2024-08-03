@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required, permission_required, 
 from django.db.models import Q
 from django.contrib import messages
 from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad, SeguimientoTarea, Subtarea, Educacion, ExperienciaLaboral
-from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm, SeguimientoTareaForm, EducacionFormSet, ExperienciaLaboralFormSet, EducacionForm, SubtareaForm, ComentarioTareaForm, ExperienciaLaboralForm
+from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm, SeguimientoTareaForm,EducacionFormSet, ExperienciaLaboralFormSet, EducacionForm, SubtareaForm, ComentarioTareaForm, ExperienciaLaboralForm,ValoracionForm
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
@@ -346,6 +346,62 @@ def ver_perfil(request):
         'experiencias': experiencias,
         'educaciones': educaciones,
     })
+
+def filtrar_especialistas(request):
+    query = request.GET.get('q', '')
+    habilidades = request.GET.get('habilidades', '')
+    ciudad = request.GET.get('ciudad', '')
+    especialistas = Perfil.objects.all()
+
+    if query:
+        especialistas = especialistas.filter(
+            Q(nombre__icontains=query) | Q(apellido__icontains=query)
+        )
+    if habilidades:
+        especialistas = especialistas.filter(habilidades__icontains=habilidades)
+    if ciudad:
+        especialistas = especialistas.filter(ciudad__icontains=ciudad)
+
+    return render(request, 'myapp/filtrar_especialistas.html', {'especialistas': especialistas})
+
+
+@login_required
+def dashboard_especialista(request):
+    perfil = request.user.perfil
+    postulaciones = Postulacion.objects.filter(usuario=request.user)
+    proyectos = Proyecto.objects.filter(creador=request.user)
+
+    return render(request, 'myapp/dashboard_especialista.html', {
+        'postulaciones': postulaciones,
+        'proyectos': proyectos,
+    })
+
+@login_required
+def valorar_especialista(request, especialista_id):
+    especialista = Perfil.objects.get(id=especialista_id)
+    if request.method == 'POST':
+        form = ValoracionForm(request.POST)
+        if form.is_valid():
+            valoracion = form.save(commit=False)
+            valoracion.especialista = especialista
+            valoracion.autor = request.user
+            valoracion.save()
+            return redirect('ver_perfil', especialista.user.id)
+    else:
+        form = ValoracionForm()
+    return render(request, 'myapp/valorar_especialista.html', {'form': form, 'especialista': especialista})
+
+
+@login_required
+def recomendar_especialistas(request, proyecto_id):
+    proyecto = Proyecto.objects.get(id=proyecto_id)
+    habilidades_requeridas = proyecto.descripcion.split()  # Simplificación, se puede mejorar
+    especialistas = Perfil.objects.filter(
+        Q(habilidades__icontains=habilidades_requeridas[0]) | 
+        Q(habilidades__icontains=habilidades_requeridas[1]) | 
+        Q(habilidades__icontains=habilidades_requeridas[2])
+    )
+    return render(request, 'myapp/recomendar_especialistas.html', {'proyecto': proyecto, 'especialistas': especialistas})
 
 @login_required
 def cambiar_password(request):

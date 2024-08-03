@@ -2,7 +2,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 from django.contrib.auth.models import User
-from .models import Recurso, Perfil, Comentario, Mensaje, Proyecto, Tarea, ExperienciaLaboral, Educacion, SeguimientoTarea, Subtarea, ComentarioTarea, Categoria
+from .models import Recurso, Perfil, Comentario, Mensaje, Proyecto, Tarea, ExperienciaLaboral, Educacion, SeguimientoTarea, Subtarea, ComentarioTarea, Categoria, Valoracion
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 
@@ -19,7 +19,12 @@ class PerfilForm(forms.ModelForm):
 
     class Meta:
         model = Perfil
-        fields = ['nombre', 'apellido', 'telefono', 'fecha_nacimiento', 'avatar', 'website', 'twitter', 'facebook', 'linkedin']
+        fields = ['nombre', 'apellido', 'telefono', 'fecha_nacimiento', 'avatar', 'website', 'twitter', 'facebook', 'linkedin', 'habilidades', 'experiencia']
+        widgets = {
+            'habilidades': forms.Textarea(attrs={'rows': 3}),
+            'experiencia': forms.Textarea(attrs={'rows': 5}),
+        }
+
 
 class ExperienciaLaboralForm(forms.ModelForm):
     fecha_inicio = forms.DateField(
@@ -67,6 +72,16 @@ class EducacionForm(forms.ModelForm):
 
 ExperienciaLaboralFormSet = inlineformset_factory(Perfil, ExperienciaLaboral, form=ExperienciaLaboralForm, extra=0, can_delete=True)
 EducacionFormSet = inlineformset_factory(Perfil, Educacion, form=EducacionForm, extra=0, can_delete=True)
+
+class ValoracionForm(forms.ModelForm):
+    class Meta:
+        model = Valoracion
+        fields = ['puntuacion', 'comentario']
+        widgets = {
+            'puntuacion': forms.Select(attrs={'class': 'form-control'}),
+            'comentario': forms.Textarea(attrs={'class': 'form-control'}),
+        }
+
 
 class ComentarioForm(forms.ModelForm):
     class Meta:
