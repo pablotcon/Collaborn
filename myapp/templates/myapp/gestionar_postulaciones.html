@@ -1,0 +1,58 @@
+{% extends "myapp/base.html" %}
+{% load static %}
+
+{% block title %}Gestionar Postulaciones{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'myapp/css/proyecto_detalle.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="mb-3">
+        <a href="{% url 'proyecto_detalle' proyecto.id %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Volver al Proyecto
+        </a>
+    </div>
+    <div class="card mb-3">
+        <div class="card-header">
+            Gestionar Postulaciones para {{ proyecto.nombre }}
+        </div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Usuario</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for postulacion in postulaciones %}
+                    <tr>
+                        <td>{{ postulacion.usuario.username }}</td>
+                        <td>{{ postulacion.get_estado_display }}</td>
+                        <td>
+                            {% if postulacion.estado == 'pendiente' %}
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="postulacion_id" value="{{ postulacion.id }}">
+                                <input type="hidden" name="accion" value="aceptar">
+                                <button type="submit" class="btn btn-success btn-sm">Aceptar</button>
+                            </form>
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="postulacion_id" value="{{ postulacion.id }}">
+                                <input type="hidden" name="accion" value="rechazar">
+                                <button type="submit" class="btn btn-danger btn-sm">Rechazar</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

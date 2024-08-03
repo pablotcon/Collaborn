@@ -1,3 +1,59 @@
+/* Agrega esto a tu archivo base.css */
+
+.navbar-brand span {
+    font-weight: bold;
+    color: #f5dd5d;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+}
+
+.navbar-custom .navbar-nav .nav-link {
+    color: var(--primary-fg);
+    font-weight: 600;
+    padding: 10px;
+}
+
+.navbar-custom .navbar-nav .nav-link:hover {
+    color: var(--accent);
+}
+
+.navbar-custom .navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent);
+}
+
+.navbar-custom .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(245,243,120, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+.dropdown-menu-profile {
+    background-color: var(--secondary);
+    border: none;
+    z-index: 1001; /* Asegura que el menú desplegable esté por encima de otros elementos */
+}
+
+.dropdown-menu-profile .dropdown-item {
+    color: var(--primary-fg);
+    font-weight: 500;
+}
+
+.dropdown-menu-profile .dropdown-item:hover {
+    background-color: var(--accent);
+    color: var(--secondary);
+}
+
+.navbar-nav .nav-item .nav-link img {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.badge-danger {
+    background-color: red;
+    color: white;
+}
+
+
 
 /* VARIABLE DEFINITIONS */
 html[data-theme="light"],

@@ -72,6 +72,9 @@ class ComentarioForm(forms.ModelForm):
     class Meta:
         model = Comentario
         fields = ['texto']
+        widgets = {
+            'texto': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Escribe tu comentario aquí...'}),
+        }
 
 class MensajeForm(forms.ModelForm):
     receptor_username = forms.CharField(
@@ -110,6 +113,15 @@ class ProyectoForm(forms.ModelForm):
         ('puerto_montt', 'Puerto Montt'),
     ]
 
+    CATEGORIAS_CHOICES = [
+        ('tecnologia', 'Tecnología'),
+        ('educacion', 'Educación'),
+        ('salud', 'Salud'),
+        ('finanzas', 'Finanzas'),
+        ('energia', 'Energía'),
+        ('animales', 'Animales'),
+    ]
+
     fecha_inicio = forms.DateField(
         input_formats=['%d-%m-%Y'],
         widget=forms.DateInput(format='%d-%m-%Y', attrs={'id': 'id_fecha_inicio', 'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'}),
@@ -130,8 +142,9 @@ class ProyectoForm(forms.ModelForm):
         widget=forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
         label='Imagen del proyecto'
     )
-    categoria = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
+    categoria = forms.ChoiceField(
+        choices=CATEGORIAS_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'}),
         label='Categoría'
     )
 

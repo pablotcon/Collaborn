@@ -19,12 +19,19 @@ class Proyecto(models.Model):
     fecha_fin = models.DateField()
     ciudad = models.CharField(max_length=100, blank=True, null=True)
     imagen = models.ImageField(upload_to='proyectos/', blank=True, null=True)
-    categoria = models.CharField(max_length=100, blank=True, null=True)
+    categoria = models.CharField(max_length=100, choices=[
+        ('tecnologia', 'Tecnología'),
+        ('educacion', 'Educación'),
+        ('salud', 'Salud'),
+        ('finanzas', 'Finanzas'),
+        ('energia', 'Energía'),
+        ('animales', 'Animales'),
+    ])
     creador = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.nombre
-    
+
     def clean(self):
         if self.fecha_fin <= self.fecha_inicio:
             raise ValidationError('La fecha de fin debe ser posterior a la fecha de inicio.')

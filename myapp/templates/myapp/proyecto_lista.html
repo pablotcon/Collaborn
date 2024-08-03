@@ -20,10 +20,18 @@
             <input type="text" name="q" placeholder="Buscar proyectos" value="{{ request.GET.q }}">
             <button type="submit" class="btn btn-primary">Buscar</button>
         </form>
+        <div class="text-center my-4">
+            <ul class="category-list">
+                <li class="category-item"><a href="?category=Todos">Todos</a></li>
+                {% for category in categories %}
+                    <li class="category-item"><a href="?category={{ category }}">{{ category }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
         {% for proyecto in proyectos %}
         <article class="postcard light blue">
-            <a class="postcard__img_link" href="#">
-                <img class="postcard__img" src="https://picsum.photos/1000/1000" alt="Project Image" />
+            <a class="postcard__img_link" href="{% url 'proyecto_detalle' proyecto.id %}">
+                <img class="postcard__img" src="{% if proyecto.imagen %}{{ proyecto.imagen.url }}{% else %}https://picsum.photos/1000/1000{% endif %}" alt="Project Image" />
             </a>
             <div class="postcard__text t-dark">
                 <h1 class="postcard__title blue"><a href="{% url 'proyecto_detalle' proyecto.id %}">{{ proyecto.nombre }}</a></h1>
@@ -36,13 +44,11 @@
                 <div class="postcard__preview-txt">{{ proyecto.descripcion }}</div>
                 <ul class="postcard__tagbox">
                     <li class="tag__item"><i class="fas fa-tag mr-2"></i>{{ proyecto.categoria }}</li>
-                    <li class="tag__item"><i class="fas fa-clock mr-2"></i>{{ proyecto.fecha_fin}} mins.</li>
+                    <li class="tag__item"><i class="fas fa-clock mr-2"></i>{{ proyecto.fecha_fin }} mins.</li>
                     <li class="tag__item play blue">
-                        <a href="#"><i class="fas fa-play mr-2"></i>Ver Proyecto</a>
+                        <a href="{% url 'proyecto_detalle' proyecto.id %}"><i class="fas fa-play mr-2"></i>Ver Proyecto</a>
                     </li>
                 </ul>
-               
-                </div>
             </div>
         </article>
         {% endfor %}

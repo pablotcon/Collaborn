@@ -397,13 +397,23 @@ def marcar_notificacion_leida(request, notificacion_id):
 @login_required
 def proyecto_lista(request):
     query = request.GET.get('q', '')
+    categoria = request.GET.get('category', 'Todos')
+    categories = Proyecto.objects.exclude(categoria__isnull=True).exclude(categoria__exact='').values_list('categoria', flat=True).distinct()
+
     if query:
         proyectos = Proyecto.objects.filter(
             Q(nombre__icontains=query) | Q(descripcion__icontains=query)
         )
     else:
         proyectos = Proyecto.objects.all()
-    return render(request, 'myapp/proyecto_lista.html', {'proyectos': proyectos})
+
+    if categoria != 'Todos':
+        proyectos = proyectos.filter(categoria=categoria)
+
+    return render(request, 'myapp/proyecto_lista.html', {
+        'proyectos': proyectos,
+        'categories': categories,
+    })
 
 @login_required
 def crear_proyecto(request):
@@ -482,6 +492,41 @@ def confirmar_eliminar_proyecto(request, pk):
         return redirect('proyecto_lista')
     return render(request, 'myapp/confirmar_eliminar_proyecto.html', {'proyecto': proyecto})
 
+
+## gestion proyecto ###
+@login_required
+def gestionar_postulaciones(request, proyecto_id):
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+    postulaciones = proyecto.postulacion_set.all()
+
+    if request.method == 'POST':
+        accion = request.POST.get('accion')
+        postulacion_id = request.POST.get('postulacion_id')
+        postulacion = get_object_or_404(Postulacion, id=postulacion_id)
+
+        if accion == 'aceptar':
+            postulacion.estado = 'aceptada'
+            postulacion.save()
+            messages.success(request, 'La postulación ha sido aceptada.')
+            Notificacion.objects.create(
+                receptor=postulacion.usuario,
+                mensaje=f'Tu postulación al proyecto "{postulacion.proyecto.nombre}" ha sido aceptada.'
+            )
+        elif accion == 'rechazar':
+            postulacion.estado = 'rechazada'
+            postulacion.save()
+            messages.success(request, 'La postulación ha sido rechazada.')
+            Notificacion.objects.create(
+                receptor=postulacion.usuario,
+                mensaje=f'Tu postulación al proyecto "{postulacion.proyecto.nombre}" ha sido rechazada.'
+            )
+
+    return render(request, 'myapp/gestionar_postulaciones.html', {
+        'proyecto': proyecto,
+        'postulaciones': postulaciones,
+    })
+
+### POSTULAR PROYECTO ###
 @login_required
 def postular_proyecto(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
@@ -498,6 +543,8 @@ def postular_proyecto(request, proyecto_id):
         return redirect('proyecto_detalle', proyecto_id=proyecto_id)
     return render(request, 'myapp/proyecto_detalle.html', {'proyecto': proyecto})
 
+
+### ACEPTAR POSTULACION ####
 @login_required
 @permission_required('myapp.change_postulacion', raise_exception=True)
 def aceptar_postulacion(request, postulacion_id):
@@ -512,6 +559,7 @@ def aceptar_postulacion(request, postulacion_id):
         )
     return redirect('proyecto_detalle', proyecto_id=postulacion.proyecto.id)
 
+### RECHAZAR POSTULACION
 @login_required
 @permission_required('myapp.change_postulacion', raise_exception=True)
 def rechazar_postulacion(request, postulacion_id):
@@ -531,7 +579,8 @@ def mis_postulaciones(request):
     postulaciones = Postulacion.objects.filter(usuario=request.user)
     return render(request, 'myapp/mis_postulaciones.html', {'postulaciones': postulaciones})
 
-# Functions related to Resources
+
+### Funciones relacionadas a RECURSOS ###
 @login_required
 def recurso_detail(request, pk):
     recurso = get_object_or_404(Recurso, pk=pk)

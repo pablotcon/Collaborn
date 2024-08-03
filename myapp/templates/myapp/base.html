@@ -26,6 +26,7 @@
         }
         .navbar.custom-navbar {
             background-color: #000000;
+            z-index: 1000; /* Asegura que la barra de navegación esté por encima de otros elementos */
         }
         .navbar.custom-navbar .navbar-nav .nav-link {
             color: #f5f378;
@@ -41,6 +42,7 @@
         }
         .dropdown-menu {
             background-color: #000000;
+            z-index: 1001; /* Asegura que el menú desplegable esté por encima de otros elementos */
         }
         .dropdown-menu .dropdown-item {
             color: #f5f378;
@@ -58,19 +60,27 @@
     <header>
         <nav class="navbar navbar-expand-lg fixed-top custom-navbar">
             <div class="container">
-                <a class="navbar-brand" href="{% url 'index' %}">Collaborn</a>
+                <a class="navbar-brand" href="{% url 'index' %}">
+                    <span style="font-weight: bold; color: #f5f378; font-size: 1.5rem;">Collaborize</span>
+                </a>
+                
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
                     <ul class="navbar-nav mx-auto">
-                        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'ver_perfil' %}">Perfil</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'proyecto_lista' %}">Proyectos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'listar_recursos' %}">Recursos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}"><i class="fas fa-home"></i> Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'proyecto_lista' %}"><i class="fas fa-project-diagram"></i> Proyectos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'listar_recursos' %}"><i class="fas fa-book"></i> Recursos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'listar_mensajes' %}"><i class="fas fa-envelope"></i> Mensajes
+                            {% if unread_messages_count > 0 %}
+                                <span class="badge badge-danger">{{ unread_messages_count }}</span>
+                            {% endif %}
+                        </a></li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="notificacionesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Notificaciones <span id="notificaciones-count" class="badge badge-danger"></span>
+                                <i class="fas fa-bell"></i> Notificaciones
+                                <span id="notificaciones-count" class="badge badge-danger"></span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-notifications" aria-labelledby="notificacionesDropdown">
                                 <div id="notificaciones-content"></div>
@@ -78,23 +88,26 @@
                                 <a class="dropdown-item text-center" href="{% url 'listar_notificaciones' %}">Ver todas las notificaciones</a>
                             </div>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'listar_mensajes' %}">Mensajes
-                                {% if unread_messages_count > 0 %}
-                                    <span class="badge badge-danger">{{ unread_messages_count }}</span>
-                                {% endif %}
-                            </a>
-                        </li>
                         {% if user.is_staff %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'crear_proyecto' %}">Crear Proyecto</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}">Admin Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel_tareas' %}">Panel de Tareas</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'crear_proyecto' %}"><i class="fas fa-plus"></i> Crear Proyecto</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel_tareas' %}"><i class="fas fa-tasks"></i> Panel de Tareas</a></li>
                         {% endif %}
-                        <li class="nav-item">
-                            <form method="post" action="{% url 'logout' %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-link nav-link">Cerrar Sesión</button>
-                            </form>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="perfilDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <img src="{% if user.perfil.avatar %}{{ user.perfil.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Foto de perfil" class="rounded-circle" width="30" height="30">
+                                <span class="ml-2">{{ user.perfil.nombre }} </span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-profile" aria-labelledby="perfilDropdown">
+                                <a class="dropdown-item" href="{% url 'ver_perfil' %}">Perfil</a>
+                                <div class="dropdown-divider"></div>
+                                <form method="post" action="{% url 'logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item">Cerrar Sesión</button>
+                                </form>
+                            </div>
                         </li>
                     </ul>
                 </div>

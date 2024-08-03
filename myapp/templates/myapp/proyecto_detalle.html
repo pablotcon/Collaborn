@@ -1,4 +1,5 @@
 {% extends "myapp/base.html" %}
+{% load custom_filters %}
 {% load static %}
 
 {% block title %}Detalles del Proyecto{% endblock %}
@@ -15,34 +16,48 @@
         </a>
     </div>
     <div class="card mb-3">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <h1 class="card-title">{{ proyecto.nombre }}</h1>
-                {% if perms.myapp.change_proyecto %}
-                <div class="btn-group mt-2 mt-md-0" role="group" aria-label="Administrar Proyecto">
-                    <a href="{% url 'proyecto_edit' proyecto.id %}" class="btn btn-outline-warning">Editar</a>
-                    <a href="{% url 'confirmar_eliminar_proyecto' proyecto.id %}" class="btn btn-outline-danger">Eliminar</a>
-                    <a href="{% url 'listar_tareas' proyecto.id %}" class="btn btn-outline-info">Tareas</a>
-                </div>
-                {% endif %}
+        <div class="card-header d-flex justify-content-between align-items-center">
+            {{ proyecto.nombre }}
+            {% if perms.myapp.change_proyecto %}
+            <div class="btn-group" role="group" aria-label="Administrar Proyecto">
+                <a href="{% url 'proyecto_edit' proyecto.id %}" class="btn btn-outline-warning">Editar</a>
+                <a href="{% url 'confirmar_eliminar_proyecto' proyecto.id %}" class="btn btn-outline-danger">Eliminar</a>
+                <a href="{% url 'listar_tareas' proyecto.id %}" class="btn btn-outline-info">Tareas</a>
+                <a href="{% url 'gestionar_postulaciones' proyecto.id %}" class="btn btn-outline-primary">Gestionar Postulaciones</a>
             </div>
-            <hr>
-            <p class="card-text">{{ proyecto.descripcion }}</p>
-            <p class="card-text"><strong>Fecha de Inicio:</strong> {{ proyecto.fecha_inicio }}</p>
-            <p class="card-text"><strong>Fecha de Fin:</strong> {{ proyecto.fecha_fin }}</p>
-            <p class="card-text"><strong>Ciudad:</strong> {{ proyecto.ciudad }}</p>
+            {% endif %}
+        </div>
+        <div class="card-body">
             {% if proyecto.imagen %}
             <img src="{{ proyecto.imagen.url }}" alt="{{ proyecto.nombre }}" class="img-fluid mb-3">
             {% else %}
             <p>No hay imagen disponible.</p>
             {% endif %}
+            <p class="card-text">{{ proyecto.descripcion }}</p>
+            <hr>
+            <p class="card-text"><strong>Fecha de Inicio:</strong> {{ proyecto.fecha_inicio }}</p>
+            <p class="card-text"><strong>Fecha de Fin:</strong> {{ proyecto.fecha_fin }}</p>
+            <p class="card-text"><strong>Ciudad:</strong> {{ proyecto.ciudad }}</p>
             <p class="card-text"><strong>Categoría:</strong> {{ proyecto.categoria }}</p>
+            <div class="mt-4">
+                <form method="post" action="{% url 'postular_proyecto' proyecto.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-block">Postular al Proyecto</button>
+                </form>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <div class="postulaciones-counter">
+                Postulaciones: <span>{{ proyecto.postulaciones.count }}</span>
+            </div>
         </div>
     </div>
 
     <div class="card mb-3">
+        <div class="card-header">
+            Comentarios
+        </div>
         <div class="card-body">
-            <h2 class="card-title">Comentarios</h2>
             <ul class="list-group list-group-flush">
                 {% for comentario in comentarios %}
                 <li class="list-group-item d-flex justify-content-between align-items-start">
@@ -58,52 +73,16 @@
     </div>
 
     <div class="card mb-3">
+        <div class="card-header">
+            Agregar Comentario
+        </div>
         <div class="card-body">
-            <h2 class="card-title">Agregar Comentario</h2>
             <form method="post">
                 {% csrf_token %}
                 <div class="form-group">
-                    {{ form.as_p }}
+                    {{ form.texto|add_class:"form-control" }}
                 </div>
                 <button type="submit" class="btn btn-primary">Agregar Comentario</button>
-            </form>
-        </div>
-    </div>
-
-    <div class="card mb-3">
-        <div class="card-body">
-            <h2 class="card-title">Postulaciones</h2>
-            <ul class="list-group list-group-flush">
-                {% for postulacion in postulaciones %}
-                <li class="list-group-item d-flex justify-content-between align-items-start">
-                    <div class="ms-2 me-auto">
-                        <div class="fw-bold">{{ postulacion.usuario.username }}</div>
-                        Estado: {{ postulacion.get_estado_display }}
-                    </div>
-                    {% if postulacion.estado == 'pendiente' and perms.myapp.change_postulacion %}
-                    <div class="btn-group" role="group" aria-label="Acciones de Postulación">
-                        <form method="post" action="{% url 'aceptar_postulacion' postulacion.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-success">Aceptar</button>
-                        </form>
-                        <form method="post" action="{% url 'rechazar_postulacion' postulacion.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">Rechazar</button>
-                        </form>
-                    </div>
-                    {% endif %}
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-
-    <div class="card mb-3">
-        <div class="card-body">
-            <h2 class="card-title">Postular al Proyecto</h2>
-            <form method="post" action="{% url 'postular_proyecto' proyecto.id %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-success">Postular</button>
             </form>
         </div>
     </div>
