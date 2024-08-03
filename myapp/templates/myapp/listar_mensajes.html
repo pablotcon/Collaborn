@@ -23,9 +23,7 @@
                             <i class="fas fa-user"></i> {{ usuario.username }}
                         </a>
                         <button type="button" class="btn btn-sm btn-danger ocultar-conversation-button" data-username="{{ usuario.username }}">
-                            <i class="fas fa-eye-slash"></i>
-                        </button>
-                    </li>
+                            <i class="fas fa-eye-slash"></i></button></li>
                     {% endfor %}
                 </ul>
                 <h3><i class="fas fa-plus-circle"></i> Iniciar nuevo chat</h3>
@@ -56,12 +54,11 @@
                                     <img src="{{ mensaje.imagen.url }}" alt="Imagen del mensaje">
                                 </div>
                                 {% endif %}
+                                {% if mensaje.emisor == request.user %}
                                 <div class="mt-2">
-                                    {% if mensaje.emisor != request.user %}
-                                    <a href="#" class="btn btn-sm btn-primary responder-btn" data-emisor-username="{{ mensaje.emisor.username }}"><i class="fas fa-reply"></i> Responder</a>
-                                    {% endif %}
                                     <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="{{ mensaje.id }}"><i class="fas fa-trash"></i> Eliminar</button>
                                 </div>
+                                {% endif %}
                             </div>
                             {% endfor %}
                         </div>
@@ -110,12 +107,51 @@
 
     <script>
         $(document).ready(function() {
+            function loadMessages(username) {
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url "cargar_mensajes" %}',
+                    data: { 'username': username },
+                    success: function(response) {
+                        if (response.success) {
+                            var messagesContainer = $('#chat-' + response.user_id + ' .messages');
+                            messagesContainer.empty();
+                            response.mensajes.forEach(function(mensaje) {
+                                var messageClass = (mensaje.emisor == '{{ request.user.username }}') ? 'sent' : 'received';
+                                var messageHtml = '<div class="chat-message ' + messageClass + '">' +
+                                    '<div>' +
+                                    '<strong>' + (messageClass == 'sent' ? 'Tú' : mensaje.emisor) + '</strong>: ' +
+                                    mensaje.contenido + '<br>' +
+                                    '<small>' + mensaje.fecha_envio + '</small>' +
+                                    '</div>';
+                                if (mensaje.imagen_url) {
+                                    messageHtml += '<div><img src="' + mensaje.imagen_url + '" alt="Imagen del mensaje"></div>';
+                                }
+                                if (messageClass == 'sent') {
+                                    messageHtml += '<div class="mt-2">' +
+                                        '<button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="' + mensaje.id + '"><i class="fas fa-trash"></i> Eliminar</button>' +
+                                        '</div>';
+                                }
+                                messageHtml += '</div>';
+                                messagesContainer.append(messageHtml);
+                            });
+                        } else {
+                            alert(response.error);
+                        }
+                    },
+                    error: function(response) {
+                        alert('Error al cargar los mensajes.');
+                    }
+                });
+            }
+
             $('.chat-user-link').on('click', function(event) {
                 event.preventDefault();
                 var username = $(this).data('username');
                 $('.receptor-username').val(username);
                 $('.chat-window').hide();
-                $($(this).attr('href')).show();
+                var chatWindow = $($(this).attr('href')).show();
+                loadMessages(username);
             });
 
             $('#start-new-chat-form').on('submit', function(event) {
@@ -144,7 +180,7 @@
 
                                 $.ajax({
                                     type: 'GET',
-                                    url: '{% url "cargar_mensajes" %}',  // Nueva URL para cargar mensajes
+                                    url: '{% url "cargar_mensajes" %}',
                                     data: { 'username': newUser.username },
                                     success: function(response) {
                                         var newChatHtml = '<div class="tab-pane chat-window" id="chat-' + newUser.id + '">' +
@@ -153,16 +189,22 @@
                                             '<div class="messages">';
                                         response.mensajes.forEach(function(mensaje) {
                                             var messageClass = (mensaje.emisor == '{{ request.user.username }}') ? 'sent' : 'received';
-                                            newChatHtml += '<div class="chat-message ' + messageClass + '">' +
+                                            var messageHtml = '<div class="chat-message ' + messageClass + '">' +
                                                 '<div>' +
                                                 '<strong>' + (messageClass == 'sent' ? 'Tú' : mensaje.emisor) + '</strong>: ' +
                                                 mensaje.contenido + '<br>' +
                                                 '<small>' + mensaje.fecha_envio + '</small>' +
                                                 '</div>';
                                             if (mensaje.imagen_url) {
-                                                newChatHtml += '<div><img src="' + mensaje.imagen_url + '" alt="Imagen del mensaje"></div>';
+                                                messageHtml += '<div><img src="' + mensaje.imagen_url + '" alt="Imagen del mensaje"></div>';
                                             }
-                                            newChatHtml += '</div>';
+                                            if (messageClass == 'sent') {
+                                                messageHtml += '<div class="mt-2">' +
+                                                    '<button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="' + mensaje.id + '"><i class="fas fa-trash"></i> Eliminar</button>' +
+                                                    '</div>';
+                                            }
+                                            messageHtml += '</div>';
+                                            newChatHtml += messageHtml;
                                         });
                                         newChatHtml += '</div></div>' +
                                             '<div class="chat-input mt-3">' +
@@ -176,13 +218,16 @@
                                             '<div class="error-message text-danger"></div>' +
                                             '</div></div>';
                                         $('#chat-content').append(newChatHtml);
+                                        loadMessages(newUser.username);
+
                                         // Aquí se añade la funcionalidad de manejo de clicks para los nuevos elementos
                                         $('.chat-user-link').on('click', function(event) {
                                             event.preventDefault();
                                             var username = $(this).data('username');
                                             $('.receptor-username').val(username);
                                             $('.chat-window').hide();
-                                            $($(this).attr('href')).show();
+                                            var chatWindow = $($(this).attr('href')).show();
+                                            loadMessages(username);
                                         });
 
                                         $('.send-message-button').on('click', function(event) {

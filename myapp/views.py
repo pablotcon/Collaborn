@@ -588,27 +588,26 @@ def listar_recursos(request):
 
 # Functions related to Messages
 # views.py
+
 @login_required
 def listar_mensajes(request):
     query = request.GET.get('q')
     ocultas = ConversacionOculta.objects.filter(usuario=request.user).values_list('usuario_oculto', flat=True)
-    mensajes_recibidos = Mensaje.objects.filter(receptor=request.user).exclude(emisor__in=ocultas).order_by('fecha_envio')
-    mensajes_enviados = Mensaje.objects.filter(emisor=request.user).exclude(receptor__in=ocultas).order_by('fecha_envio')
+    mensajes_recibidos = Mensaje.objects.filter(receptor=request.user).exclude(emisor__in=ocultas)
+    mensajes_enviados = Mensaje.objects.filter(emisor=request.user).exclude(receptor__in=ocultas)
 
     if query:
         mensajes_recibidos = mensajes_recibidos.filter(contenido__icontains=query)
         mensajes_enviados = mensajes_enviados.filter(contenido__icontains=query)
 
-    # Agrupar mensajes por usuario
+    all_messages = mensajes_recibidos.union(mensajes_enviados).order_by('fecha_envio')
+
     usuarios = {}
-    for mensaje in mensajes_recibidos:
-        if mensaje.emisor not in usuarios:
-            usuarios[mensaje.emisor] = []
-        usuarios[mensaje.emisor].append(mensaje)
-    for mensaje in mensajes_enviados:
-        if mensaje.receptor not in usuarios:
-            usuarios[mensaje.receptor] = []
-        usuarios[mensaje.receptor].append(mensaje)
+    for mensaje in all_messages:
+        user = mensaje.emisor if mensaje.receptor == request.user else mensaje.receptor
+        if user not in usuarios:
+            usuarios[user] = []
+        usuarios[user].append(mensaje)
 
     all_users = User.objects.exclude(id=request.user.id)
 
@@ -617,6 +616,58 @@ def listar_mensajes(request):
         'all_users': all_users,
         'query': query
     })
+
+@login_required
+def cargar_mensajes(request):
+    if request.method == 'GET':
+        username = request.GET.get('username')
+        try:
+            user = User.objects.get(username=username)
+            mensajes = Mensaje.objects.filter(
+                (Q(receptor=request.user) & Q(emisor=user)) |
+                (Q(emisor=request.user) & Q(receptor=user))
+            ).order_by('fecha_envio')
+
+            mensajes_data = []
+            for mensaje in mensajes:
+                mensajes_data.append({
+                    'emisor': mensaje.emisor.username,
+                    'contenido': mensaje.contenido,
+                    'fecha_envio': mensaje.fecha_envio.strftime("%d-%m-%Y %H:%M"),
+                    'imagen_url': mensaje.imagen.url if mensaje.imagen else None
+                })
+
+            return JsonResponse({'success': True, 'mensajes': mensajes_data})
+        except User.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Usuario no encontrado.'})
+    return JsonResponse({'success': False, 'error': 'Método no permitido.'}, status=405)
+
+
+@login_required
+def cargar_mensajes(request):
+    if request.method == 'GET':
+        username = request.GET.get('username')
+        try:
+            user = User.objects.get(username=username)
+            mensajes = Mensaje.objects.filter(
+                (Q(receptor=request.user) & Q(emisor=user)) |
+                (Q(emisor=request.user) & Q(receptor=user))
+            ).order_by('fecha_envio')
+
+            mensajes_data = []
+            for mensaje in mensajes:
+                mensajes_data.append({
+                    'emisor': mensaje.emisor.username,
+                    'contenido': mensaje.contenido,
+                    'fecha_envio': mensaje.fecha_envio.strftime("%d-%m-%Y %H:%M"),
+                    'imagen_url': mensaje.imagen.url if mensaje.imagen else None
+                })
+
+            return JsonResponse({'success': True, 'mensajes': mensajes_data})
+        except User.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Usuario no encontrado.'})
+    return JsonResponse({'success': False, 'error': 'Método no permitido.'}, status=405)
+    
 from .models import Mensaje, Notificacion
 import logging
 
@@ -729,17 +780,16 @@ def iniciar_nuevo_chat(request):
         return JsonResponse(response_data)
     return JsonResponse({'success': False, 'error': 'Método no permitido.'}, status=405)
 
-login_required
+@login_required
 def cargar_mensajes(request):
     if request.method == 'GET':
         username = request.GET.get('username')
         try:
             user = User.objects.get(username=username)
-            mensajes_recibidos = Mensaje.objects.filter(receptor=request.user, emisor=user).order_by('fecha_envio')
-            mensajes_enviados = Mensaje.objects.filter(emisor=request.user, receptor=user).order_by('fecha_envio')
-
-            mensajes = list(mensajes_recibidos) + list(mensajes_enviados)
-            mensajes.sort(key=lambda x: x.fecha_envio)
+            mensajes = Mensaje.objects.filter(
+                (Q(receptor=request.user) & Q(emisor=user)) |
+                (Q(emisor=request.user) & Q(receptor=user))
+            ).order_by('fecha_envio')
 
             mensajes_data = []
             for mensaje in mensajes:
@@ -754,7 +804,6 @@ def cargar_mensajes(request):
         except User.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Usuario no encontrado.'})
     return JsonResponse({'success': False, 'error': 'Método no permitido.'}, status=405)
-
 # Functions related to Activities
 @login_required
 def historial_actividades(request):
