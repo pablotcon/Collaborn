@@ -11,7 +11,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),
 
     # Perfil
-    path('perfil/', views.ver_perfil, name='ver_perfil'),
+    path('perfil/', views.ver_mi_perfil, name='ver_mi_perfil'),
     path('perfil/editar/', views.editar_perfil, name='editar_perfil'),
     path('perfil/cambiar_password/', views.cambiar_password, name='cambiar_password'),
 

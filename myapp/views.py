@@ -251,7 +251,6 @@ def user_notification(event):
 
 
 # Functions related to User Profile
-@login_required
 def editar_perfil(request):
     perfil = request.user.perfil
 
@@ -267,7 +266,7 @@ def editar_perfil(request):
             experiencia_formset.save()
             educacion_formset.save()
             messages.success(request, 'Perfil actualizado exitosamente')
-            return redirect('ver_perfil')
+            return redirect('ver_perfil', user_id=request.user.id)
         else:
             print(user_form.errors)
             print(perfil_form.errors)
@@ -332,8 +331,10 @@ def eliminar_educacion(request, pk):
         return redirect('editar_perfil')
     return render(request, 'myapp/eliminar_educacion.html', {'educacion': educacion})
 
-@login_required
 
+@login_required
+def ver_mi_perfil(request):
+    return redirect('ver_perfil', user_id=request.user.id)
 
 @login_required
 def ver_perfil(request, user_id):
