@@ -5,24 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Mi Proyecto{% endblock %}</title>
     {% load static %}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@icon/entypo@1.0.3/entypo.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="stylesheet" href="{% static 'css/ver_perfil.css' %}">
-    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+    <!-- Carga de estilos CSS desde CDNs -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"> <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Font Awesome para íconos -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@icon/entypo@1.0.3/entypo.css"> <!-- Iconos Entypo -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"> <!-- Datepicker CSS -->
+    <!-- Carga de estilos CSS personalizados -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"> <!-- CSS personalizado -->
+    <link rel="stylesheet" href="{% static 'css/ver_perfil.css' %}"> <!-- CSS personalizado para ver perfil -->
+    <link rel="stylesheet" href="{% static 'css/register.css' %}"> <!-- CSS personalizado para registro -->
     {% block extra_css %}{% endblock %}
     <style>
         body {
-            background-color: #f5f378;
+            background-color: #f5f378; /* Color de fondo del cuerpo */
         }
         main.container {
-            margin-top: 80px;
+            padding-top: 80px; /* Padding superior del contenedor principal para evitar superposición con la navbar */
         }
         .dropdown-menu-notifications {
             max-height: 400px;
-            overflow-y: auto;
+            overflow-y: auto; /* Habilita el desplazamiento vertical para las notificaciones */
         }
         .navbar.custom-navbar {
             background-color: #000000;
@@ -50,75 +52,95 @@
         .dropdown-menu .dropdown-item:hover {
             color: #000000;
         }
+        .navbar-toggler {
+            border-color: rgba(245, 243, 120, 0.5); /* Color del borde del botón de la barra de navegación */
+        }
         .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(245,243,120, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(245,243,120, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"); /* Imagen del icono del botón de la barra de navegación */
+        }
+        .navbar .nav-item {
+            margin-left: 1rem; /* Margen izquierdo de los elementos de la navegación */
+        }
+
+        @media (max-width: 1200px) {
+            /* Estilos para dispositivos con un ancho máximo de 1200px */
+            .navbar.custom-navbar .navbar-nav {
+                flex-wrap: wrap; /* Permite que los elementos se envuelvan en múltiples líneas */
+                justify-content: center;
+            }
+            .navbar.custom-navbar .navbar-nav .nav-item {
+                flex: 0 0 45%; /* Cada elemento ocupará el 45% del ancho disponible */
+                text-align: center;
+            }
         }
 
         @media (max-width: 768px) {
-            .navbar.custom-navbar .navbar-brand, 
-            .navbar.custom-navbar .navbar-nav .nav-link {
-                text-align: center;
-                width: 100%;
-            }
+            /* Estilos para dispositivos con un ancho máximo de 768px */
             .navbar.custom-navbar .navbar-brand {
                 margin-bottom: 10px;
             }
             .navbar.custom-navbar .navbar-nav .nav-item {
                 margin-bottom: 10px;
+                margin-left: 0;
+            }
+            .navbar-nav {
+                flex-direction: column; /* Organiza los elementos de la navegación en columna en pantallas pequeñas */
+            }
+            .navbar-collapse {
+                text-align: center;
             }
         }
     </style>
 </head>
 <body>
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated %} <!-- Verifica si el usuario está autenticado -->
     <header>
-        <nav class="navbar navbar-expand-lg fixed-top custom-navbar">
-            <div class="container">
-                <a class="navbar-brand" href="{% url 'index' %}">
-                    <span style="font-weight: bold; color: #f5f378; font-size: 1.5rem;">Collaborize</span>
+        <nav class="navbar navbar-expand-lg fixed-top custom-navbar"> <!-- Barra de navegación -->
+            <div class="container-fluid d-flex justify-content-between align-items-center"> <!-- Contenedor fluido para la barra de navegación, con flexbox para alineación -->
+                <a class="navbar-brand" href="{% url 'index' %}"> <!-- Enlace al índice -->
+                    <span style="font-weight: bold; color: #f5f378; font-size: 1.5rem;">Collaborize</span> <!-- Texto del logo -->
                 </a>
-                
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <!-- Botón de la barra de navegación para dispositivos móviles -->
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
-                    <ul class="navbar-nav mx-auto">
-                        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}"><i class="fas fa-home"></i> Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'proyecto_lista' %}"><i class="fas fa-project-diagram"></i> Proyectos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'listar_recursos' %}"><i class="fas fa-book"></i> Recursos</a></li>
+                <div class="collapse navbar-collapse justify-content-between" id="navbarNav"> <!-- Contenedor colapsable de la barra de navegación -->
+                    <ul class="navbar-nav mx-auto"> <!-- Lista de elementos de navegación centrados -->
+                        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}"><i class="fas fa-home"></i> Inicio</a></li> <!-- Enlace a Inicio -->
+                        <li class="nav-item"><a class="nav-link" href="{% url 'proyecto_lista' %}"><i class="fas fa-project-diagram"></i> Proyectos</a></li> <!-- Enlace a Proyectos -->
+                        <li class="nav-item"><a class="nav-link" href="{% url 'listar_recursos' %}"><i class="fas fa-book"></i> Recursos</a></li> <!-- Enlace a Recursos -->
                         <li class="nav-item"><a class="nav-link" href="{% url 'listar_mensajes' %}"><i class="fas fa-envelope"></i> Mensajes
                             {% if unread_messages_count > 0 %}
-                                <span class="badge badge-danger">{{ unread_messages_count }}</span>
+                                <span class="badge badge-danger">{{ unread_messages_count }}</span> <!-- Muestra el número de mensajes no leídos -->
                             {% endif %}
-                        </a></li>
+                        </a></li> <!-- Enlace a Mensajes -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="notificacionesDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" id="notificacionesDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <!-- Enlace desplegable a Notificaciones -->
                                 <i class="fas fa-bell"></i> Notificaciones
-                                <span id="notificaciones-count" class="badge badge-danger"></span>
+                                <span id="notificaciones-count" class="badge badge-danger"></span> <!-- Contador de notificaciones -->
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-notifications" aria-labelledby="notificacionesDropdown">
+                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-notifications" aria-labelledby="notificacionesDropdown"> <!-- Menú desplegable de notificaciones -->
                                 <div id="notificaciones-content"></div>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-center" href="{% url 'listar_notificaciones' %}">Ver todas las notificaciones</a>
                             </div>
                         </li>
-                        {% if user.is_staff %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'crear_proyecto' %}"><i class="fas fa-plus"></i> Crear Proyecto</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel_tareas' %}"><i class="fas fa-tasks"></i> Panel de Tareas</a></li>
+                        {% if user.is_staff %} <!-- Verifica si el usuario es administrador -->
+                        <li class="nav-item"><a class="nav-link" href="{% url 'crear_proyecto' %}"><i class="fas fa-plus"></i> Crear Proyecto</a></li> <!-- Enlace a Crear Proyecto -->
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</a></li> <!-- Enlace a Admin Dashboard -->
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel_tareas' %}"><i class="fas fa-tasks"></i> Panel de Tareas</a></li> <!-- Enlace a Panel de Tareas -->
                         {% endif %}
                     </ul>
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav ms-auto"> <!-- Lista de elementos de navegación alineados a la derecha -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="perfilDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img src="{% if user.perfil.avatar %}{{ user.perfil.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Foto de perfil" class="rounded-circle" width="30" height="30">
+                            <a class="nav-link dropdown-toggle" href="#" id="perfilDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <!-- Enlace desplegable al perfil -->
+                                <img src="{% if user.perfil.avatar %}{{ user.perfil.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Foto de perfil" class="rounded-circle" width="30" height="30"> <!-- Imagen de perfil del usuario -->
                                 {{ user.username }}
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-profile" aria-labelledby="perfilDropdown">
-                                <a class="dropdown-item" href="{% url 'ver_mi_perfil' %}">Perfil</a>
+                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-profile" aria-labelledby="perfilDropdown"> <!-- Menú desplegable del perfil -->
+                                <a class="dropdown-item" href="{% url 'ver_mi_perfil' %}">Perfil</a> <!-- Enlace a Perfil -->
                                 <div class="dropdown-divider"></div>
-                                <form method="post" action="{% url 'logout' %}">
-                                    {% csrf_token %}
+                                <form method="post" action="{% url 'logout' %}"> <!-- Formulario para cerrar sesión -->
+                                    {% csrf_token %} <!-- Token CSRF para seguridad -->
                                     <button type="submit" class="dropdown-item">Cerrar Sesión</button>
                                 </form>
                             </div>
@@ -129,17 +151,18 @@
         </nav>
     </header>
     {% endif %}
-    <main class="container">
-        {% if messages %}
+    <main class="container" style="padding-top: 80px;"> <!-- Contenedor principal con padding superior para evitar superposición con la navbar -->
+        {% if messages %} <!-- Verifica si hay mensajes -->
         <div class="alert alert-info" role="alert">
             {% for message in messages %}
-            {{ message }}
+            {{ message }} <!-- Muestra los mensajes -->
             {% endfor %}
         </div>
         {% endif %}
-        {% block content %}{% endblock %}
+        {% block content %}{% endblock %} <!-- Bloque de contenido -->
     </main>
 
+    <!-- Carga de scripts JavaScript desde CDNs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
@@ -147,7 +170,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.es.min.js"></script>
     <script src="https://unpkg.com/scrollreveal"></script>
-    <script src="{% static 'js/script.js' %}"></script>
+    <script src="{% static 'js/script.js' %}"></script> <!-- Script personalizado -->
 
     <script>
         $(document).ready(function() {
@@ -169,7 +192,7 @@
             }
 
             loadNotificaciones();
-            setInterval(loadNotificaciones, 60000);
+            setInterval(loadNotificaciones, 60000); /* Recarga las notificaciones cada 60 segundos */
         });
 
         const userId = {{ user.id }};
@@ -188,6 +211,6 @@
             console.error('Notification socket closed unexpectedly');
         };
     </script>
-    {% block scripts %}{% endblock %}
+    {% block scripts %}{% endblock %} <!-- Bloque de scripts adicionales -->
 </body>
 </html>
