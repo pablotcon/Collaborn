@@ -7,3 +7,7 @@ def add_class(value, arg):
     css_classes = value.field.widget.attrs.get('class', '')
     value.field.widget.attrs['class'] = css_classes + ' ' + arg
     return value
+
+@register.filter(name='add_class')
+def add_class(value, arg):
+    return value.as_widget(attrs={'class': arg})

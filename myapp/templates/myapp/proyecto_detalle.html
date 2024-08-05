@@ -10,74 +10,84 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="back-button">
+    <div class="back-button mb-4">
         <a href="{% url 'proyecto_lista' %}" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left"></i> Volver
         </a>
     </div>
-    <div class="card mb-3">
+    <div class="card mb-4 shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <div class="card-title">{{ proyecto.nombre }}</div>
-            {% if perms.myapp.change_proyecto %}
-            <div class="btn-group" role="group" aria-label="Administrar Proyecto">
-                <a href="{% url 'proyecto_edit' proyecto.id %}" class="btn btn-outline-warning">Editar</a>
-                <a href="{% url 'confirmar_eliminar_proyecto' proyecto.id %}" class="btn btn-outline-danger">Eliminar</a>
-                <a href="{% url 'listar_tareas' proyecto.id %}" class="btn btn-outline-info">Tareas</a>
-                <a href="{% url 'gestionar_postulaciones' proyecto.id %}" class="btn btn-outline-primary">Gestionar Postulaciones</a>
-                <a href="{% url 'recomendar_especialistas' proyecto.id %}" class="btn btn-outline-success">Recomendar Especialistas</a>
-            </div>
-            {% endif %}
+            <h2 class="card-title">{{ proyecto.nombre }}</h2>
         </div>
-        <div class="card-body project-details">
-            <div class="project-image">
-                {% if proyecto.imagen %}
-                <img src="{{ proyecto.imagen.url }}" alt="{{ proyecto.nombre }}">
-                {% else %}
-                <p>No hay imagen disponible.</p>
-                {% endif %}
-                <div class="postulaciones-counter">
-                    <i class="fas fa-users postulaciones-icon"></i> Postulaciones: <span>{{ proyecto.postulaciones.count }}</span>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col text-end">
+                    {% if user.is_staff %}
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adminModal">
+                        <i class="fas fa-cogs"></i> Administrar
+                    </button>
+                    {% endif %}
                 </div>
             </div>
-            <div class="project-description">
-                <p class="card-text">{{ proyecto.descripcion }}</p>
-                <hr>
-                <p class="card-text"><strong>Fecha de Inicio:</strong> {{ proyecto.fecha_inicio }}</p>
-                <p class="card-text"><strong>Fecha de Fin:</strong> {{ proyecto.fecha_fin }}</p>
-                <p class="card-text"><strong>Ciudad:</strong> {{ proyecto.ciudad }}</p>
-                <p class="card-text"><strong>Categoría:</strong> {{ proyecto.categoria }}</p>
-                <div class="mt-4">
-                    <form method="post" action="{% url 'postular_proyecto' proyecto.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-success btn-block">Postular al Proyecto</button>
-                    </form>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="project-image text-center">
+                        {% if proyecto.imagen %}
+                        <img src="{{ proyecto.imagen.url }}" alt="{{ proyecto.nombre }}" class="img-fluid rounded shadow-sm">
+                        {% else %}
+                        <p>No hay imagen disponible.</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="project-info mb-4">
+                        <h5>Descripción del Proyecto</h5>
+                        <p class="text-muted">{{ proyecto.descripcion }}</p>
+                    </div>
+                    <div class="project-details mb-4">
+                        <h5>Detalles del Proyecto</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-calendar-alt"></i> <strong>Fecha de Inicio:</strong> {{ proyecto.fecha_inicio }}</li>
+                            <li class="mb-2"><i class="fas fa-calendar-check"></i> <strong>Fecha de Fin:</strong> {{ proyecto.fecha_fin }}</li>
+                            <li class="mb-2"><i class="fas fa-map-marker-alt"></i> <strong>Ciudad:</strong> {{ proyecto.ciudad }}</li>
+                            <li class="mb-2"><i class="fas fa-tag"></i> <strong>Categoría:</strong> {{ proyecto.categoria }}</li>
+                        </ul>
+                    </div>
+                    <div class="text-center">
+                        <form method="post" action="{% url 'postular_proyecto' proyecto.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-block"><i class="fas fa-paper-plane"></i> Postular al Proyecto</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card mb-3">
-        <div class="card-header">
-            Comentarios
+    <div class="card card-comments mb-4 shadow-sm">
+        <div class="card-header custom-header">
+            <h5 class="mb-0">Comentarios</h5>
         </div>
         <div class="card-body">
             <ul class="list-group list-group-flush">
                 {% for comentario in comentarios %}
                 <li class="list-group-item d-flex justify-content-between align-items-start">
-                    <div class="ms-2 me-auto">
-                        <div class="fw-bold">{{ comentario.autor.username }}</div>
-                        {{ comentario.texto }}
+                    <div>
+                        <h6 class="fw-bold mb-1">
+                            <a href="{% url 'ver_perfil' comentario.autor.id %}">{{ comentario.autor.username }}</a>
+                        </h6>
+                        <p class="mb-1">{{ comentario.texto }}</p>
+                        <small class="text-muted">{{ comentario.fecha_creacion|date:"d M Y, H:i" }}</small>
                     </div>
-                    <span class="badge bg-primary rounded-pill">{{ comentario.fecha_creacion|date:"d M Y, H:i" }}</span>
                 </li>
                 {% endfor %}
             </ul>
         </div>
     </div>
 
-    <div class="card mb-3">
-        <div class="card-header">
-            Agregar Comentario
+    <div class="card card-form mb-4 shadow-sm">
+        <div class="card-header custom-header">
+            <h5 class="mb-0">Agregar Comentario</h5>
         </div>
         <div class="card-body">
             <form method="post">
@@ -85,9 +95,46 @@
                 <div class="form-group">
                     {{ form.texto|add_class:"form-control" }}
                 </div>
-                <button type="submit" class="btn btn-primary">Agregar Comentario</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-comment-alt"></i> Agregar Comentario</button>
             </form>
         </div>
     </div>
 </div>
+
+<!-- Admin Modal -->
+<div class="modal fade" id="adminModal" tabindex="-1" aria-labelledby="adminModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="adminModalLabel">Administrar Proyecto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% if perms.myapp.change_proyecto %}
+                <div class="btn-group-vertical w-100" role="group" aria-label="Administrar Proyecto">
+                    <a href="{% url 'proyecto_edit' proyecto.id %}" class="btn btn-warning mb-2"><i class="fas fa-edit"></i> Editar</a>
+                    <a href="{% url 'confirmar_eliminar_proyecto' proyecto.id %}" class="btn btn-danger mb-2"><i class="fas fa-trash-alt"></i> Eliminar</a>
+                    <a href="{% url 'listar_tareas' proyecto.id %}" class="btn btn-info mb-2"><i class="fas fa-tasks"></i> Tareas</a>
+                    <a href="{% url 'gestionar_postulaciones' proyecto.id %}" class="btn btn-primary mb-2"><i class="fas fa-users"></i> Gestionar Postulaciones</a>
+                    <a href="{% url 'recomendar_especialistas' proyecto.id %}" class="btn btn-success mb-2"><i class="fas fa-user-plus"></i> Recomendar Especialistas</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+        console.log("Document is ready");
+        $('#adminModal').on('shown.bs.modal', function () {
+            console.log("Modal is shown");
+        });
+    });
+</script>
 {% endblock %}

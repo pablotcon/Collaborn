@@ -35,6 +35,7 @@ urlpatterns = [
     path('proyectos/<int:pk>/editar/', views.proyecto_edit, name='proyecto_edit'),
     path('proyectos/<int:pk>/confirmar_eliminar/', views.confirmar_eliminar_proyecto, name='confirmar_eliminar_proyecto'),
     path('proyectos/<int:pk>/eliminar/', views.proyecto_delete, name='proyecto_delete'),
+    path('perfil/<int:user_id>/', views.ver_perfil, name='ver_perfil'),
     
     ### POSTULACIONES ###
     path('proyecto/<int:proyecto_id>/gestionar_postulaciones/', views.gestionar_postulaciones, name='gestionar_postulaciones'),

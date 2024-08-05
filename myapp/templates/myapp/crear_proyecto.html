@@ -1,55 +1,65 @@
 {% extends 'myapp/base.html' %}
-{% load custom_filters %}
+{% load static custom_filters %}
 
 {% block title %}Crear Proyecto{% endblock %}
 
 {% block content %}
-<h1>Crear Proyecto</h1>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="form-group">
-        <label for="id_nombre">Nombre del Proyecto</label>
-        {{ form.nombre|add_class:"form-control" }}
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <h1 class="card-title text-center mb-4">Crear Proyecto</h1>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_nombre" class="form-label">Nombre del Proyecto</label>
+                    {{ form.nombre|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_descripcion" class="form-label">Descripción del Proyecto</label>
+                    {{ form.descripcion|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_fecha_inicio" class="form-label">Fecha de Inicio de Postulaciones</label>
+                    {{ form.fecha_inicio|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_fecha_fin" class="form-label">Fecha de Cierre de Postulaciones</label>
+                    {{ form.fecha_fin|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_ciudad" class="form-label">Ciudad</label>
+                    {{ form.ciudad|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_imagen" class="form-label">Imagen del Proyecto</label>
+                    {{ form.imagen|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_categoria" class="form-label">Categoría</label>
+                    {{ form.categoria|add_class:"form-control" }}
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Crear Proyecto</button>
+            </form>
+        </div>
     </div>
-    <div class="form-group">
-        <label for="id_descripcion">Descripción del Proyecto</label>
-        {{ form.descripcion|add_class:"form-control" }}
-    </div>
-    <div class="form-group">
-        <label for="id_fecha_inicio">Fecha de Inicio de Postulaciones</label>
-        {{ form.fecha_inicio|add_class:"form-control" }}
-    </div>
-    <div class="form-group">
-        <label for="id_fecha_fin">Fecha de Cierre de Postulaciones</label>
-        {{ form.fecha_fin|add_class:"form-control" }}
-    </div>
-    <div class="form-group">
-        <label for="id_ciudad">Ciudad</label>
-        {{ form.ciudad|add_class:"form-control" }}
-    </div>
-    <div class="form-group">
-        <label for="id_imagen">Imagen del Proyecto</label>
-        {{ form.imagen|add_class:"form-control-file" }}
-    </div>
-    <div class="form-group">
-        <label for="id_categoria">Categoría</label>
-        {{ form.categoria|add_class:"form-control" }}
-    </div>
-    <button type="submit" class="btn btn-primary">Crear Proyecto</button>
-</form>
+</div>
+{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/crear_proyecto.css' %}">
 {% endblock %}
 
 {% block scripts %}
 <script type="text/javascript">
     $(document).ready(function(){
         $('#id_fecha_inicio').datepicker({
-            format: 'yyyy-mm-dd',
+            format: 'dd-mm-yyyy',
             autoclose: true,
             todayHighlight: true,
             language: 'es'
         });
         $('#id_fecha_fin').datepicker({
-            format: 'yyyy-mm-dd',
+            format: 'dd-mm-yyyy',
             autoclose: true,
             todayHighlight: true,
             language: 'es'

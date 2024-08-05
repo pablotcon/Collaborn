@@ -1,0 +1,68 @@
+/* static/css/crear_proyecto.css */
+
+body {
+    background-color: #f4f6f9;
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+}
+
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #007bff;
+    margin-bottom: 30px;
+    text-align: center;
+    font-weight: 700;
+}
+
+.form-label {
+    font-weight: bold;
+    color: #555;
+}
+
+.form-control {
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ced4da;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.card {
+    border: none;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.header {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px;
+    border-radius: 10px 10px 0 0;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+}

@@ -336,8 +336,9 @@ def eliminar_educacion(request, pk):
 
 
 @login_required
-def ver_perfil(request):
-    perfil = request.user.perfil
+def ver_perfil(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    perfil = user.perfil
     experiencias = perfil.experiencias.all().order_by('-fecha_inicio')
     educaciones = perfil.educaciones.all().order_by('-fecha_inicio')
 
