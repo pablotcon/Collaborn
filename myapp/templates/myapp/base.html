@@ -19,9 +19,6 @@
         body {
             background-color: #f5f378; /* Color de fondo del cuerpo */
         }
-        main.container {
-            padding-top: 80px; /* Padding superior del contenedor principal para evitar superposición con la navbar */
-        }
         .dropdown-menu-notifications {
             max-height: 400px;
             overflow-y: auto; /* Habilita el desplazamiento vertical para las notificaciones */
@@ -113,9 +110,16 @@
                                 <span class="badge badge-danger">{{ unread_messages_count }}</span> <!-- Muestra el número de mensajes no leídos -->
                             {% endif %}
                         </a></li> <!-- Enlace a Mensajes -->
+                        {% if user.is_staff %} <!-- Verifica si el usuario es administrador -->
+                        <li class="nav-item"><a class="nav-link" href="{% url 'crear_proyecto' %}"><i class="fas fa-plus"></i> Crear Proyecto</a></li> <!-- Enlace a Crear Proyecto -->
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</a></li> <!-- Enlace a Admin Dashboard -->
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel_tareas' %}"><i class="fas fa-tasks"></i> Panel de Tareas</a></li> <!-- Enlace a Panel de Tareas -->
+                        {% endif %}
+                    </ul>
+                    <ul class="navbar-nav ms-auto"> <!-- Lista de elementos de navegación alineados a la derecha -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="notificacionesDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <!-- Enlace desplegable a Notificaciones -->
-                                <i class="fas fa-bell"></i> Notificaciones
+                                <i class="fas fa-bell"></i>
                                 <span id="notificaciones-count" class="badge badge-danger"></span> <!-- Contador de notificaciones -->
                             </a>
                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-notifications" aria-labelledby="notificacionesDropdown"> <!-- Menú desplegable de notificaciones -->
@@ -124,13 +128,6 @@
                                 <a class="dropdown-item text-center" href="{% url 'listar_notificaciones' %}">Ver todas las notificaciones</a>
                             </div>
                         </li>
-                        {% if user.is_staff %} <!-- Verifica si el usuario es administrador -->
-                        <li class="nav-item"><a class="nav-link" href="{% url 'crear_proyecto' %}"><i class="fas fa-plus"></i> Crear Proyecto</a></li> <!-- Enlace a Crear Proyecto -->
-                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</a></li> <!-- Enlace a Admin Dashboard -->
-                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel_tareas' %}"><i class="fas fa-tasks"></i> Panel de Tareas</a></li> <!-- Enlace a Panel de Tareas -->
-                        {% endif %}
-                    </ul>
-                    <ul class="navbar-nav ms-auto"> <!-- Lista de elementos de navegación alineados a la derecha -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="perfilDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <!-- Enlace desplegable al perfil -->
                                 <img src="{% if user.perfil.avatar %}{{ user.perfil.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Foto de perfil" class="rounded-circle" width="30" height="30"> <!-- Imagen de perfil del usuario -->
@@ -151,7 +148,7 @@
         </nav>
     </header>
     {% endif %}
-    <main class="container" style="padding-top: 80px;"> <!-- Contenedor principal con padding superior para evitar superposición con la navbar -->
+    <main class="container"> <!-- Contenedor principal -->
         {% if messages %} <!-- Verifica si hay mensajes -->
         <div class="alert alert-info" role="alert">
             {% for message in messages %}
@@ -210,6 +207,16 @@
         notificationSocket.onclose = function(e) {
             console.error('Notification socket closed unexpectedly');
         };
+
+        // Ajusta el padding-top del contenedor principal basado en la altura de la navbar
+        function adjustPadding() {
+            const navbarHeight = document.querySelector('.navbar').offsetHeight;
+            document.querySelector('main.container').style.paddingTop = `${navbarHeight + 20}px`;
+        }
+
+        // Ajustar el padding al cargar la página y al redimensionar la ventana
+        adjustPadding();
+        window.addEventListener('resize', adjustPadding);
     </script>
     {% block scripts %}{% endblock %} <!-- Bloque de scripts adicionales -->
 </body>
