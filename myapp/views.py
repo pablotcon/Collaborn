@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required, permission_required, 
 from django.db.models import Q
 from django.contrib import messages
 from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad, SeguimientoTarea, Subtarea, Educacion, ExperienciaLaboral
-from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm, SeguimientoTareaForm,EducacionFormSet, ExperienciaLaboralFormSet, EducacionForm, SubtareaForm, ComentarioTareaForm, ExperienciaLaboralForm,ValoracionForm
+from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm, SeguimientoTareaForm,EducacionFormSet, ExperienciaLaboralFormSet, EducacionForm, SubtareaForm, ComentarioTareaForm, ExperienciaLaboralForm,ValoracionForm, BusquedaEspecialistaForm,DisponibilidadForm
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
@@ -17,6 +17,62 @@ import json
 from django.utils import timezone
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+
+
+@login_required
+def actualizar_disponibilidad(request):
+    perfil = request.user.perfil
+    if request.method == 'POST':
+        form = DisponibilidadForm(request.POST, instance=perfil)
+        if form.is_valid():
+            form.save()
+            return redirect('ver_mi_perfil')
+    else:
+        form = DisponibilidadForm(instance=perfil)
+    
+    return render(request, 'actualizar_disponibilidad.html', {'form': form})
+
+
+def listar_especialistas(request):
+    form = BusquedaEspecialistaForm(request.GET or None)
+    especialistas = Perfil.objects.all()
+
+    if form.is_valid():
+        especialidad = form.cleaned_data.get('especialidad')
+        ubicacion = form.cleaned_data.get('ubicacion')
+        disponibilidad = form.cleaned_data.get('disponibilidad')
+
+        if especialidad:
+            especialistas = especialistas.filter(especialidad__icontains=especialidad)
+        if ubicacion:
+            especialistas = especialistas.filter(ubicacion__icontains=ubicacion)
+        if disponibilidad is not None:
+            especialistas = especialistas.filter(disponibilidad=disponibilidad)
+
+    return render(request, 'myapp/listar_especialistas.html', {'especialistas': especialistas, 'form': form})
+
+#Busqueda Especialista:
+def buscar_especialistas(request):
+    form = BusquedaEspecialistaForm(request.GET or None)
+    resultados = Perfil.objects.all()
+    
+    if form.is_valid():
+        especialidad = form.cleaned_data.get('especialidad')
+        ubicacion = form.cleaned_data.get('ubicacion')
+        disponibilidad = form.cleaned_data.get('disponibilidad')
+        
+        if especialidad:
+            resultados = resultados.filter(especialidad__icontains=especialidad)
+        if ubicacion:
+            resultados = resultados.filter(ubicacion__icontains=ubicacion)
+        if disponibilidad is not None:
+            resultados = resultados.filter(disponibilidad=disponibilidad)
+    
+    context = {
+        'form': form,
+        'resultados': resultados,
+    }
+    return render(request, 'buscar_especialistas.html', context)
 
 # Functions related to Task Management
 @login_required
@@ -340,14 +396,25 @@ def ver_mi_perfil(request):
 def ver_perfil(request, user_id):
     user = get_object_or_404(User, id=user_id)
     perfil = user.perfil
+
+    if request.method == 'POST':
+        form_disponibilidad = DisponibilidadForm(request.POST, instance=perfil)
+        if form_disponibilidad.is_valid():
+            form_disponibilidad.save()
+            return redirect('ver_perfil', user_id=user_id)
+    else:
+        form_disponibilidad = DisponibilidadForm(instance=perfil)
+
     experiencias = perfil.experiencias.all().order_by('-fecha_inicio')
     educaciones = perfil.educaciones.all().order_by('-fecha_inicio')
 
     return render(request, 'myapp/ver_perfil.html', {
         'perfil': perfil,
+        'form_disponibilidad': form_disponibilidad,
         'experiencias': experiencias,
         'educaciones': educaciones,
     })
+
 
 def filtrar_especialistas(request):
     query = request.GET.get('q', '')

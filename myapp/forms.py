@@ -11,6 +11,23 @@ class UserForm(forms.ModelForm):
         model = User
         fields = ['first_name', 'last_name', 'email']
 
+class BusquedaEspecialistaForm(forms.Form):
+    especialidad = forms.CharField(max_length=200, required=False)
+    ubicacion = forms.CharField(max_length=200, required=False)
+    disponibilidad = forms.BooleanField(required=False, label='Disponible')
+
+
+class DisponibilidadForm(forms.ModelForm):
+    class Meta:
+        model = Perfil
+        fields = ['disponibilidad']
+        labels = {
+            'disponibilidad': '¿Disponible para proyectos?',
+        }
+        widgets = {
+            'disponibilidad': forms.CheckboxInput(),
+        }
+        
 class PerfilForm(forms.ModelForm):
     fecha_nacimiento = forms.DateField(
         input_formats=['%d-%m-%Y'],

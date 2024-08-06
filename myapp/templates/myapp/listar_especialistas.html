@@ -1,0 +1,51 @@
+{% extends 'myapp/base.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/especialistas.css' %}">
+{% endblock %}
+
+{% block content %}
+<h2>Especialistas</h2>
+<form method="GET" action="{% url 'listar_especialistas' %}" class="mb-4">
+    <div class="row">
+        <div class="col-md-4">
+            <input type="text" name="especialidad" class="form-control" placeholder="Especialidad" value="{{ request.GET.especialidad }}">
+        </div>
+        <div class="col-md-4">
+            <input type="text" name="ubicacion" class="form-control" placeholder="Ubicación" value="{{ request.GET.ubicacion }}">
+        </div>
+        <div class="col-md-4">
+            <select name="disponibilidad" class="form-control">
+                <option value="">Disponibilidad</option>
+                <option value="True" {% if request.GET.disponibilidad == 'True' %}selected{% endif %}>Disponible</option>
+                <option value="False" {% if request.GET.disponibilidad == 'False' %}selected{% endif %}>No disponible</option>
+            </select>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Buscar</button>
+</form>
+
+<div class="row especialistas-container">
+    {% for especialista in especialistas %}
+    <div class="col-md-4">
+        <div class="card mb-4">
+            {% if especialista.avatar %}
+                <img src="{{ especialista.avatar.url }}" class="card-img-top" alt="Avatar de {{ especialista.nombre }}">
+            {% else %}
+                <img src="{% static 'images/default_avatar.png' %}" class="card-img-top" alt="Avatar de {{ especialista.nombre }}">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ especialista.nombre }} {{ especialista.apellido }}</h5>
+                <p class="card-text">
+                    {% if especialista.especialidad %}Especialidad: {{ especialista.especialidad }}<br>{% endif %}
+                    {% if especialista.ubicacion %}Ubicación: {{ especialista.ubicacion }}<br>{% endif %}
+                    Disponibilidad: {{ especialista.disponibilidad|yesno:"Disponible,No disponible" }}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

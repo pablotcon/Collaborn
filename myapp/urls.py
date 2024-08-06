@@ -15,6 +15,8 @@ urlpatterns = [
     path('perfil/editar/', views.editar_perfil, name='editar_perfil'),
     path('perfil/cambiar_password/', views.cambiar_password, name='cambiar_password'),
 
+    path('buscar_especialistas/', views.buscar_especialistas, name='buscar_especialistas'),
+    path('especialistas/', views.listar_especialistas, name='listar_especialistas'),
 
     path('especialistas/', views.filtrar_especialistas, name='filtrar_especialistas'),
     path('especialistas/<int:especialista_id>/valorar/', views.valorar_especialista, name='valorar_especialista'),

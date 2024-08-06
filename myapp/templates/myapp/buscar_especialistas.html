@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Buscar Especialistas</h2>
+<form method="GET" action="{% url 'buscar_especialistas' %}">
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Buscar</button>
+</form>
+
+<h3>Resultados de la búsqueda</h3>
+<div class="row">
+    {% for perfil in resultados %}
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <img src="{{ perfil.avatar.url }}" class="card-img-top" alt="Avatar de {{ perfil.nombre }}">
+            <div class="card-body">
+                <h5 class="card-title">{{ perfil.nombre }} {{ perfil.apellido }}</h5>
+                <p class="card-text">
+                    Especialidad: {{ perfil.especialidad }}<br>
+                    Ubicación: {{ perfil.ubicacion }}<br>
+                    Disponibilidad: {{ perfil.disponibilidad|yesno:"Disponible,No disponible" }}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

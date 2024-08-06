@@ -105,11 +105,7 @@
                         <li class="nav-item"><a class="nav-link" href="{% url 'index' %}"><i class="fas fa-home"></i> Inicio</a></li> <!-- Enlace a Inicio -->
                         <li class="nav-item"><a class="nav-link" href="{% url 'proyecto_lista' %}"><i class="fas fa-project-diagram"></i> Proyectos</a></li> <!-- Enlace a Proyectos -->
                         <li class="nav-item"><a class="nav-link" href="{% url 'listar_recursos' %}"><i class="fas fa-book"></i> Recursos</a></li> <!-- Enlace a Recursos -->
-                        <li class="nav-item"><a class="nav-link" href="{% url 'listar_mensajes' %}"><i class="fas fa-envelope"></i> Mensajes
-                            {% if unread_messages_count > 0 %}
-                                <span class="badge badge-danger">{{ unread_messages_count }}</span> <!-- Muestra el número de mensajes no leídos -->
-                            {% endif %}
-                        </a></li> <!-- Enlace a Mensajes -->
+                        <li class="nav-item"><a class="nav-link" href="{% url 'listar_especialistas' %}"><i class="fas fa-users"></i> Especialistas</a></li> <!-- Enlace a Especialistas -->
                         {% if user.is_staff %} <!-- Verifica si el usuario es administrador -->
                         <li class="nav-item"><a class="nav-link" href="{% url 'crear_proyecto' %}"><i class="fas fa-plus"></i> Crear Proyecto</a></li> <!-- Enlace a Crear Proyecto -->
                         <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</a></li> <!-- Enlace a Admin Dashboard -->
@@ -117,6 +113,13 @@
                         {% endif %}
                     </ul>
                     <ul class="navbar-nav ms-auto"> <!-- Lista de elementos de navegación alineados a la derecha -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'listar_mensajes' %}"><i class="fas fa-envelope"></i>
+                                {% if unread_messages_count > 0 %}
+                                    <span class="badge badge-danger">{{ unread_messages_count }}</span> <!-- Muestra el número de mensajes no leídos -->
+                                {% endif %}
+                            </a>
+                        </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="notificacionesDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <!-- Enlace desplegable a Notificaciones -->
                                 <i class="fas fa-bell"></i>
