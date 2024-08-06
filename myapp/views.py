@@ -420,7 +420,7 @@ def cambiar_password(request):
         form = PasswordChangeForm(request.user)
     return render(request, 'myapp/cambiar_password.html', {'form': form})
 
-# Funciones de Notificaciones
+# Funciones de 
 @login_required
 def notificaciones_ajax(request):
     notificaciones = request.user.notificacion_set.all().order_by('-fecha_creacion')[:5]  # Obtener las últimas 5 notificaciones
@@ -437,21 +437,17 @@ def notificaciones_ajax(request):
 
 @login_required
 def listar_notificaciones(request):
-    notificaciones_no_leidas = request.user.notificacion_set.filter(leido=False).count()
-    notificaciones = request.user.notificacion_set.all().order_by('-fecha_creacion')
-    return render(request, 'myapp/listar_notificaciones.html', {
-        'notificaciones': notificaciones,
-        'notificaciones_no_leidas': notificaciones_no_leidas,
-    })
+    notificaciones = Notificacion.objects.filter(receptor=request.user).order_by('-fecha_creacion')
+    return render(request, 'myapp/notificaciones.html', {'notificaciones': notificaciones})
+
 
 @login_required
 def marcar_notificacion_leida(request, notificacion_id):
     notificacion = get_object_or_404(Notificacion, id=notificacion_id, receptor=request.user)
     notificacion.leido = True
     notificacion.save()
-    messages.success(request, 'Notificación marcada como leída.')
-    return redirect('listar_notificaciones')
-
+    return redirect(notificacion.url)
+    
 @login_required
 def proyecto_lista(request):
     query = request.GET.get('q', '')
@@ -595,12 +591,12 @@ def postular_proyecto(request, proyecto_id):
         else:
             Notificacion.objects.create(
                 receptor=proyecto.creador,
-                mensaje=f'El usuario {request.user.username} se ha postulado a tu proyecto "{proyecto.nombre}".'
+                mensaje=f'El usuario {request.user.username} se ha postulado a tu proyecto "{proyecto.nombre}".',
+                url=reverse('proyecto_detalle', kwargs={'proyecto_id': proyecto.id})
             )
             messages.success(request, 'Te has postulado al proyecto exitosamente.')
         return redirect('proyecto_detalle', proyecto_id=proyecto_id)
     return render(request, 'myapp/proyecto_detalle.html', {'proyecto': proyecto})
-
 
 ### ACEPTAR POSTULACION ####
 @login_required
@@ -699,6 +695,7 @@ def listar_recursos(request):
 @login_required
 def listar_mensajes(request):
     query = request.GET.get('q')
+    usuario_id = request.GET.get('usuario_id')
     ocultas = ConversacionOculta.objects.filter(usuario=request.user).values_list('usuario_oculto', flat=True)
     mensajes_recibidos = Mensaje.objects.filter(receptor=request.user).exclude(emisor__in=ocultas)
     mensajes_enviados = Mensaje.objects.filter(emisor=request.user).exclude(receptor__in=ocultas)
@@ -721,35 +718,9 @@ def listar_mensajes(request):
     return render(request, 'myapp/listar_mensajes.html', {
         'usuarios': usuarios,
         'all_users': all_users,
-        'query': query
+        'query': query,
+        'selected_user_id': int(usuario_id) if usuario_id else None,
     })
-
-@login_required
-def cargar_mensajes(request):
-    if request.method == 'GET':
-        username = request.GET.get('username')
-        try:
-            user = User.objects.get(username=username)
-            mensajes = Mensaje.objects.filter(
-                (Q(receptor=request.user) & Q(emisor=user)) |
-                (Q(emisor=request.user) & Q(receptor=user))
-            ).order_by('fecha_envio')
-
-            mensajes_data = []
-            for mensaje in mensajes:
-                mensajes_data.append({
-                    'emisor': mensaje.emisor.username,
-                    'contenido': mensaje.contenido,
-                    'fecha_envio': mensaje.fecha_envio.strftime("%d-%m-%Y %H:%M"),
-                    'imagen_url': mensaje.imagen.url if mensaje.imagen else None
-                })
-
-            return JsonResponse({'success': True, 'mensajes': mensajes_data})
-        except User.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Usuario no encontrado.'})
-    return JsonResponse({'success': False, 'error': 'Método no permitido.'}, status=405)
-
-
 @login_required
 def cargar_mensajes(request):
     if request.method == 'GET':
@@ -779,6 +750,7 @@ from .models import Mensaje, Notificacion
 import logging
 
 logger = logging.getLogger(__name__)
+
 @login_required
 def enviar_mensaje(request):
     if request.method == 'POST':
@@ -794,10 +766,11 @@ def enviar_mensaje(request):
                 mensaje.emisor = request.user
                 mensaje.save()
                 # Crear notificación para el receptor
+                chat_url = reverse('listar_mensajes') + f'?usuario_id={mensaje.emisor.id}'  # URL del chat con el emisor
                 Notificacion.objects.create(
                     receptor=receptor,
                     mensaje=f"Tienes un nuevo mensaje de {request.user.username}",
-                    url=f"/mensajes/{mensaje.id}/"
+                    url=chat_url
                 )
                 response_data = {
                     'id': mensaje.id,
@@ -808,7 +781,6 @@ def enviar_mensaje(request):
                 }
                 return JsonResponse(response_data, status=200)
             except User.DoesNotExist:
-                logger.error("Usuario no encontrado: %s", receptor_username)
                 return JsonResponse({'error': 'Usuario no encontrado.'}, status=400)
         else:
             logger.error("Error al enviar el mensaje: %s", form.errors)
@@ -994,3 +966,37 @@ def admin_dashboard(request):
         'filtro': filtro,
     }
     return render(request, 'myapp/admin_dashboard.html', context)
+
+@login_required
+def ver_chat(request, user_id):
+    receptor = get_object_or_404(User, id=user_id)
+    mensajes = Mensaje.objects.filter(
+        (Q(emisor=request.user) & Q(receptor=receptor)) |
+        (Q(emisor=receptor) & Q(receptor=request.user))
+    ).order_by('fecha_envio')
+
+    context = {
+        'receptor': receptor,
+        'mensajes': mensajes
+    }
+
+ogger = logging.getLogger(__name__)
+
+@receiver(post_save, sender=Mensaje)
+def notificar_mensaje(sender, instance, created, **kwargs):
+    if created:
+        receptor = instance.receptor
+        logger.debug(f'Creando notificación para mensaje de {instance.emisor.username} a {receptor.username}')
+        # Crear la URL correcta para la redirección
+        url = reverse('listar_mensajes') + f'?usuario_id={instance.emisor.id}'
+        if not Notificacion.objects.filter(
+            receptor=receptor,
+            mensaje=f'Tienes un nuevo mensaje de {instance.emisor.username}',
+            url=url
+        ).exists():
+            Notificacion.objects.create(
+                receptor=receptor,
+                mensaje=f'Tienes un nuevo mensaje de {instance.emisor.username}',
+                url=url
+            )
+            logger.debug(f'Notificación creada para mensaje de {instance.emisor.username} a {receptor.username}')

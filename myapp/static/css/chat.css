@@ -116,3 +116,8 @@ body {
 .btn-danger:hover {
     background-color: #c82333;
 }
+.list-group-item.active {
+    background-color: transparent !important;  /* Cambiar el color de fondo a transparente */
+    color: inherit;  /* Mantener el color de texto original */
+    border-color: transparent;  /* Eliminar el borde */
+}

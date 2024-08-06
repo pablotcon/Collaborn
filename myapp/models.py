@@ -108,7 +108,7 @@ class Postulacion(models.Model):
 class Notificacion(models.Model):
     receptor = models.ForeignKey(User, on_delete=models.CASCADE)
     mensaje = models.TextField()
-    url = models.URLField(blank=True, null=True)  # Permitir valores nulos y vacíos    
+    url = models.CharField(max_length=200, default='/mensajes/')  # Provee un valor por defecto
     leido = models.BooleanField(default=False)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 

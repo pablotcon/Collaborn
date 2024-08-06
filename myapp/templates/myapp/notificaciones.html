@@ -7,7 +7,7 @@
 <ul class="list-group">
     {% for notificacion in notificaciones %}
     <li class="list-group-item {% if notificacion.leida %}list-group-item-secondary{% else %}list-group-item-info{% endif %}">
-        {{ notificacion.mensaje }} - {{ notificacion.fecha_creacion }}
+        <a href="{{ notificacion.url }}">{{ notificacion.mensaje }}</a> - {{ notificacion.fecha_creacion }}
         {% if notificacion.leida %}
         <span class="badge badge-success">Leída</span>
         {% else %}

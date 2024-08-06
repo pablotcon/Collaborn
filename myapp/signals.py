@@ -14,13 +14,13 @@ def notificar_mensaje(sender, instance, created, **kwargs):
     if created:
         receptor = instance.receptor
         logger.debug(f'Creando notificación para mensaje de {instance.emisor.username} a {receptor.username}')
-        Notificacion.objects.create(
+        # Verificar si la notificación ya existe
+        if not Notificacion.objects.filter(
             receptor=receptor,
             mensaje=f'Tienes un nuevo mensaje de {instance.emisor.username}',
-            url=f'/mensajes/{instance.id}/' if instance.id else None
-        )
-        logger.debug(f'Notificación creada para mensaje de {instance.emisor.username} a {receptor.username}')
-
+            url=f'/mensajes/{instance.id}/' if instance.id else None):
+        
+            logger.debug(f'Notificación creada para mensaje de {instance.emisor.username} a {receptor.username}')
 
 @receiver(post_save, sender=Comentario)
 def notificar_comentario_proyecto(sender, instance, created, **kwargs):
@@ -34,9 +34,6 @@ def notificar_comentario_proyecto(sender, instance, created, **kwargs):
         )
         logger.debug(f'Notificación creada para comentario en proyecto: {proyecto.nombre}')
 
-
-
-
 @receiver(post_save, sender=Tarea)
 def notificar_asignacion_tarea(sender, instance, created, **kwargs):
     if created and instance.asignada_a:
@@ -45,6 +42,7 @@ def notificar_asignacion_tarea(sender, instance, created, **kwargs):
             mensaje=f"Se te ha asignado una nueva tarea: {instance.nombre}",
             url=f"/tareas/{instance.id}/"
         )
+
 @receiver(post_save, sender=Tarea)
 def registrar_actividad_tarea(sender, instance, created, **kwargs):
     if created:
@@ -52,6 +50,3 @@ def registrar_actividad_tarea(sender, instance, created, **kwargs):
     else:
         accion = f"Actualizó la tarea: {instance.nombre}"
     Actividad.objects.create(usuario=instance.asignada_a, accion=accion)
-       
-
-
