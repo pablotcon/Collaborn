@@ -127,51 +127,6 @@
                             </article>
                         {% endfor %}
                     </div>
-                    <h3>Proyectos Actuales</h3>
-                    <div class="timeline-centered">
-                        <h4>Proyectos Creados</h4>
-                        {% for proyecto in proyectos_creados %}
-                            <article class="timeline-entry">
-                                <div class="timeline-entry-inner">
-                                    <div class="timeline-icon bg-warning">
-                                        <i class="entypo-folder"></i>
-                                    </div>
-                                    <div class="timeline-label">
-                                        <h2>{{ proyecto.nombre }}</h2>
-                                        <p>{{ proyecto.descripcion }}</p>
-                                    </div>
-                                    <time class="timeline-time" datetime="{{ proyecto.fecha_inicio }}">{{ proyecto.fecha_inicio|date:"d-m-Y" }} - 
-                                        {% if proyecto.fecha_fin %}
-                                            {{ proyecto.fecha_fin|date:"d-m-Y" }}
-                                        {% else %}
-                                            Actualmente
-                                        {% endif %}
-                                    </time>
-                                </div>
-                            </article>
-                        {% endfor %}
-                        <h4>Proyectos Colaborados</h4>
-                        {% for proyecto in proyectos_colaborados %}
-                            <article class="timeline-entry">
-                                <div class="timeline-entry-inner">
-                                    <div class="timeline-icon bg-warning">
-                                        <i class="entypo-folder"></i>
-                                    </div>
-                                    <div class="timeline-label">
-                                        <h2>{{ proyecto.nombre }}</h2>
-                                        <p>{{ proyecto.descripcion }}</p>
-                                    </div>
-                                    <time class="timeline-time" datetime="{{ proyecto.fecha_inicio }}">{{ proyecto.fecha_inicio|date:"d-m-Y" }} - 
-                                        {% if proyecto.fecha_fin %}
-                                            {{ proyecto.fecha_fin|date:"d-m-Y" }}
-                                        {% else %}
-                                            Actualmente
-                                        {% endif %}
-                                    </time>
-                                </div>
-                            </article>
-                        {% endfor %}
-                    </div>
                 </div>
             </div>
         </div>

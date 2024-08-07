@@ -955,7 +955,14 @@ def cargar_mensajes(request):
 @login_required
 def historial_actividades(request):
     actividades = Actividad.objects.filter(usuario=request.user).order_by('-fecha')
-    return render(request, 'myapp/historial_actividades.html', {'actividades': actividades})
+    proyectos_creados = Proyecto.objects.filter(creador=request.user)
+    proyectos_colaborados = Proyecto.objects.filter(colaboradores=request.user)
+
+    return render(request, 'myapp/historial_actividades.html', {
+        'actividades': actividades,
+        'proyectos_creados': proyectos_creados,
+        'proyectos_colaborados': proyectos_colaborados,
+    })
 
 # User Authentication Functions
 def login_view(request):
