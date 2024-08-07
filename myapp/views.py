@@ -17,7 +17,7 @@ import json
 from django.utils import timezone
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-
+from django.forms import modelformset_factory
 
 @login_required
 def actualizar_disponibilidad(request):
@@ -392,29 +392,30 @@ def eliminar_educacion(request, pk):
 def ver_mi_perfil(request):
     return redirect('ver_perfil', user_id=request.user.id)
 
+
 @login_required
 def ver_perfil(request, user_id):
     user = get_object_or_404(User, id=user_id)
     perfil = user.perfil
 
     if request.method == 'POST':
-        form_disponibilidad = DisponibilidadForm(request.POST, instance=perfil)
-        if form_disponibilidad.is_valid():
-            form_disponibilidad.save()
-            return redirect('ver_perfil', user_id=user_id)
-    else:
-        form_disponibilidad = DisponibilidadForm(instance=perfil)
+        if 'toggle_disponibilidad' in request.POST:
+            perfil.disponibilidad = not perfil.disponibilidad
+            perfil.save()
+        return redirect('ver_perfil', user_id=user_id)
 
-    experiencias = perfil.experiencias.all().order_by('-fecha_inicio')
-    educaciones = perfil.educaciones.all().order_by('-fecha_inicio')
+    experiencias = ExperienciaLaboral.objects.filter(perfil=perfil).order_by('-fecha_inicio')
+    educaciones = Educacion.objects.filter(perfil=perfil).order_by('-fecha_inicio')
+    proyectos_creados = Proyecto.objects.filter(creador=user)
+    proyectos_colaborados = Proyecto.objects.filter(colaboradores=user)
 
     return render(request, 'myapp/ver_perfil.html', {
         'perfil': perfil,
-        'form_disponibilidad': form_disponibilidad,
         'experiencias': experiencias,
         'educaciones': educaciones,
+        'proyectos_creados': proyectos_creados,
+        'proyectos_colaborados': proyectos_colaborados,
     })
-
 
 def filtrar_especialistas(request):
     query = request.GET.get('q', '')

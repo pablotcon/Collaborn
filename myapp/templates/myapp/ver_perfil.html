@@ -1,6 +1,6 @@
 {% extends 'myapp/base.html' %}
 {% load static %}
-{% load custom_filters %}  <!-- Cargar los filtros personalizados -->
+{% load custom_filters %}
 
 {% block title %}Perfil de {{ user.username }}{% endblock %}
 
@@ -69,7 +69,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container bootstrap snippet">
+<div class="container bootstrap snippet mt-5">
     <div class="row">
         <div class="col-md-12">
             <div class="btn-group-custom">
@@ -97,25 +97,29 @@
                         {% endif %}
                     </div>
                     <h3>@{{ user.username }}</h3>
-                    <p>{{ perfil.nombre }} {{ perfil.apellido }}</p>
                     <div class="availability-form">
                         <h4>Disponibilidad</h4>
-                        <form method="post" action="{% url 'ver_perfil' user_id=user.id %}">
+                        <form method="post" action="">
                             {% csrf_token %}
-                            {{ form_disponibilidad.as_p }}
-                            <button type="submit" class="btn btn-primary">Actualizar Disponibilidad</button>
+                            <button type="submit" name="toggle_disponibilidad" class="btn btn-secondary">
+                                {% if perfil.disponibilidad %}
+                                    Marcar como No Disponible
+                                {% else %}
+                                    Marcar como Disponible
+                                {% endif %}
+                            </button>
+                            <p>{{ perfil.disponibilidad|yesno:"Disponible,No disponible" }}</p>
                         </form>
                     </div>
                     <div class="personal-info mt-4">
                         <h3>Información Personal</h3>
                         <ul class="personal-list">
-                            <br>
                             <li><i class="entypo-phone"></i>(+56) {{ perfil.telefono }}</li>
                             <li><i class="entypo-calendar"></i>{{ perfil.fecha_nacimiento }}</li>
                             <li><i class="entypo-globe"></i>{{ perfil.website }}</li>
-                            <li class="list-group-item text-right"><span class="pull-left"><strong></strong></span> <i class="fab fa-twitter"></i> {{ perfil.twitter }}</li>
-                            <li class="list-group-item text-right"><span class="pull-left"><strong></strong></span> <i class="fab fa-facebook-f"></i> {{ perfil.facebook }}</li>
-                            <li class="list-group-item text-right"><span class="pull-left"><strong></strong></span> <i class="fab fa-linkedin-in"></i> {{ perfil.linkedin }}</li>
+                            <li><i class="fab fa-twitter"></i> {{ perfil.twitter }}</li>
+                            <li><i class="fab fa-facebook-f"></i> {{ perfil.facebook }}</li>
+                            <li><i class="fab fa-linkedin-in"></i> {{ perfil.linkedin }}</li>
                         </ul>
                     </div>
                     <div class="personal-info mt-4">
@@ -170,6 +174,51 @@
                                     <time class="timeline-time" datetime="{{ educacion.fecha_inicio }}">{{ educacion.fecha_inicio|date:"d-m-Y" }} - 
                                         {% if educacion.fecha_fin %}
                                             {{ educacion.fecha_fin|date:"d-m-Y" }}
+                                        {% else %}
+                                            Actualmente
+                                        {% endif %}
+                                    </time>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                    <h3>Proyectos Actuales</h3>
+                    <div class="timeline-centered">
+                        <h4>Proyectos Creados</h4>
+                        {% for proyecto in proyectos_creados %}
+                            <article class="timeline-entry">
+                                <div class="timeline-entry-inner">
+                                    <div class="timeline-icon bg-warning">
+                                        <i class="entypo-folder"></i>
+                                    </div>
+                                    <div class="timeline-label">
+                                        <h2>{{ proyecto.nombre }}</h2>
+                                        <p>{{ proyecto.descripcion }}</p>
+                                    </div>
+                                    <time class="timeline-time" datetime="{{ proyecto.fecha_inicio }}">{{ proyecto.fecha_inicio|date:"d-m-Y" }} - 
+                                        {% if proyecto.fecha_fin %}
+                                            {{ proyecto.fecha_fin|date:"d-m-Y" }}
+                                        {% else %}
+                                            Actualmente
+                                        {% endif %}
+                                    </time>
+                                </div>
+                            </article>
+                        {% endfor %}
+                        <h4>Proyectos Colaborados</h4>
+                        {% for proyecto in proyectos_colaborados %}
+                            <article class="timeline-entry">
+                                <div class="timeline-entry-inner">
+                                    <div class="timeline-icon bg-warning">
+                                        <i class="entypo-folder"></i>
+                                    </div>
+                                    <div class="timeline-label">
+                                        <h2>{{ proyecto.nombre }}</h2>
+                                        <p>{{ proyecto.descripcion }}</p>
+                                    </div>
+                                    <time class="timeline-time" datetime="{{ proyecto.fecha_inicio }}">{{ proyecto.fecha_inicio|date:"d-m-Y" }} - 
+                                        {% if proyecto.fecha_fin %}
+                                            {{ proyecto.fecha_fin|date:"d-m-Y" }}
                                         {% else %}
                                             Actualmente
                                         {% endif %}

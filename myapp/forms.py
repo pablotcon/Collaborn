@@ -2,7 +2,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 from django.contrib.auth.models import User
-from .models import Recurso, Perfil, Comentario, Mensaje, Proyecto, Tarea, ExperienciaLaboral, Educacion, SeguimientoTarea, Subtarea, ComentarioTarea, Categoria, Valoracion
+from .models import Recurso, Perfil,Comentario, Mensaje, Proyecto, Tarea, ExperienciaLaboral, Educacion, SeguimientoTarea, Subtarea, ComentarioTarea, Categoria, Valoracion
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 
@@ -36,10 +36,11 @@ class PerfilForm(forms.ModelForm):
 
     class Meta:
         model = Perfil
-        fields = ['nombre', 'apellido', 'telefono', 'fecha_nacimiento', 'avatar', 'website', 'twitter', 'facebook', 'linkedin', 'habilidades', 'experiencia']
+        fields = ['nombre', 'apellido', 'telefono', 'fecha_nacimiento', 'avatar', 'website', 'twitter', 'facebook', 'linkedin', 'habilidades', 'experiencia', 'disponibilidad']
         widgets = {
             'habilidades': forms.Textarea(attrs={'rows': 3}),
             'experiencia': forms.Textarea(attrs={'rows': 5}),
+            'disponibilidad': forms.CheckboxInput(),
         }
 
 
