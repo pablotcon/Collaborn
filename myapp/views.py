@@ -307,6 +307,7 @@ def user_notification(event):
 
 
 # Functions related to User Profile
+@login_required
 def editar_perfil(request):
     perfil = request.user.perfil
 
@@ -315,7 +316,7 @@ def editar_perfil(request):
         perfil_form = PerfilForm(request.POST, request.FILES, instance=perfil)
         experiencia_formset = ExperienciaLaboralFormSet(request.POST, request.FILES, instance=perfil)
         educacion_formset = EducacionFormSet(request.POST, request.FILES, instance=perfil)
-        
+
         if user_form.is_valid() and perfil_form.is_valid() and experiencia_formset.is_valid() and educacion_formset.is_valid():
             user_form.save()
             perfil_form.save()
@@ -342,7 +343,6 @@ def editar_perfil(request):
         'experiencias': perfil.experiencias.all(),
         'educaciones': perfil.educaciones.all(),
     })
-
 @login_required
 def editar_experiencia(request, pk):
     experiencia = get_object_or_404(ExperienciaLaboral, pk=pk)
