@@ -8,64 +8,6 @@
 <link rel="stylesheet" href="{% static 'css/ver_perfil.css' %}">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@icon/entypo@1.0.3/entypo.css" rel="stylesheet">
-<style>
-    .btn-group-custom {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-    }
-
-    .btn-custom {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .btn-custom i {
-        font-size: 1.2em;
-    }
-
-    .left-profile-card .user-profile img {
-        width: 100%;
-        max-width: 150px;
-        height: auto;
-        margin: 0 auto;
-        display: block;
-        border-radius: 50%;
-    }
-
-    .timeline-entry-inner {
-        margin-bottom: 20px;
-    }
-
-    .card-body h3 {
-        font-size: 1.5em;
-        margin-bottom: 20px;
-        font-weight: bold;
-    }
-
-    .personal-info ul {
-        list-style: none;
-        padding: 0;
-    }
-
-    .personal-info ul li {
-        margin-bottom: 10px;
-    }
-
-    .personal-info ul li i {
-        margin-right: 10px;
-    }
-
-    .availability-form {
-        margin-top: 20px;
-        text-align: center;
-    }
-
-    .availability-form button {
-        margin-top: 10px;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -89,28 +31,31 @@
         <div class="col-md-4">
             <div class="left-profile-card card">
                 <div class="card-body">
-                    <div class="user-profile">
+                    <div class="user-profile {% if perfil.disponibilidad %}available{% else %}not-available{% endif %}">
                         {% if perfil.avatar %}
-                            <img src="{{ perfil.avatar.url }}" class="img-fluid rounded-circle" alt="Avatar">
+                            <img src="{{ perfil.avatar.url }}" alt="Avatar">
                         {% else %}
-                            <img src="{% static 'images/default-avatar.png' %}" class="img-fluid rounded-circle" alt="Avatar">
+                            <img src="{% static 'images/default-avatar.png' %}" alt="Avatar">
                         {% endif %}
                     </div>
-                    <h3>@{{ user.username }}</h3>
+                    <div class="availability-status {% if not perfil.disponibilidad %}not-available{% endif %}">
+                        {{ perfil.disponibilidad|yesno:"Disponible,No disponible" }}
+                    </div>
                     <div class="availability-form">
-                        <h4>Disponibilidad</h4>
                         <form method="post" action="">
                             {% csrf_token %}
-                            <button type="submit" name="toggle_disponibilidad" class="btn btn-secondary">
+                            <br>
+                            <button type="submit" name="toggle_disponibilidad" class="btn-availability {% if perfil.disponibilidad %}available{% else %}not-available{% endif %}">
                                 {% if perfil.disponibilidad %}
                                     Marcar como No Disponible
                                 {% else %}
                                     Marcar como Disponible
                                 {% endif %}
                             </button>
-                            <p>{{ perfil.disponibilidad|yesno:"Disponible,No disponible" }}</p>
                         </form>
                     </div>
+                    <h3>@{{ user.username }}</h3>
+                    <p>{{ perfil.nombre }} {{ perfil.apellido }}</p> <!-- Añadir nombre completo -->
                     <div class="personal-info mt-4">
                         <h3>Información Personal</h3>
                         <ul class="personal-list">
