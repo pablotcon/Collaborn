@@ -17,7 +17,6 @@ urlpatterns = [
 
     path('buscar_especialistas/', views.buscar_especialistas, name='buscar_especialistas'),
     path('especialistas/', views.listar_especialistas, name='listar_especialistas'),
-
     path('especialistas/', views.filtrar_especialistas, name='filtrar_especialistas'),
     path('especialistas/<int:especialista_id>/valorar/', views.valorar_especialista, name='valorar_especialista'),
     path('proyectos/<int:proyecto_id>/recomendar/', views.recomendar_especialistas, name='recomendar_especialistas'),

@@ -18,9 +18,7 @@
         </div>
         <div class="col-md-4">
             <select name="disponibilidad" class="form-control">
-                <option value="">Disponibilidad</option>
                 <option value="True" {% if request.GET.disponibilidad == 'True' %}selected{% endif %}>Disponible</option>
-                <option value="False" {% if request.GET.disponibilidad == 'False' %}selected{% endif %}>No disponible</option>
             </select>
         </div>
     </div>
@@ -31,17 +29,17 @@
     {% for especialista in especialistas %}
     <div class="col-md-4">
         <div class="card mb-4">
-            {% if especialista.avatar %}
-                <img src="{{ especialista.avatar.url }}" class="card-img-top" alt="Avatar de {{ especialista.nombre }}">
+            {% if especialista.perfil.avatar %}
+                <img src="{{ especialista.perfil.avatar.url }}" class="card-img-top" alt="Avatar de {{ especialista.first_name }}">
             {% else %}
-                <img src="{% static 'images/default_avatar.png' %}" class="card-img-top" alt="Avatar de {{ especialista.nombre }}">
+                <img src="{% static 'images/default_avatar.png' %}" class="card-img-top" alt="Avatar de {{ especialista.first_name }}">
             {% endif %}
             <div class="card-body">
-                <h5 class="card-title">{{ especialista.nombre }} {{ especialista.apellido }}</h5>
+                <h5 class="card-title">{{ especialista.first_name }} {{ especialista.last_name }}</h5>
                 <p class="card-text">
-                    {% if especialista.especialidad %}Especialidad: {{ especialista.especialidad }}<br>{% endif %}
-                    {% if especialista.ubicacion %}Ubicación: {{ especialista.ubicacion }}<br>{% endif %}
-                    Disponibilidad: {{ especialista.disponibilidad|yesno:"Disponible,No disponible" }}
+                    {% if especialista.perfil.especialidad %}Especialidad: {{ especialista.perfil.especialidad }}<br>{% endif %}
+                    {% if especialista.perfil.ubicacion %}Ubicación: {{ especialista.perfil.ubicacion }}<br>{% endif %}
+                    Disponibilidad: {{ especialista.perfil.disponibilidad|yesno:"Disponible,No disponible" }}
                 </p>
             </div>
         </div>
@@ -49,3 +47,4 @@
     {% endfor %}
 </div>
 {% endblock %}
+    

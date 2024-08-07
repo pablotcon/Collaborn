@@ -1,29 +1,35 @@
-/* estilos para la página de especialistas */
 .especialistas-container {
-    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
 }
 
-.especialistas-container .card {
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    transition: transform 0.2s, box-shadow 0.2s;
+.card {
+    width: 100%;
+    max-width: 300px;
+    margin: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
 }
 
-.especialistas-container .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+.card:hover {
+    transform: scale(1.02);
 }
 
-.especialistas-container .card-img-top {
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
 }
 
-.especialistas-container .card-title {
+.card-body {
+    text-align: center;
+}
+
+.card-title {
+    font-size: 1.25rem;
     font-weight: bold;
 }
 
-.especialistas-container .card-text {
-    font-size: 14px;
+.card-text {
     color: #555;
 }

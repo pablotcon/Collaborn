@@ -33,23 +33,23 @@ def actualizar_disponibilidad(request):
     return render(request, 'actualizar_disponibilidad.html', {'form': form})
 
 
+
 def listar_especialistas(request):
-    form = BusquedaEspecialistaForm(request.GET or None)
-    especialistas = Perfil.objects.all()
+    especialidad = request.GET.get('especialidad', '')
+    ubicacion = request.GET.get('ubicacion', '')
+    disponibilidad = request.GET.get('disponibilidad', 'True')  # Default to showing only available specialists
 
-    if form.is_valid():
-        especialidad = form.cleaned_data.get('especialidad')
-        ubicacion = form.cleaned_data.get('ubicacion')
-        disponibilidad = form.cleaned_data.get('disponibilidad')
+    especialistas = User.objects.filter(perfil__disponibilidad=True)
 
-        if especialidad:
-            especialistas = especialistas.filter(especialidad__icontains=especialidad)
-        if ubicacion:
-            especialistas = especialistas.filter(ubicacion__icontains=ubicacion)
-        if disponibilidad is not None:
-            especialistas = especialistas.filter(disponibilidad=disponibilidad)
+    if especialidad:
+        especialistas = especialistas.filter(perfil__especialidad__icontains=especialidad)
+    if ubicacion:
+        especialistas = especialistas.filter(perfil__ubicacion__icontains=ubicacion)
 
-    return render(request, 'myapp/listar_especialistas.html', {'especialistas': especialistas, 'form': form})
+    context = {
+        'especialistas': especialistas
+    }
+    return render(request, 'myapp/listar_especialistas.html', context)
 
 #Busqueda Especialista:
 def buscar_especialistas(request):
