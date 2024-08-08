@@ -27,15 +27,17 @@ class Proyecto(models.Model):
         ('energia', 'Energía'),
         ('animales', 'Animales'),
     ], default='tecnologia')
-    creador = models.ForeignKey(User, on_delete=models.CASCADE)
+    creador = models.ForeignKey(User, on_delete=models.CASCADE, related_name='proyectos_creados')
     colaboradores = models.ManyToManyField(User, related_name='proyectos_colaborados', blank=True)
+
     def __str__(self):
         return self.nombre
 
     def clean(self):
-        if self.fecha_fin <= self.fecha_inicio:
-            raise ValidationError('La fecha de fin debe ser posterior a la fecha de inicio.')
-
+        if self.fecha_inicio and self.fecha_fin:
+            if self.fecha_fin <= self.fecha_inicio:
+                raise ValidationError('La fecha de fin debe ser posterior a la fecha de inicio.')
+            
 class Tarea(models.Model):
     proyecto = models.ForeignKey(Proyecto, related_name='tareas', on_delete=models.CASCADE)
     nombre = models.CharField(max_length=200)

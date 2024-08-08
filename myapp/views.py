@@ -1,3 +1,4 @@
+import datetime
 from django.forms import ModelForm, modelform_factory
 from asgiref.sync import async_to_sync
 from django.shortcuts import render, redirect, get_object_or_404
@@ -548,11 +549,11 @@ def crear_proyecto(request):
             messages.success(request, 'Proyecto creado exitosamente.')
             return redirect('proyecto_detalle', proyecto_id=proyecto.id)
         else:
-            messages.error(request, 'Error al crear el proyecto.')
+            messages.error(request, "Error al crear el proyecto. Por favor, revisa los campos resaltados.")
     else:
         form = ProyectoForm()
     return render(request, 'myapp/crear_proyecto.html', {'form': form})
-
+    
 @login_required
 def proyecto_edit(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
@@ -684,8 +685,10 @@ def aceptar_postulacion(request, postulacion_id):
             receptor=postulacion.usuario,
             mensaje=f'Tu postulación al proyecto "{postulacion.proyecto.nombre}" ha sido aceptada.'
         )
+        # Agregar colaborador al proyecto
+        postulacion.proyecto.colaboradores.add(postulacion.usuario)
+        postulacion.proyecto.save()
     return redirect('proyecto_detalle', proyecto_id=postulacion.proyecto.id)
-
 ### RECHAZAR POSTULACION
 @login_required
 @permission_required('myapp.change_postulacion', raise_exception=True)
@@ -957,16 +960,18 @@ def cargar_mensajes(request):
             return JsonResponse({'success': False, 'error': 'Usuario no encontrado.'})
     return JsonResponse({'success': False, 'error': 'Método no permitido.'}, status=405)
 # Functions related to Activities
+
 @login_required
 def historial_actividades(request, user_id):
     usuario = get_object_or_404(User, id=user_id)
     actividades = Actividad.objects.filter(usuario=usuario).order_by('-fecha')
     proyectos_creados = Proyecto.objects.filter(creador=usuario)
     proyectos_colaborados = Proyecto.objects.filter(colaboradores=usuario)
-    
+
     # Imprimir en la consola para depuración
-    print("Proyectos creados:", proyectos_creados)
-    print("Proyectos colaborados:", proyectos_colaborados)
+    print("Usuario:", usuario)
+    print("Proyectos creados:", list(proyectos_creados))
+    print("Proyectos colaborados:", list(proyectos_colaborados))
 
     return render(request, 'myapp/historial_actividades.html', {
         'usuario': usuario,
@@ -974,8 +979,6 @@ def historial_actividades(request, user_id):
         'proyectos_creados': proyectos_creados,
         'proyectos_colaborados': proyectos_colaborados,
     })
-
-
 # User Authentication Functions
 def login_view(request):
     if request.method == 'POST':

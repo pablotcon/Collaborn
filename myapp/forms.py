@@ -154,15 +154,13 @@ class ProyectoForm(forms.ModelForm):
         ('energia', 'Energía'),
         ('animales', 'Animales'),
     ]
-
+    
     fecha_inicio = forms.DateField(
-        input_formats=['%d-%m-%Y'],
-        widget=forms.DateInput(format='%d-%m-%Y', attrs={'id': 'id_fecha_inicio', 'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'}),
+        widget=forms.DateInput(attrs={'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'}),
         label='Fecha de inicio de postulaciones'
     )
     fecha_fin = forms.DateField(
-        input_formats=['%d-%m-%Y'],
-        widget=forms.DateInput(format='%d-%m-%Y', attrs={'id': 'id_fecha_fin', 'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'}),
+        widget=forms.DateInput(attrs={'class': 'form-control datepicker', 'placeholder': 'DD-MM-YYYY'}),
         label='Fecha de cierre de postulaciones'
     )
     ciudad = forms.ChoiceField(
@@ -184,6 +182,13 @@ class ProyectoForm(forms.ModelForm):
     class Meta:
         model = Proyecto
         fields = ['nombre', 'descripcion', 'fecha_inicio', 'fecha_fin', 'ciudad', 'imagen', 'categoria']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
+            'ciudad': forms.TextInput(attrs={'class': 'form-control'}),
+            'imagen': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+            'categoria': forms.Select(attrs={'class': 'form-control'}),
+        }
 
 class TareaForm(forms.ModelForm):
     fecha_limite = forms.DateField(

@@ -144,28 +144,10 @@
         <div class="col-md-12 mb-4">
             <h2 class="text-center">Historial de Actividades</h2>
         </div>
-        <div class="col-md-12 mb-5">
-            <div class="timeline-centered">
-                {% for actividad in actividades %}
-                    <article class="timeline-entry">
-                        <div class="timeline-entry-inner">
-                            <div class="timeline-icon bg-primary">
-                                <i class="entypo-suitcase"></i>
-                            </div>
-                            <div class="timeline-label">
-                                <h4>{{ actividad.titulo }}</h4>
-                                <p>{{ actividad.descripcion }}</p>
-                                <time class="timeline-time" datetime="{{ actividad.fecha }}">{{ actividad.fecha|date:"d-m-Y" }}</time>
-                            </div>
-                        </div>
-                    </article>
-                {% endfor %}
-            </div>
-        </div>
         <div class="col-md-6">
             <div class="card shadow-sm mb-4">
                 <div class="card-header">
-                    Proyectos Creados
+                    <h4>Proyectos Creados</h4>
                 </div>
                 <div class="card-body">
                     <div class="timeline-centered">
@@ -196,7 +178,7 @@
         <div class="col-md-6">
             <div class="card shadow-sm mb-4">
                 <div class="card-header">
-                    Proyectos Colaborados
+                    <h4>Proyectos Colaborados</h4>
                 </div>
                 <div class="card-body">
                     <div class="timeline-centered">
