@@ -658,6 +658,7 @@ def gestionar_postulaciones(request, proyecto_id):
     })
 
 ### POSTULAR PROYECTO ###
+from .models import Proyecto, Postulacion, Notificacion, Mensaje, Conversacion
 @login_required
 def postular_proyecto(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
@@ -666,11 +667,20 @@ def postular_proyecto(request, proyecto_id):
         if not created:
             messages.error(request, 'Ya te has postulado a este proyecto.')
         else:
+            # Crear notificación para el creador del proyecto
             Notificacion.objects.create(
                 receptor=proyecto.creador,
                 mensaje=f'El usuario {request.user.username} se ha postulado a tu proyecto "{proyecto.nombre}".',
                 url=reverse('proyecto_detalle', kwargs={'proyecto_id': proyecto.id})
             )
+
+            # Crear mensaje predeterminado en una instancia de chat
+            Mensaje.objects.create(
+                emisor=proyecto.creador,
+                receptor=request.user,
+                contenido=f"Gracias por generar interés en {proyecto.nombre}. Mientras te contactamos con el responsable del proyecto, nos gustaría saber de ti. ¡Cuéntanos por qué quieres ser parte del proyecto!"
+            )
+
             messages.success(request, 'Te has postulado al proyecto exitosamente.')
         return redirect('proyecto_detalle', proyecto_id=proyecto_id)
     return render(request, 'myapp/proyecto_detalle.html', {'proyecto': proyecto})
@@ -865,16 +875,19 @@ def enviar_mensaje(request):
             return JsonResponse({'error': 'Error al enviar el mensaje.', 'form_errors': form.errors}, status=400)
     return JsonResponse({'error': 'Método no permitido.'}, status=405)
 
-@login_required
-def eliminar_mensaje(request, mensaje_id):
-    mensaje = get_object_or_404(Mensaje, id=mensaje_id)
+def eliminar_mensaje(request):
     if request.method == 'POST':
-        mensaje.delete()
-        messages.success(request, 'Mensaje eliminado exitosamente.')
-        return redirect('listar_mensajes')
-    return render(request, 'myapp/confirm_delete_mensaje.html', {'mensaje': mensaje})
-
-@login_required
+        mensaje_id = request.POST.get('id')
+        if mensaje_id:
+            try:
+                mensaje = Mensaje.objects.get(id=mensaje_id, emisor=request.user)
+                mensaje.delete()
+                return JsonResponse({'success': True})
+            except Mensaje.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Mensaje no encontrado.'})
+        else:
+            return JsonResponse({'success': False, 'error': 'ID de mensaje no proporcionado.'})
+    return JsonResponse({'success': False, 'error': 'Método no permitido.'})
 def detalle_mensaje(request, mensaje_id):
     mensaje = get_object_or_404(Mensaje, id=mensaje_id)
 

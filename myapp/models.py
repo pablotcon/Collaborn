@@ -91,6 +91,7 @@ class Comentario(models.Model):
 
 
 
+# models.py
 class Postulacion(models.Model):
     ESTADO_CHOICES = [
         ('pendiente', 'Pendiente'),
@@ -104,7 +105,15 @@ class Postulacion(models.Model):
 
     class Meta:
         unique_together = ('proyecto', 'usuario')
-        
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Crear instancia de chat y mensaje predeterminado
+        Mensaje.objects.create(
+            emisor=self.proyecto.creador,
+            receptor=self.usuario,
+            contenido=f"Gracias por generar interés en {self.proyecto.nombre}. Mientras te contactamos con el responsable del proyecto, nos gustaría saber de ti. ¡Cuéntanos por qué quieres ser parte del proyecto!"
+        )
 # Modelo Notificaciones
 class Notificacion(models.Model):
     receptor = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -116,6 +125,14 @@ class Notificacion(models.Model):
     def __str__(self):
         return f'Notificación para {self.receptor.username}: {self.mensaje}'
     
+class Conversacion(models.Model):
+    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
+    usuario1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='conversaciones_usuario1')
+    usuario2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='conversaciones_usuario2')
+
+    def __str__(self):
+        return f'Conversacion entre {self.usuario1.username} y {self.usuario2.username} sobre {self.proyecto.nombre}'
+        
 class Mensaje(models.Model):
     emisor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mensajes_enviados')
     receptor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mensajes_recibidos')

@@ -5,7 +5,7 @@
 </head>
 <body>
     <h2>Postular a {{ proyecto.nombre }}</h2>
-    <form method="post">
+    <form method="post" action="{% url 'postular_proyecto' proyecto.id %}">
         {% csrf_token %}
         <button type="submit">Postular</button>
     </form>

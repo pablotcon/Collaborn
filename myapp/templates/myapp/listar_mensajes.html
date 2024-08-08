@@ -1,4 +1,4 @@
-{% extends 'myapp/base.html' %}
+}{% extends 'myapp/base.html' %}
 {% load static %}
 
 {% block title %}Mensajes{% endblock %}
@@ -92,7 +92,7 @@
                     ¿Estás seguro de que deseas eliminar este mensaje?
                 </div>
                 <div class="modal-footer">
-                    <form id="deleteForm" method="post" action="">
+                    <form id="deleteForm" method="post">
                         {% csrf_token %}
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-danger">Eliminar</button>
@@ -107,6 +107,8 @@
 
     <script>
         $(document).ready(function() {
+            var mensajeIdParaEliminar = null;
+
             function loadMessages(username) {
                 $.ajax({
                     type: 'GET',
@@ -376,21 +378,32 @@
                 }
             });
 
-            $('.responder-btn').on('click', function(event) {
-                event.preventDefault();
-                var emisorUsername = $(this).data('emisor-username');
-                $('.receptor-username').val(emisorUsername);
-                $('html, body').animate({
-                    scrollTop: $(".receptor-username").offset().top
-                }, 1000);
-            });
-
             $('#confirmDeleteModal').on('show.bs.modal', function (event) {
                 var button = $(event.relatedTarget);
-                var mensajeId = button.data('mensaje-id');
-                var action = "{% url 'eliminar_mensaje' 0 %}".slice(0, -2) + mensajeId + "/";
-                var modal = $(this);
-                modal.find('#deleteForm').attr('action', action);
+                mensajeIdParaEliminar = button.data('mensaje-id');
+            });
+
+            $('#deleteForm').on('submit', function(event) {
+                event.preventDefault();
+                var action = "{% url 'eliminar_mensaje' 0 %}".slice(0, -2) + mensajeIdParaEliminar + "/";
+                $.ajax({
+                    type: 'POST',
+                    url: action,
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#chat-' + response.mensaje_receptor_id + ' .messages .chat-message[data-mensaje-id="' + mensajeIdParaEliminar + '"]').remove();
+                            $('#confirmDeleteModal').modal('hide');
+                        } else {
+                            alert(response.error);
+                        }
+                    },
+                    error: function(response) {
+                        alert('Error al eliminar el mensaje.');
+                    }
+                });
             });
 
             // Mostrar el chat seleccionado automáticamente
