@@ -39,6 +39,10 @@
                 {{ perfil_form.twitter|as_crispy_field }}
                 {{ perfil_form.facebook|as_crispy_field }}
                 {{ perfil_form.linkedin|as_crispy_field }}
+                <h4>¿Cuáles son tus 3 habilidades más relevantes?</h4>
+                {{ perfil_form.habilidad_1|as_crispy_field }}
+                {{ perfil_form.habilidad_2|as_crispy_field }}
+                {{ perfil_form.habilidad_3|as_crispy_field }}
             </div>
         </div>
         {% if user_form.errors %}

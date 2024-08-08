@@ -308,6 +308,7 @@ def user_notification(event):
 
 
 # Functions related to User Profile
+
 @login_required
 def editar_perfil(request):
     perfil = request.user.perfil
@@ -410,14 +411,15 @@ def ver_perfil(request, user_id):
     proyectos_creados = Proyecto.objects.filter(creador=usuario)
     proyectos_colaborados = Proyecto.objects.filter(colaboradores=usuario)
 
-    return render(request, 'myapp/ver_perfil.html', {
+    context = {
         'usuario': usuario,
         'perfil': perfil,
         'experiencias': experiencias,
         'educaciones': educaciones,
         'proyectos_creados': proyectos_creados,
         'proyectos_colaborados': proyectos_colaborados,
-    })
+    }
+    return render(request, 'myapp/ver_perfil.html', context)
 def filtrar_especialistas(request):
     query = request.GET.get('q', '')
     habilidades = request.GET.get('habilidades', '')

@@ -147,11 +147,12 @@ class Perfil(models.Model):
     twitter = models.URLField(max_length=200, blank=True, null=True)
     facebook = models.URLField(max_length=200, blank=True, null=True)
     linkedin = models.URLField(max_length=200, blank=True, null=True)
-    habilidades = models.TextField(blank=True, null=True)
+    habilidad_1 = models.CharField(max_length=100, blank=True, null=True)
+    habilidad_2 = models.CharField(max_length=100, blank=True, null=True)
+    habilidad_3 = models.CharField(max_length=100, blank=True, null=True)
     experiencia = models.TextField(blank=True, null=True)
-
-    especialidad = models.CharField(max_length=200,blank=True, null=True)
-    ubicacion = models.CharField(max_length=200,blank=True, null=True)
+    especialidad = models.CharField(max_length=200, blank=True, null=True)
+    ubicacion = models.CharField(max_length=200, blank=True, null=True)
     disponibilidad = models.BooleanField(blank=True, null=True)
     def __str__(self):
         return f'{self.nombre} {self.apellido or ""}'

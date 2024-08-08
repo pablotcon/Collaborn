@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from .models import Recurso, Perfil,Comentario, Mensaje, Proyecto, Tarea, ExperienciaLaboral, Educacion, SeguimientoTarea, Subtarea, ComentarioTarea, Categoria, Valoracion
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-
+from .models import Perfil
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
@@ -36,13 +36,22 @@ class PerfilForm(forms.ModelForm):
 
     class Meta:
         model = Perfil
-        fields = ['nombre', 'apellido', 'telefono', 'fecha_nacimiento', 'avatar', 'website', 'twitter', 'facebook', 'linkedin', 'habilidades', 'experiencia', 'disponibilidad']
+        fields = [
+            'nombre', 'apellido', 'telefono', 'fecha_nacimiento', 'avatar',
+            'website', 'twitter', 'facebook', 'linkedin', 'habilidad_1',
+            'habilidad_2', 'habilidad_3', 'experiencia', 'disponibilidad'
+        ]
         widgets = {
-            'habilidades': forms.Textarea(attrs={'rows': 3}),
+            'habilidad_1': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Habilidad 1'}),
+            'habilidad_2': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Habilidad 2'}),
+            'habilidad_3': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Habilidad 3'}),
             'experiencia': forms.Textarea(attrs={'rows': 5}),
             'disponibilidad': forms.CheckboxInput(),
+            'website': forms.URLInput(attrs={'placeholder': 'No disponible'}),
+            'twitter': forms.URLInput(attrs={'placeholder': 'No disponible'}),
+            'facebook': forms.URLInput(attrs={'placeholder': 'No disponible'}),
+            'linkedin': forms.URLInput(attrs={'placeholder': 'No disponible'}),
         }
-
 
 class ExperienciaLaboralForm(forms.ModelForm):
     fecha_inicio = forms.DateField(
