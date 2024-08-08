@@ -585,12 +585,15 @@ def proyecto_detalle(request, proyecto_id):
             messages.error(request, 'Error al agregar el comentario.')
     else:
         form = ComentarioForm()
+    
     postulaciones = proyecto.postulacion_set.all()
+    aceptados = proyecto.postulacion_set.filter(estado='aceptada')
     return render(request, 'myapp/proyecto_detalle.html', {
         'proyecto': proyecto, 
         'comentarios': comentarios, 
         'form': form,
         'postulaciones': postulaciones,
+        'aceptados': aceptados,
     })
 
 
@@ -617,6 +620,7 @@ def confirmar_eliminar_proyecto(request, pk):
 
 ## gestion proyecto ###
 @login_required
+@permission_required('myapp.change_proyecto', raise_exception=True)
 def gestionar_postulaciones(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
     postulaciones = proyecto.postulacion_set.all()
@@ -642,7 +646,10 @@ def gestionar_postulaciones(request, proyecto_id):
                 receptor=postulacion.usuario,
                 mensaje=f'Tu postulación al proyecto "{postulacion.proyecto.nombre}" ha sido rechazada.'
             )
-
+        elif accion == 'eliminar':
+            postulacion.delete()
+            messages.success(request, 'El postulante ha sido eliminado del proyecto.')
+    
     return render(request, 'myapp/gestionar_postulaciones.html', {
         'proyecto': proyecto,
         'postulaciones': postulaciones,

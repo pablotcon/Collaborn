@@ -46,6 +46,13 @@
                                 <input type="hidden" name="accion" value="rechazar">
                                 <button type="submit" class="btn btn-danger btn-sm">Rechazar</button>
                             </form>
+                            {% elif postulacion.estado == 'aceptada' %}
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="postulacion_id" value="{{ postulacion.id }}">
+                                <input type="hidden" name="accion" value="eliminar">
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
                             {% endif %}
                         </td>
                     </tr>

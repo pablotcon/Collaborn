@@ -6,6 +6,34 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'myapp/css/proyecto_detalle.css' %}">
+<style>
+    .card-aceptado {
+        background-color: #000000;
+        border: 1px solid #ffffff;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .card-aceptado img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+    }
+    .card-aceptado h5 {
+        margin: 10px 0 5px;
+        font-size: 1.1em;
+    }
+    .card-aceptado a {
+        color: #007bff;
+        text-decoration: none;
+    }
+    .card-aceptado a:hover {
+        text-decoration: underline;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -64,6 +92,35 @@
         </div>
     </div>
 
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header text-center">
+            <h5 class="mb-0">Colaboradores</h5>
+        </div>
+        <div class="card-body">
+            {% if aceptados %}
+                <div class="row">
+                    {% for aceptado in aceptados %}
+                        <div class="col-md-3 mb-4">
+                            <div class="card card-aceptado">
+                                <div class="card-body text-center">
+                                    {% if aceptado.usuario.perfil.avatar %}
+                                        <img src="{{ aceptado.usuario.perfil.avatar.url }}" alt="{{ aceptado.usuario.username }}">
+                                    {% else %}
+                                        <img src="{% static 'myapp/images/default_avatar.png' %}" alt="{{ aceptado.usuario.username }}">
+                                    {% endif %}
+                                    <h5 class="card-title">
+                                        <a href="{% url 'ver_perfil' aceptado.usuario.id %}">{{ aceptado.usuario.username }}</a>
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No hay postulantes aceptados.</p>
+            {% endif %}
+        </div>
+    </div>
     <div class="card card-comments mb-4 shadow-sm">
         <div class="card-header custom-header">
             <h5 class="mb-0">Comentarios</h5>
@@ -138,3 +195,5 @@
     });
 </script>
 {% endblock %}
+
+
