@@ -1,19 +1,51 @@
 {% extends 'myapp/base.html' %}
+{% load static %}
 
 {% block title %}Notificaciones{% endblock %}
 
 {% block content %}
-<h1>Notificaciones</h1>
-<ul class="list-group">
-    {% for notificacion in notificaciones %}
-    <li class="list-group-item {% if notificacion.leida %}list-group-item-secondary{% else %}list-group-item-info{% endif %}">
-        <a href="{{ notificacion.url }}">{{ notificacion.mensaje }}</a> - {{ notificacion.fecha_creacion }}
-        {% if notificacion.leida %}
-        <span class="badge badge-success">Leída</span>
-        {% else %}
-        <a href="{% url 'marcar_notificacion_leida' notificacion.id %}" class="btn btn-sm btn-primary">Marcar como leída</a>
-        {% endif %}
-    </li>
-    {% endfor %}
-</ul>
+<link rel="stylesheet" href="{% static 'css/notificaciones.css' %}">
+
+<div class="container">
+    <h2>Notificaciones</h2>
+    <ul class="list-group">
+        {% for notificacion in notificaciones %}
+        <li id="notificacion-{{ notificacion.id }}" class="list-group-item {% if notificacion.leida %}list-group-item-secondary{% else %}list-group-item-light{% endif %}">
+            <div class="notificacion-content">
+                <a href="{{ notificacion.url }}" class="notificacion-mensaje">{{ notificacion.mensaje }}</a>
+                <br>
+                <small class="notificacion-fecha">{{ notificacion.fecha_creacion|date:"d M Y H:i" }}</small>
+            </div>
+            <div class="notificacion-actions">
+                {% if notificacion.leida %}
+                <span class="badge badge-success">Leída</span>
+                {% else %}
+                <button class="btn btn-sm btn-outline-primary marcar-leida" data-id="{{ notificacion.id }}">Marcar como leída</button>
+                {% endif %}
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.marcar-leida').click(function() {
+            var notificacionId = $(this).data('id');
+            $.ajax({
+                url: "{% url 'marcar_notificacion_leida' 0 %}".replace(0, notificacionId),
+                method: "POST",
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#notificacion-' + notificacionId).fadeOut();
+                    }
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

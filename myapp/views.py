@@ -508,14 +508,15 @@ def notificaciones_ajax(request):
 def listar_notificaciones(request):
     notificaciones = Notificacion.objects.filter(receptor=request.user).order_by('-fecha_creacion')
     return render(request, 'myapp/notificaciones.html', {'notificaciones': notificaciones})
-
+from django.views.decorators.http import require_POST
 
 @login_required
+@require_POST
 def marcar_notificacion_leida(request, notificacion_id):
     notificacion = get_object_or_404(Notificacion, id=notificacion_id, receptor=request.user)
-    notificacion.leido = True
+    notificacion.leida = True
     notificacion.save()
-    return redirect(notificacion.url)
+    return JsonResponse({'success': True})
     
 @login_required
 def proyecto_lista(request):

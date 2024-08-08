@@ -1,0 +1,23 @@
+.dropdown-item {
+    padding: 10px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.dropdown-item p {
+    margin: 0;
+    color: #333;
+}
+
+.dropdown-item small {
+    color: #666;
+}
+
+.list-group-item-info {
+    background-color: #d9edf7;
+    color: #31708f;
+}
+
+.list-group-item-light {
+    background-color: #f7f7f7;
+    color: #333;
+}

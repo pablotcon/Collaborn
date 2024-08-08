@@ -1,0 +1,58 @@
+.container {
+    margin-top: 20px;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.list-group-item:hover {
+    background-color: #000000;
+}
+
+.list-group-item-secondary {
+    background-color: #000000;
+}
+
+.list-group-item-light {
+    background-color: #000000;
+}
+
+.notificacion-content {
+    flex-grow: 1;
+}
+
+.notificacion-actions {
+    margin-left: 20px;
+}
+
+.notificacion-actions .btn {
+    padding: 5px 10px;
+    font-size: 14px;
+}
+
+.notificacion-mensaje {
+    font-weight: bold;
+    color: #f5f368;
+    text-decoration: none;
+}
+
+.notificacion-mensaje:hover {
+    text-decoration: underline;
+}
+
+.notificacion-fecha {
+    font-size: 12px;
+    color: #fbff00;
+}
