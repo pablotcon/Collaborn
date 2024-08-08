@@ -685,9 +685,22 @@ def aceptar_postulacion(request, postulacion_id):
             receptor=postulacion.usuario,
             mensaje=f'Tu postulación al proyecto "{postulacion.proyecto.nombre}" ha sido aceptada.'
         )
+
         # Agregar colaborador al proyecto
-        postulacion.proyecto.colaboradores.add(postulacion.usuario)
-        postulacion.proyecto.save()
+        proyecto = postulacion.proyecto
+        usuario = postulacion.usuario
+        proyecto.colaboradores.add(usuario)
+        proyecto.save()
+        print(f"Usuario {usuario.id} añadido como colaborador al proyecto {proyecto.id}")
+        print(f"Colaboradores actuales en el proyecto {proyecto.id}: {list(proyecto.colaboradores.all())}")
+
+        # Registrar actividad en el historial
+        Actividad.objects.create(
+            usuario=usuario,
+            accion=f'Colaborador en el proyecto "{proyecto.nombre}"'
+        )
+        print(f"Actividad registrada para usuario {usuario.id}")
+    
     return redirect('proyecto_detalle', proyecto_id=postulacion.proyecto.id)
 ### RECHAZAR POSTULACION
 @login_required
@@ -979,6 +992,7 @@ def historial_actividades(request, user_id):
         'proyectos_creados': proyectos_creados,
         'proyectos_colaborados': proyectos_colaborados,
     })
+
 # User Authentication Functions
 def login_view(request):
     if request.method == 'POST':
