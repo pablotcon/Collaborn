@@ -24,9 +24,10 @@
                         <i class="fa fa-key"></i> Cambiar Contraseña
                     </a>
                 {% endif %}
-                <a href="{% url 'historial_actividades' %}" class="btn btn-info btn-custom">
+                <a href="{% url 'historial_actividades' usuario.id %}" class="btn btn-info btn-custom">
                     <i class="fa fa-history"></i> Historial de Actividades
                 </a>
+                
             </div>
         </div>
     </div>

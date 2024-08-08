@@ -79,7 +79,7 @@ urlpatterns = [
     path('mensajes/<int:user_id>/', views.ver_chat, name='ver_chat'),
 
     # Actividades
-    path('actividades/historial/', views.historial_actividades, name='historial_actividades'),
+    path('actividades/historial/<int:user_id>/', views.historial_actividades, name='historial_actividades'),
 
     # Admin Dashboard
     path('admin_panel/dashboard/', views.admin_dashboard, name='admin_dashboard'),

@@ -128,3 +128,14 @@ footer {
     text-align: center;
     margin-top: 40px;
 }
+
+.card-header {
+    font-size: 1.25rem;
+    font-weight: bold;
+    background-color: #333333; /* Fondo negro */
+    color: #f5f378; /* Texto amarillo */
+    padding: 10px;
+    text-align: center;
+}
+h2.card-title {
+    color: #f5f378; /* Color del texto */}

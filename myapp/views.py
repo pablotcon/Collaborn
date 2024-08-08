@@ -958,16 +958,23 @@ def cargar_mensajes(request):
     return JsonResponse({'success': False, 'error': 'Método no permitido.'}, status=405)
 # Functions related to Activities
 @login_required
-def historial_actividades(request):
-    actividades = Actividad.objects.filter(usuario=request.user).order_by('-fecha')
-    proyectos_creados = Proyecto.objects.filter(creador=request.user)
-    proyectos_colaborados = Proyecto.objects.filter(colaboradores=request.user)
+def historial_actividades(request, user_id):
+    usuario = get_object_or_404(User, id=user_id)
+    actividades = Actividad.objects.filter(usuario=usuario).order_by('-fecha')
+    proyectos_creados = Proyecto.objects.filter(creador=usuario)
+    proyectos_colaborados = Proyecto.objects.filter(colaboradores=usuario)
+    
+    # Imprimir en la consola para depuración
+    print("Proyectos creados:", proyectos_creados)
+    print("Proyectos colaborados:", proyectos_colaborados)
 
     return render(request, 'myapp/historial_actividades.html', {
+        'usuario': usuario,
         'actividades': actividades,
         'proyectos_creados': proyectos_creados,
         'proyectos_colaborados': proyectos_colaborados,
     })
+
 
 # User Authentication Functions
 def login_view(request):

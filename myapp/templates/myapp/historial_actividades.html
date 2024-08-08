@@ -1,62 +1,229 @@
 {% extends 'myapp/base.html' %}
+{% load static %}
+{% block title %}Historial de Actividades de {{ usuario.username }}{% endblock %}
+{% block extra_head %}
+    <style>
+    /* Estilos específicos para la página de historial de actividades */
+    .timeline-centered {
+        position: relative;
+        margin-bottom: 30px;
+    }
 
-{% block title %}Historial de Actividades{% endblock %}
+    .timeline-centered:before {
+        content: '';
+        position: absolute;
+        display: block;
+        width: 4px;
+        background: #000;
+        top: 20px;
+        bottom: 20px;
+        left: 50%;
+        margin-left: -2px;
+    }
 
+    .timeline-entry {
+        position: relative;
+        width: 50%;
+        float: left;
+        clear: both;
+    }
+
+    .timeline-entry:before,
+    .timeline-entry-inner:before {
+        content: '';
+        display: table;
+    }
+
+    .timeline-entry-inner {
+        position: relative;
+        margin-left: -3px;
+    }
+
+    .timeline-icon {
+        background: #fff;
+        color: #fff;
+        border-radius: 50%;
+        text-align: center;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        font-size: 18px;
+        border: 2px solid #d4d4d4;
+        position: absolute;
+        left: 50%;
+        top: 0;
+        margin-left: -20px;
+        z-index: 100;
+    }
+
+    .timeline-label {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 3px;
+        position: relative;
+        margin-left: 40px;
+        width: 90%;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .timeline-time {
+        font-size: 12px;
+        color: #777;
+        margin-top: 5px;
+        display: block;
+        text-align: right;
+    }
+
+    .timeline-entry.left {
+        float: right;
+    }
+
+    .timeline-entry.left .timeline-label {
+        left: auto;
+        right: 50%;
+        transform: translateX(50%);
+    }
+
+    /* Estilos adicionales para las tarjetas */
+    .card {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        font-size: 1.25rem;
+        font-weight: bold;
+        background-color: #333333; /* Fondo negro */
+        color: #f5f378; /* Texto amarillo */
+        padding: 10px;
+        text-align: center;
+    }
+
+    .card-body {
+        padding: 20px;
+        border: 1px solid #000000; /* Borde negro */
+        border-radius: 0 0 10px 10px;
+    }
+
+    .card-body h5 {
+        margin-top: 0;
+        font-size: 1.125rem;
+        color: #333333; /* Color del texto del contenido */
+    }
+
+    .card-body .timeline-centered .timeline-entry-inner {
+        margin-left: -3px;
+    }
+
+    .card-body .timeline-centered .timeline-label {
+        margin-left: 60px;
+        width: calc(100% - 60px);
+    }
+
+    .card-body .timeline-label time.timeline-time {
+        display: inline-block;
+        background-color: #ffc107;
+        padding: 2px 5px;
+        border-radius: 3px;
+        color: #000;
+        margin-top: 10px;
+    }
+
+    .timeline-label h4, .timeline-label h5 {
+        font-size: 1rem;
+        color: #f5f378; /* Color del texto de los proyectos */
+    }
+    </style>
+{% endblock %}
 {% block content %}
 <div class="container mt-5">
-    <h1>Historial de Actividades</h1>
-    <ul class="list-group">
-        {% for actividad in actividades %}
-        <li class="list-group-item">
-            {{ actividad.accion }} <em>{{ actividad.fecha }}</em>
-        </li>
-        {% endfor %}
-    </ul>
-
-    <h3>Proyectos Actuales</h3>
-    <div class="timeline-centered">
-        <h4>Proyectos Creados</h4>
-        {% for proyecto in proyectos_creados %}
-            <article class="timeline-entry">
-                <div class="timeline-entry-inner">
-                    <div class="timeline-icon bg-warning">
-                        <i class="entypo-folder"></i>
-                    </div>
-                    <div class="timeline-label">
-                        <h2>{{ proyecto.nombre }}</h2>
-                        <p>{{ proyecto.descripcion }}</p>
-                    </div>
-                    <time class="timeline-time" datetime="{{ proyecto.fecha_inicio }}">{{ proyecto.fecha_inicio|date:"d-m-Y" }} - 
-                        {% if proyecto.fecha_fin %}
-                            {{ proyecto.fecha_fin|date:"d-m-Y" }}
-                        {% else %}
-                            Actualmente
-                        {% endif %}
-                    </time>
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <h2 class="text-center">Historial de Actividades</h2>
+        </div>
+        <div class="col-md-12 mb-5">
+            <div class="timeline-centered">
+                {% for actividad in actividades %}
+                    <article class="timeline-entry">
+                        <div class="timeline-entry-inner">
+                            <div class="timeline-icon bg-primary">
+                                <i class="entypo-suitcase"></i>
+                            </div>
+                            <div class="timeline-label">
+                                <h4>{{ actividad.titulo }}</h4>
+                                <p>{{ actividad.descripcion }}</p>
+                                <time class="timeline-time" datetime="{{ actividad.fecha }}">{{ actividad.fecha|date:"d-m-Y" }}</time>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    Proyectos Creados
                 </div>
-            </article>
-        {% endfor %}
-        <h4>Proyectos Colaborados</h4>
-        {% for proyecto in proyectos_colaborados %}
-            <article class="timeline-entry">
-                <div class="timeline-entry-inner">
-                    <div class="timeline-icon bg-warning">
-                        <i class="entypo-folder"></i>
+                <div class="card-body">
+                    <div class="timeline-centered">
+                        {% for proyecto in proyectos_creados %}
+                            <article class="timeline-entry">
+                                <div class="timeline-entry-inner">
+                                    <div class="timeline-icon bg-info">
+                                        <i class="entypo-graduation-cap"></i>
+                                    </div>
+                                    <div class="timeline-label">
+                                        <h5>{{ proyecto.nombre }}</h5>
+                                        <time class="timeline-time" datetime="{{ proyecto.fecha_inicio }}">
+                                            {{ proyecto.fecha_inicio|date:"d-m-Y" }} - 
+                                            {% if proyecto.fecha_fin %}
+                                                {{ proyecto.fecha_fin|date:"d-m-Y" }}
+                                            {% else %}
+                                                Actualmente
+                                            {% endif %}
+                                        </time>
+                                    </div>
+                                </div>
+                            </article>
+                        {% endfor %}
                     </div>
-                    <div class="timeline-label">
-                        <h2>{{ proyecto.nombre }}</h2>
-                        <p>{{ proyecto.descripcion }}</p>
-                    </div>
-                    <time class="timeline-time" datetime="{{ proyecto.fecha_inicio }}">{{ proyecto.fecha_inicio|date:"d-m-Y" }} - 
-                        {% if proyecto.fecha_fin %}
-                            {{ proyecto.fecha_fin|date:"d-m-Y" }}
-                        {% else %}
-                            Actualmente
-                        {% endif %}
-                    </time>
                 </div>
-            </article>
-        {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    Proyectos Colaborados
+                </div>
+                <div class="card-body">
+                    <div class="timeline-centered">
+                        {% for proyecto in proyectos_colaborados %}
+                            <article class="timeline-entry">
+                                <div class="timeline-entry-inner">
+                                    <div class="timeline-icon bg-info">
+                                        <i class="entypo-graduation-cap"></i>
+                                    </div>
+                                    <div class="timeline-label">
+                                        <h5>{{ proyecto.nombre }}</h5>
+                                        <time class="timeline-time" datetime="{{ proyecto.fecha_inicio }}">
+                                            {{ proyecto.fecha_inicio|date:"d-m-Y" }} - 
+                                            {% if proyecto.fecha_fin %}
+                                                {{ proyecto.fecha_fin|date:"d-m-Y" }}
+                                            {% else %}
+                                                Actualmente
+                                            {% endif %}
+                                        </time>
+                                    </div>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
