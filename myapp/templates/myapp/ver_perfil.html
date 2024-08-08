@@ -2,12 +2,13 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}Perfil de {{ user.username }}{% endblock %}
+{% block title %}Perfil de {{ usuario.username }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/ver_perfil.css' %}">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@icon/entypo@1.0.3/entypo.css" rel="stylesheet">
+
 {% endblock %}
 
 {% block content %}
@@ -15,12 +16,14 @@
     <div class="row">
         <div class="col-md-12">
             <div class="btn-group-custom">
-                <a href="{% url 'editar_perfil' %}" class="btn btn-primary btn-custom">
-                    <i class="fa fa-edit"></i> Editar Perfil
-                </a>
-                <a href="{% url 'cambiar_password' %}" class="btn btn-secondary btn-custom">
-                    <i class="fa fa-key"></i> Cambiar Contraseña
-                </a>
+                {% if request.user == usuario %}
+                    <a href="{% url 'editar_perfil' %}" class="btn btn-primary btn-custom">
+                        <i class="fa fa-edit"></i> Editar Perfil
+                    </a>
+                    <a href="{% url 'cambiar_password' %}" class="btn btn-secondary btn-custom">
+                        <i class="fa fa-key"></i> Cambiar Contraseña
+                    </a>
+                {% endif %}
                 <a href="{% url 'historial_actividades' %}" class="btn btn-info btn-custom">
                     <i class="fa fa-history"></i> Historial de Actividades
                 </a>
@@ -37,10 +40,11 @@
                         {% else %}
                             <img src="{% static 'images/default-avatar.png' %}" alt="Avatar">
                         {% endif %}
+                        <div class="availability-status {% if not perfil.disponibilidad %}not-available{% endif %}">
+                            {{ perfil.disponibilidad|yesno:"Disponible,No disponible" }}
+                        </div>
                     </div>
-                    <div class="availability-status {% if not perfil.disponibilidad %}not-available{% endif %}">
-                        {{ perfil.disponibilidad|yesno:"Disponible,No disponible" }}
-                    </div>
+                    {% if request.user == usuario %}
                     <div class="availability-form">
                         <form method="post" action="">
                             {% csrf_token %}
@@ -54,7 +58,8 @@
                             </button>
                         </form>
                     </div>
-                    <h3>@{{ user.username }}</h3>
+                    {% endif %}
+                    <h3>@{{ usuario.username }}</h3>
                     <p>{{ perfil.nombre }} {{ perfil.apellido }}</p>
                     <div class="personal-info mt-4">
                         <h3>Información Personal</h3>

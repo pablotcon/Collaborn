@@ -395,8 +395,8 @@ def ver_mi_perfil(request):
 
 @login_required
 def ver_perfil(request, user_id):
-    user = get_object_or_404(User, id=user_id)
-    perfil = user.perfil
+    usuario = get_object_or_404(User, id=user_id)
+    perfil = usuario.perfil
 
     if request.method == 'POST':
         if 'toggle_disponibilidad' in request.POST:
@@ -406,17 +406,17 @@ def ver_perfil(request, user_id):
 
     experiencias = ExperienciaLaboral.objects.filter(perfil=perfil).order_by('-fecha_inicio')
     educaciones = Educacion.objects.filter(perfil=perfil).order_by('-fecha_inicio')
-    proyectos_creados = Proyecto.objects.filter(creador=user)
-    proyectos_colaborados = Proyecto.objects.filter(colaboradores=user)
+    proyectos_creados = Proyecto.objects.filter(creador=usuario)
+    proyectos_colaborados = Proyecto.objects.filter(colaboradores=usuario)
 
     return render(request, 'myapp/ver_perfil.html', {
+        'usuario': usuario,
         'perfil': perfil,
         'experiencias': experiencias,
         'educaciones': educaciones,
         'proyectos_creados': proyectos_creados,
         'proyectos_colaborados': proyectos_colaborados,
     })
-
 def filtrar_especialistas(request):
     query = request.GET.get('q', '')
     habilidades = request.GET.get('habilidades', '')
@@ -586,13 +586,11 @@ def proyecto_detalle(request, proyecto_id):
     else:
         form = ComentarioForm()
     
-    postulaciones = proyecto.postulacion_set.all()
     aceptados = proyecto.postulacion_set.filter(estado='aceptada')
     return render(request, 'myapp/proyecto_detalle.html', {
         'proyecto': proyecto, 
         'comentarios': comentarios, 
         'form': form,
-        'postulaciones': postulaciones,
         'aceptados': aceptados,
     })
 

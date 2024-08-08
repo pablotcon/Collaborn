@@ -14,38 +14,36 @@ urlpatterns = [
     path('perfil/', views.ver_mi_perfil, name='ver_mi_perfil'),
     path('perfil/editar/', views.editar_perfil, name='editar_perfil'),
     path('perfil/cambiar_password/', views.cambiar_password, name='cambiar_password'),
+    path('perfil/<int:user_id>/', views.ver_perfil, name='ver_perfil'),
 
-    path('buscar_especialistas/', views.buscar_especialistas, name='buscar_especialistas'),
-    path('especialistas/', views.listar_especialistas, name='listar_especialistas'),
-    path('especialistas/', views.filtrar_especialistas, name='filtrar_especialistas'),
-    path('especialistas/<int:especialista_id>/valorar/', views.valorar_especialista, name='valorar_especialista'),
-    path('proyectos/<int:proyecto_id>/recomendar/', views.recomendar_especialistas, name='recomendar_especialistas'),
-
-    # Experiencia y educación ###
-    path('experiencia/<int:pk>/editar/', views.editar_experiencia, name='editar_experiencia'),
-    path('experiencia/<int:pk>/eliminar/', views.eliminar_experiencia, name='eliminar_experiencia'),
-    path('educacion/<int:pk>/editar/', views.editar_educacion, name='editar_educacion'),
-    path('educacion/<int:pk>/eliminar/', views.eliminar_educacion, name='eliminar_educacion'),
-    
-    path('perfil/cambiar_password/', views.cambiar_password, name='cambiar_password'),
-
-    ### PROYECTOS ###
+    # Proyectos
     path('proyectos/', views.proyecto_lista, name='proyecto_lista'),
     path('proyectos/<int:proyecto_id>/', views.proyecto_detalle, name='proyecto_detalle'),
     path('proyectos/crear/', views.crear_proyecto, name='crear_proyecto'),
     path('proyectos/<int:pk>/editar/', views.proyecto_edit, name='proyecto_edit'),
     path('proyectos/<int:pk>/confirmar_eliminar/', views.confirmar_eliminar_proyecto, name='confirmar_eliminar_proyecto'),
     path('proyectos/<int:pk>/eliminar/', views.proyecto_delete, name='proyecto_delete'),
-    path('perfil/<int:user_id>/', views.ver_perfil, name='ver_perfil'),
-    
-    ### POSTULACIONES ###
+
+    # Postulaciones
     path('proyecto/<int:proyecto_id>/gestionar_postulaciones/', views.gestionar_postulaciones, name='gestionar_postulaciones'),
     path('proyectos/<int:proyecto_id>/postular/', views.postular_proyecto, name='postular_proyecto'),
     path('postulacion/aceptar/<int:postulacion_id>/', views.aceptar_postulacion, name='aceptar_postulacion'),
     path('postulacion/rechazar/<int:postulacion_id>/', views.rechazar_postulacion, name='rechazar_postulacion'),
     path('mis_postulaciones/', views.mis_postulaciones, name='mis_postulaciones'),
 
-    ### Tareas ###
+    # Experiencia y educación
+    path('experiencia/<int:pk>/editar/', views.editar_experiencia, name='editar_experiencia'),
+    path('experiencia/<int:pk>/eliminar/', views.eliminar_experiencia, name='eliminar_experiencia'),
+    path('educacion/<int:pk>/editar/', views.editar_educacion, name='editar_educacion'),
+    path('educacion/<int:pk>/eliminar/', views.eliminar_educacion, name='eliminar_educacion'),
+
+    # Especialistas
+    path('buscar_especialistas/', views.buscar_especialistas, name='buscar_especialistas'),
+    path('especialistas/', views.listar_especialistas, name='listar_especialistas'),
+    path('especialistas/<int:especialista_id>/valorar/', views.valorar_especialista, name='valorar_especialista'),
+    path('proyectos/<int:proyecto_id>/recomendar/', views.recomendar_especialistas, name='recomendar_especialistas'),
+
+    # Tareas
     path('tareas/<int:tarea_id>/actualizar_estado/', views.actualizar_estado_tarea, name='actualizar_estado_tarea'),
     path('tareas/agregar/<int:proyecto_id>/', views.agregar_tarea, name='agregar_tarea'),
     path('tareas/<int:tarea_id>/agregar_subtarea/', views.agregar_subtarea, name='agregar_subtarea'),
@@ -63,7 +61,6 @@ urlpatterns = [
     path('notificaciones/', views.listar_notificaciones, name='listar_notificaciones'),
     path('notificaciones/marcar_leida/<int:notificacion_id>/', views.marcar_notificacion_leida, name='marcar_notificacion_leida'),
     path('notificaciones/ajax/', views.notificaciones_ajax, name='notificaciones_ajax'),
-    path('proyectos/<int:proyecto_id>/', views.proyecto_detalle, name='proyecto_detalle'),
 
     # Recursos
     path('recursos/', views.listar_recursos, name='listar_recursos'),
@@ -80,7 +77,7 @@ urlpatterns = [
     path('mensajes/ocultar_conversacion/', views.ocultar_conversacion, name='ocultar_conversacion'),
     path('mensajes/cargar_mensajes/', views.cargar_mensajes, name='cargar_mensajes'),
     path('mensajes/<int:user_id>/', views.ver_chat, name='ver_chat'),
-    path('mensajes/', views.listar_mensajes, name='listar_mensajes'),
+
     # Actividades
     path('actividades/historial/', views.historial_actividades, name='historial_actividades'),
 
