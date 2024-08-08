@@ -27,6 +27,7 @@ urlpatterns = [
     # Postulaciones
     path('proyecto/<int:proyecto_id>/gestionar_postulaciones/', views.gestionar_postulaciones, name='gestionar_postulaciones'),
     path('proyectos/<int:proyecto_id>/postular/', views.postular_proyecto, name='postular_proyecto'),
+    path('postulaciones/aceptar/<int:postulacion_id>/', views.aceptar_postulacion, name='aceptar_postulacion'),
     path('postulacion/aceptar/<int:postulacion_id>/', views.aceptar_postulacion, name='aceptar_postulacion'),
     path('postulacion/rechazar/<int:postulacion_id>/', views.rechazar_postulacion, name='rechazar_postulacion'),
     path('mis_postulaciones/', views.mis_postulaciones, name='mis_postulaciones'),
@@ -80,7 +81,9 @@ urlpatterns = [
 
     # Actividades
     path('actividades/historial/<int:user_id>/', views.historial_actividades, name='historial_actividades'),
-
+    path('test/proyectos_colaborados/<int:user_id>/', views.test_proyectos_colaborados, name='test_proyectos_colaborados'),
+    path('verificar_relaciones/', views.verificar_relaciones, name='verificar_relaciones'),
+    
     # Admin Dashboard
     path('admin_panel/dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('admin_panel_tareas/', views.admin_panel_tareas, name='admin_panel_tareas'),

@@ -28,8 +28,7 @@ class Proyecto(models.Model):
         ('animales', 'Animales'),
     ], default='tecnologia')
     creador = models.ForeignKey(User, on_delete=models.CASCADE, related_name='proyectos_creados')
-    colaboradores = models.ManyToManyField(User, related_name='proyectos_colaborados', blank=True)
-
+    colaboradores = models.ManyToManyField(User, related_name='proyectos_colaborados')
     def __str__(self):
         return self.nombre
 

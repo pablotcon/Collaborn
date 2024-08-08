@@ -5,6 +5,7 @@ from .models import Tarea, Comentario, Notificacion, Actividad, Mensaje, Proyect
 from django.apps import AppConfig
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from .models import Postulacion, Proyecto
 
 import logging
 logger = logging.getLogger(__name__)
@@ -50,3 +51,11 @@ def registrar_actividad_tarea(sender, instance, created, **kwargs):
     else:
         accion = f"Actualizó la tarea: {instance.nombre}"
     Actividad.objects.create(usuario=instance.asignada_a, accion=accion)
+
+@receiver(post_save, sender=Postulacion)
+def actualizar_historial_colaboradores(sender, instance, **kwargs):
+    if instance.estado == 'aceptada':
+        proyecto = instance.proyecto
+        usuario = instance.usuario
+        proyecto.colaboradores.add(usuario)
+        proyecto.save()

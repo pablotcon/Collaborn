@@ -685,23 +685,9 @@ def aceptar_postulacion(request, postulacion_id):
             receptor=postulacion.usuario,
             mensaje=f'Tu postulación al proyecto "{postulacion.proyecto.nombre}" ha sido aceptada.'
         )
-
-        # Agregar colaborador al proyecto
-        proyecto = postulacion.proyecto
-        usuario = postulacion.usuario
-        proyecto.colaboradores.add(usuario)
-        proyecto.save()
-        print(f"Usuario {usuario.id} añadido como colaborador al proyecto {proyecto.id}")
-        print(f"Colaboradores actuales en el proyecto {proyecto.id}: {list(proyecto.colaboradores.all())}")
-
-        # Registrar actividad en el historial
-        Actividad.objects.create(
-            usuario=usuario,
-            accion=f'Colaborador en el proyecto "{proyecto.nombre}"'
-        )
-        print(f"Actividad registrada para usuario {usuario.id}")
-    
     return redirect('proyecto_detalle', proyecto_id=postulacion.proyecto.id)
+
+    
 ### RECHAZAR POSTULACION
 @login_required
 @permission_required('myapp.change_postulacion', raise_exception=True)
@@ -981,10 +967,9 @@ def historial_actividades(request, user_id):
     proyectos_creados = Proyecto.objects.filter(creador=usuario)
     proyectos_colaborados = Proyecto.objects.filter(colaboradores=usuario)
 
-    # Imprimir en la consola para depuración
-    print("Usuario:", usuario)
-    print("Proyectos creados:", list(proyectos_creados))
-    print("Proyectos colaborados:", list(proyectos_colaborados))
+    # Depuración
+    print(f"Proyectos creados por {usuario.username}: {list(proyectos_creados)}")
+    print(f"Proyectos colaborados por {usuario.username}: {list(proyectos_colaborados)}")
 
     return render(request, 'myapp/historial_actividades.html', {
         'usuario': usuario,
@@ -992,7 +977,6 @@ def historial_actividades(request, user_id):
         'proyectos_creados': proyectos_creados,
         'proyectos_colaborados': proyectos_colaborados,
     })
-
 # User Authentication Functions
 def login_view(request):
     if request.method == 'POST':
@@ -1104,3 +1088,38 @@ def notificar_mensaje(sender, instance, created, **kwargs):
                 url=url
             )
             logger.debug(f'Notificación creada para mensaje de {instance.emisor.username} a {receptor.username}')
+
+from django.http import HttpResponse
+
+@login_required
+def test_proyectos_colaborados(request, user_id):
+    usuario = get_object_or_404(User, id=user_id)
+    proyectos_colaborados = Proyecto.objects.filter(colaboradores=usuario)
+    response = f"Proyectos colaborados por {usuario.username}:<br>"
+    for proyecto in proyectos_colaborados:
+        response += f"- {proyecto.nombre} (Descripción: {proyecto.descripcion})<br>"
+    return HttpResponse(response)
+
+from django.http import HttpResponse
+from django.db import connection
+
+@login_required
+def verificar_relaciones(request):
+    proyecto_nombre = 'Rescate animales'  # Cambia esto según el nombre del proyecto que quieras verificar
+    query = """
+        SELECT user.username
+        FROM myapp_proyecto_colaboradores AS pc
+        JOIN auth_user AS user ON pc.user_id = user.id
+        JOIN myapp_proyecto AS proyecto ON pc.proyecto_id = proyecto.id
+        WHERE proyecto.nombre = %s
+    """
+    
+    with connection.cursor() as cursor:
+        cursor.execute(query, [proyecto_nombre])
+        rows = cursor.fetchall()
+
+    response = f"Colaboradores del proyecto '{proyecto_nombre}':<br>"
+    for row in rows:
+        response += f"- {row[0]}<br>"
+
+    return HttpResponse(response)
