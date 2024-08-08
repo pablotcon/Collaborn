@@ -19,6 +19,9 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.forms import modelformset_factory
+from django.core.paginator import Paginator
+
+
 
 @login_required
 def actualizar_disponibilidad(request):
@@ -36,21 +39,32 @@ def actualizar_disponibilidad(request):
 
 
 def listar_especialistas(request):
-    especialidad = request.GET.get('especialidad', '')
-    ubicacion = request.GET.get('ubicacion', '')
-    disponibilidad = request.GET.get('disponibilidad', 'True')  # Default to showing only available specialists
+    habilidad = request.GET.get('habilidad', '')
 
-    especialistas = User.objects.filter(perfil__disponibilidad=True)
+    especialistas = User.objects.exclude(id=request.user.id)  # Excluir al usuario logueado
 
-    if especialidad:
-        especialistas = especialistas.filter(perfil__especialidad__icontains=especialidad)
-    if ubicacion:
-        especialistas = especialistas.filter(perfil__ubicacion__icontains=ubicacion)
+    if habilidad:
+        especialistas = especialistas.filter(
+            perfil__habilidad_1__icontains=habilidad
+        ) | especialistas.filter(
+            perfil__habilidad_2__icontains=habilidad
+        ) | especialistas.filter(
+            perfil__habilidad_3__icontains=habilidad
+        )
+
+    paginator = Paginator(especialistas, 10)  # Mostrar 10 especialistas por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     context = {
-        'especialistas': especialistas
+        'page_obj': page_obj,
+        'habilidad': habilidad,
     }
     return render(request, 'myapp/listar_especialistas.html', context)
+
+
+
+
 
 #Busqueda Especialista:
 def buscar_especialistas(request):

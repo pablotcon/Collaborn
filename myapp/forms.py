@@ -39,13 +39,15 @@ class PerfilForm(forms.ModelForm):
         fields = [
             'nombre', 'apellido', 'telefono', 'fecha_nacimiento', 'avatar',
             'website', 'twitter', 'facebook', 'linkedin', 'habilidad_1',
-            'habilidad_2', 'habilidad_3', 'experiencia', 'disponibilidad'
+            'habilidad_2', 'habilidad_3', 'experiencia', 'especialidad', 'ubicacion', 'disponibilidad'
         ]
         widgets = {
             'habilidad_1': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Habilidad 1'}),
             'habilidad_2': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Habilidad 2'}),
             'habilidad_3': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Habilidad 3'}),
             'experiencia': forms.Textarea(attrs={'rows': 5}),
+            'especialidad': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Especialidad'}),
+            'ubicacion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ubicación'}),
             'disponibilidad': forms.CheckboxInput(),
             'website': forms.URLInput(attrs={'placeholder': 'No disponible'}),
             'twitter': forms.URLInput(attrs={'placeholder': 'No disponible'}),
