@@ -1040,8 +1040,17 @@ def logout_view(request):
 
 @login_required
 def index(request):
-    nuevos_mensajes = Mensaje.objects.filter(receptor=request.user, leido=False).count()
-    return render(request, 'myapp/index.html', {'nuevos_mensajes': nuevos_mensajes})
+    # Seleccionar usuarios destacados basados en el número de proyectos en los que han colaborado.
+    usuarios_destacados = User.objects.annotate(num_proyectos_colaborados=Count('proyectos_colaborados')).order_by('-num_proyectos_colaborados')[:5]
+    
+    # Seleccionar proyectos destacados basados en el número de colaboradores.
+    proyectos_destacados = Proyecto.objects.annotate(num_colaboradores=Count('colaboradores')).order_by('-num_colaboradores')[:5]
+
+    context = {
+        'especialistas_destacados': usuarios_destacados,
+        'proyectos_destacados': proyectos_destacados,
+    }
+    return render(request, 'myapp/index.html', context)
 
 # Signal to save user profile upon user creation
 @receiver(post_save, sender=User)

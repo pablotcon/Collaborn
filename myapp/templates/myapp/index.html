@@ -1,6 +1,6 @@
 {% extends "myapp/base.html" %}
 {% load static %}
-{% block title %}Home - Colaborize{% endblock %}
+{% block title %}Home - Collaborize{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
@@ -10,14 +10,66 @@
 <section class="hero">
     <div class="hero-text">
         <h5>#2 Trending</h5>
-        <h4>Lideres en el mercado</h4>
+        <h4>Líderes en el mercado</h4>
         <h1>¿Buscas ser parte de algo?</h1>
-        <p>Se parte de la revolucion de Colaborize, <br> Publica tus Proyectos o necesidades para <br> que gente capacitada pueda hecharte una mano</p>
+        <p>Se parte de la revolución de Collaborize,<br> Publica tus proyectos o necesidades para<br> que gente capacitada pueda ayudarte.</p>
         <a href="#">Comparte</a>
-        <a href="#" class="ctaa"><i class="ri-play-fill"></i>Aprende Como</a>
+        <a href="#" class="ctaa"><i class="ri-play-fill"></i>Aprende Cómo</a>
     </div>
     <div class="hero-img">
         <img src="{% static 'img/main.png' %}" alt="Main Image">
+    </div>
+</section>
+
+<!-- Sección de Proyectos Destacados -->
+<section id="projects" class="featured">
+    <h2>Proyectos Destacados</h2>
+    <div class="row">
+        {% for proyecto in proyectos_destacados %}
+        <div class="col-md-4">
+            <div class="card">
+                <img src="{% if proyecto.imagen %}{{ proyecto.imagen.url }}{% else %}https://picsum.photos/1000/1000{% endif %}" alt="{{ proyecto.nombre }}" class="card-img-top">
+                <div class="card-body">
+                    <h5 class="card-title">{{ proyecto.nombre }}</h5>
+                    <p class="card-text">{{ proyecto.descripcion|truncatewords:15 }}</p>
+                    <a href="{% url 'proyecto_detalle' proyecto.id %}" class="btn btn-primary">Ver Proyecto</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Sección de Especialistas Destacados -->
+<section id="specialists" class="featured">
+    <h2>Especialistas Destacados</h2>
+    <div class="row">
+        {% for usuario in especialistas_destacados %}
+        <div class="col-md-4">
+            <div class="card">
+                {% if usuario.perfil.avatar %}
+                    <img src="{{ usuario.perfil.avatar.url }}" class="card-img-top" alt="Avatar de {{ usuario.first_name }}">
+                {% else %}
+                    <img src="{% static 'images/default_avatar.png' %}" class="card-img-top" alt="Avatar de {{ usuario.first_name }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'ver_perfil' usuario.perfil.user.id %}">
+                            {{ usuario.perfil.nombre }} {{ usuario.perfil.apellido }}
+                        </a>
+                    </h5>
+                    <div class="habilidades">
+                        <h6>Habilidades:</h6>
+                        <ul class="list-unstyled">
+                            {% if usuario.perfil.habilidad_1 %}<li>{{ usuario.perfil.habilidad_1 }}</li>{% endif %}
+                            {% if usuario.perfil.habilidad_2 %}<li>{{ usuario.perfil.habilidad_2 }}</li>{% endif %}
+                            {% if usuario.perfil.habilidad_3 %}<li>{{ usuario.perfil.habilidad_3 }}</li>{% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
 </section>
 
@@ -28,6 +80,40 @@
 </div>
 
 <div class="scroll-down">
-    <a href="#"><i class="ri-arrow-down-s-fill"></i></a>
+    <a href="#projects"><i class="ri-arrow-down-s-fill"></i></a>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/ScrollTrigger.min.js"></script>
+<script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.from(".hero-text", { duration: 1.5, y: -50, opacity: 0, ease: "power2.out" });
+
+    gsap.from("#projects .card", {
+        scrollTrigger: {
+            trigger: "#projects",
+            start: "top 80%",
+        },
+        duration: 1,
+        y: 100,
+        opacity: 0,
+        stagger: 0.3,
+        ease: "power2.out"
+    });
+
+    gsap.from("#specialists .card", {
+        scrollTrigger: {
+            trigger: "#specialists",
+            start: "top 80%",
+        },
+        duration: 1,
+        y: 100,
+        opacity: 0,
+        stagger: 0.3,
+        ease: "power2.out"
+    });
+</script>
 {% endblock %}
