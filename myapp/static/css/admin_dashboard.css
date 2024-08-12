@@ -37,8 +37,28 @@ h1 {
 }
 
 .card {
-    border: none;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card.bg-dark {
+    background-color: #343a40 !important; /* Fondo gris oscuro */
+    color: #000 !important; /* Texto negro */
+}
+
+.card.bg-success {
+    background-color: #28a745 !important; /* Verde */
+    color: #000 !important; /* Texto negro */
+}
+
+.card.bg-warning {
+    background-color: #ffc107 !important; /* Amarillo oscuro */
+    color: #000 !important; /* Texto negro */
+}
+
+.card.bg-danger {
+    background-color: #dc3545 !important; /* Rojo */
+    color: #000 !important; /* Texto negro */
 }
 
 /* Transiciones suaves */
@@ -48,5 +68,5 @@ h1 {
 
 /* Efecto de sombra al pasar el mouse sobre las tarjetas */
 .card:hover {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }

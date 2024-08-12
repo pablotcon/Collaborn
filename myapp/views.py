@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
-from django.db.models import Q
+from django.db.models import Q , Count
 from django.contrib import messages
 from .models import Proyecto, Postulacion, User, Notificacion, Mensaje, Recurso, Perfil, Comentario, Tarea, Actividad, SeguimientoTarea, Subtarea, Educacion, ExperienciaLaboral
 from .forms import RecursoForm, PerfilForm, ComentarioForm, UserForm, MensajeForm, ProyectoForm, TareaForm, SeguimientoTareaForm,EducacionFormSet, ExperienciaLaboralFormSet, EducacionForm, SubtareaForm, ComentarioTareaForm, ExperienciaLaboralForm,ValoracionForm, BusquedaEspecialistaForm,DisponibilidadForm
@@ -462,6 +462,7 @@ def dashboard_especialista(request):
         'postulaciones': postulaciones,
         'proyectos': proyectos,
     })
+
 
 @login_required
 def valorar_especialista(request, especialista_id):
@@ -1050,16 +1051,21 @@ def save_user_profile(sender, instance, **kwargs):
 
 
 #ADMIN DASHBOARD
-
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def admin_dashboard(request):
     query = request.GET.get('q', '')
     filtro = request.GET.get('filtro', 'todos')
-    
-    proyectos = Proyecto.objects.all()
-    tareas = Tarea.objects.all()
+    fecha_inicio = request.GET.get('fecha_inicio', '')
+    fecha_fin = request.GET.get('fecha_fin', '')
+    usuario_id = request.GET.get('usuario', '')
+    page = request.GET.get('page', 1)
 
+    # Optimizar consultas usando select_related y prefetch_related
+    proyectos = Proyecto.objects.all().select_related('creador').prefetch_related('tareas').order_by('fecha_inicio')
+    tareas = Tarea.objects.all().select_related('asignada_a')
+
+    # Filtrar proyectos y tareas según el término de búsqueda (query)
     if query:
         proyectos = proyectos.filter(
             Q(nombre__icontains=query) | Q(descripcion__icontains=query)
@@ -1068,22 +1074,56 @@ def admin_dashboard(request):
             Q(nombre__icontains=query) | Q(descripcion__icontains=query)
         )
 
+    # Filtrar por estado (filtro)
     if filtro == 'activos':
         proyectos = proyectos.filter(fecha_fin__gt=timezone.now())
     elif filtro == 'completados':
         proyectos = proyectos.filter(fecha_fin__lte=timezone.now())
 
+    # Filtrar por fecha de inicio y fin
+    if fecha_inicio:
+        proyectos = proyectos.filter(fecha_inicio__gte=fecha_inicio)
+    if fecha_fin:
+        proyectos = proyectos.filter(fecha_fin__lte=fecha_fin)
+
+    # Filtrar por usuario asignado
+    if usuario_id:
+        tareas = tareas.filter(asignada_a_id=usuario_id)
+
+    # Contar tareas por estado
+    tareas_completadas = tareas.filter(completada=True).count()
+    tareas_pendientes = tareas.filter(completada=False).count()
+
+    # Obtener el número total de proyectos y tareas
+    total_proyectos = proyectos.count()
+    total_tareas = tareas.count()
+
+    # Paginación de proyectos
+    paginator = Paginator(proyectos, 10)  # 10 proyectos por página
+    proyectos_page = paginator.get_page(page)
+
+    # Obtener lista de usuarios para el filtro
+    usuarios = User.objects.all()
+
     context = {
-        'proyectos': proyectos,
+        'proyectos': proyectos_page,
         'tareas': tareas,
         'proyectos_activos': proyectos.filter(fecha_fin__gt=timezone.now()).count(),
         'proyectos_completados': proyectos.filter(fecha_fin__lte=timezone.now()).count(),
-        'tareas_pendientes': tareas.filter(completada=False).count(),
-        'tareas_completadas': tareas.filter(completada=True).count(),
+        'tareas_pendientes': tareas_pendientes,
+        'tareas_completadas': tareas_completadas,
+        'total_proyectos': total_proyectos,
+        'total_tareas': total_tareas,
+        'usuarios': usuarios,
         'query': query,
         'filtro': filtro,
+        'fecha_inicio': fecha_inicio,
+        'fecha_fin': fecha_fin,
+        'usuario_id': usuario_id,
+        'page': page,
     }
     return render(request, 'myapp/admin_dashboard.html', context)
+
 
 @login_required
 def ver_chat(request, user_id):
