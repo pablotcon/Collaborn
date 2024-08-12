@@ -541,18 +541,24 @@ def proyecto_lista(request):
     categoria = request.GET.get('category', 'Todos')
     categories = Proyecto.objects.exclude(categoria__isnull=True).exclude(categoria__exact='').values_list('categoria', flat=True).distinct()
 
+    # Filtrado de proyectos según la búsqueda y la categoría
+    proyectos = Proyecto.objects.all()  # Obtener todos los proyectos
+
     if query:
-        proyectos = Proyecto.objects.filter(
+        proyectos = proyectos.filter(
             Q(nombre__icontains=query) | Q(descripcion__icontains=query)
         )
-    else:
-        proyectos = Proyecto.objects.all()
 
     if categoria != 'Todos':
         proyectos = proyectos.filter(categoria=categoria)
 
+    # Implementación de la paginación
+    paginator = Paginator(proyectos, 10)  # Mostrar 10 proyectos por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'myapp/proyecto_lista.html', {
-        'proyectos': proyectos,
+        'page_obj': page_obj,
         'categories': categories,
     })
 

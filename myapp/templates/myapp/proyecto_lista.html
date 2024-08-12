@@ -3,16 +3,11 @@
 
 {% block title %}Lista de Proyectos{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/proyecto_lista.css' %}">
+{% endblock %}
+
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Proyectos</title>
-    <link rel="stylesheet" href="{% static 'css/proyecto_lista.css' %}">
-</head>
-<body>
 <section class="light">
     <div class="container py-2">
       
@@ -28,32 +23,72 @@
                 {% endfor %}
             </ul>
         </div>
-        {% for proyecto in proyectos %}
-        <article class="postcard light blue">
-            <a class="postcard__img_link" href="{% url 'proyecto_detalle' proyecto.id %}">
-                <img class="postcard__img" src="{% if proyecto.imagen %}{{ proyecto.imagen.url }}{% else %}https://picsum.photos/1000/1000{% endif %}" alt="Project Image" />
-            </a>
-            <div class="postcard__text t-dark">
-                <h1 class="postcard__title blue"><a href="{% url 'proyecto_detalle' proyecto.id %}">{{ proyecto.nombre }}</a></h1>
-                <div class="postcard__subtitle small">
-                    <time datetime="{{ proyecto.fecha_creacion }}">
-                        <i class="fas fa-calendar-alt mr-2"></i>{{ proyecto.fecha_creacion }}
-                    </time>
+
+        <!-- Iteración sobre los proyectos paginados -->
+        {% if page_obj.object_list %}
+            {% for proyecto in page_obj.object_list %}
+            <article class="postcard light blue">
+                <a class="postcard__img_link" href="{% url 'proyecto_detalle' proyecto.id %}">
+                    <img class="postcard__img" src="{% if proyecto.imagen %}{{ proyecto.imagen.url }}{% else %}https://picsum.photos/1000/1000{% endif %}" alt="Project Image" />
+                </a>
+                <div class="postcard__text t-dark">
+                    <h1 class="postcard__title blue"><a href="{% url 'proyecto_detalle' proyecto.id %}">{{ proyecto.nombre }}</a></h1>
+                    <div class="postcard__subtitle small">
+                        <time datetime="{{ proyecto.fecha_creacion }}">
+                            <i class="fas fa-calendar-alt mr-2"></i>{{ proyecto.fecha_creacion }}
+                        </time>
+                    </div>
+                    <div class="postcard__bar"></div>
+                    <div class="postcard__preview-txt">{{ proyecto.descripcion }}</div>
+                    <ul class="postcard__tagbox">
+                        <li class="tag__item"><i class="fas fa-tag mr-2"></i>{{ proyecto.categoria }}</li>
+                        <li class="tag__item"><i class="fas fa-clock mr-2"></i>{{ proyecto.fecha_fin }} mins.</li>
+                        <li class="tag__item play blue">
+                            <a href="{% url 'proyecto_detalle' proyecto.id %}"><i class="fas fa-play mr-2"></i>Ver Proyecto</a>
+                        </li>
+                    </ul>
                 </div>
-                <div class="postcard__bar"></div>
-                <div class="postcard__preview-txt">{{ proyecto.descripcion }}</div>
-                <ul class="postcard__tagbox">
-                    <li class="tag__item"><i class="fas fa-tag mr-2"></i>{{ proyecto.categoria }}</li>
-                    <li class="tag__item"><i class="fas fa-clock mr-2"></i>{{ proyecto.fecha_fin }} mins.</li>
-                    <li class="tag__item play blue">
-                        <a href="{% url 'proyecto_detalle' proyecto.id %}"><i class="fas fa-play mr-2"></i>Ver Proyecto</a>
-                    </li>
-                </ul>
-            </div>
-        </article>
-        {% endfor %}
+            </article>
+            {% endfor %}
+        {% else %}
+            <p>No se encontraron proyectos.</p>
+        {% endif %}
+
+        <!-- Controles de Paginación -->
+        <nav aria-label="Page navigation" class="my-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&category={{ request.GET.category }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link" aria-hidden="true">&laquo;</span>
+                </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}&q={{ request.GET.q }}&category={{ request.GET.category }}">{{ num }}</a>
+                </li>
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&category={{ request.GET.category }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link" aria-hidden="true">&raquo;</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+
     </div>
 </section>
-</body>
-</html>
 {% endblock %}

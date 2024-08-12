@@ -162,6 +162,43 @@
         {% block content %}{% endblock %} <!-- Bloque de contenido -->
     </main>
 
+    {% block footer %}
+    <footer class="bg-dark text-light py-4">
+        <div class="container">
+            <div class="row">
+                <!-- Sección de enlaces -->
+                <div class="col-md-4">
+                    <h5>Secciones</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'index' %}" class="text-light">Inicio</a></li>
+                        <li><a href="{% url 'proyecto_lista' %}" class="text-light">Proyectos</a></li>
+                        <li><a href="{% url 'listar_recursos' %}" class="text-light">Recursos</a></li>
+                        <li><a href="{% url 'listar_especialistas' %}" class="text-light">Especialistas</a></li>
+                    </ul>
+                </div>
+                <!-- Sección de contacto -->
+                <div class="col-md-4">
+                    <h5>Contacto</h5>
+                    <p><i class="fas fa-envelope"></i> info@collaborize.com</p>
+                    <p><i class="fas fa-phone"></i> +123 456 7890</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Calle Portales #505, Hualqui, Chile</p>
+                </div>
+                <!-- Sección de redes sociales -->
+                <div class="col-md-4">
+                    <h5>Redes Sociales</h5>
+                    <a href="#" class="text-light me-3"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-light me-3"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-light me-3"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-light"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <p>&copy; 2024 Collaborize. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+    {% endblock %}
+
     <!-- Carga de scripts JavaScript desde CDNs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
