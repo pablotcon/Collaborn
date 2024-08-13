@@ -7,84 +7,98 @@
 {% endblock %}
 
 {% block content %}
-<h2>Especialistas</h2>
-<form method="GET" action="{% url 'listar_especialistas' %}" class="mb-4">
-    <div class="row">
-        <div class="col-md-9">
-            <input type="text" name="habilidad" class="form-control" placeholder="Habilidad" value="{{ habilidad }}">
+<div class="especialistas-container">
+    <h2 class="text-center">Especialistas</h2> <!-- Centrar el título -->
+    <form method="GET" action="{% url 'listar_especialistas' %}" class="mb-4 d-flex justify-content-center"> <!-- Centrando la barra de búsqueda -->
+        <div class="row w-75">
+            <div class="col-md-9">
+                <input type="text" name="habilidad" class="form-control" placeholder="Habilidad" value="{{ habilidad }}">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">Buscar</button> <!-- Botón de búsqueda centrado -->
+            </div>
         </div>
-        <div class="col-md-3">
-            <button type="submit" class="btn btn-primary">Buscar</button>
-        </div>
-    </div>
-</form>
+    </form>
 
-<div class="row especialistas-container">
-    {% for especialista in page_obj %}
-    <div class="col-md-4">
-        <div class="card mb-4">
-            {% if especialista.perfil.avatar %}
-                <img src="{{ especialista.perfil.avatar.url }}" class="card-img-top" alt="Avatar de {{ especialista.first_name }}">
-            {% else %}
-                <img src="{% static 'images/default_avatar.png' %}" class="card-img-top" alt="Avatar de {{ especialista.first_name }}">
-            {% endif %}
-            <div class="card-body">
-                <h5 class="card-title">
-                    <a href="{% url 'ver_perfil' especialista.perfil.user.id %}">
-                        {{ especialista.perfil.nombre }} {{ especialista.perfil.apellido }}
-                    </a>
-                </h5>
-                <div class="habilidades">
-                    <h6>Habilidades:</h6>
-                    <ul class="list-unstyled">
-                        {% if especialista.perfil.habilidad_1 %}<li>{{ especialista.perfil.habilidad_1 }}</li>{% endif %}
-                        {% if especialista.perfil.habilidad_2 %}<li>{{ especialista.perfil.habilidad_2 }}</li>{% endif %}
-                        {% if especialista.perfil.habilidad_3 %}<li>{{ especialista.perfil.habilidad_3 }}</li>{% endif %}
-                    </ul>
+    <div class="row justify-content-center">
+        {% for especialista in page_obj %}
+        <div class="col-md-4">
+            <div class="card specialist-card mb-4">
+                <div class="card-header">
+                    {% if especialista.perfil.avatar %}
+                        <img src="{{ especialista.perfil.avatar.url }}" class="card-img-top" alt="Avatar de {{ especialista.first_name }}">
+                    {% else %}
+                        <img src="{% static 'images/default_avatar.png' %}" class="card-img-top" alt="Avatar de {{ especialista.first_name }}">
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <span class="pro-badge">PRO</span>
+                    <h5 class="card-title">
+                        <a href="{% url 'ver_perfil' especialista.perfil.user.id %}">
+                            {{ especialista.perfil.nombre }} {{ especialista.perfil.apellido }}
+                        </a>
+                    </h5>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">Message</button>
+                    </div>
+                    <div class="skills">
+                        <h6>Skills:</h6>
+                        <ul class="list-unstyled">
+                            {% if especialista.perfil.habilidad_1 %}
+                                <li><i class="fas fa-code"></i> {{ especialista.perfil.habilidad_1 }}</li>
+                            {% endif %}
+                            {% if especialista.perfil.habilidad_2 %}
+                                <li><i class="fas fa-cogs"></i> {{ especialista.perfil.habilidad_2 }}</li>
+                            {% endif %}
+                            {% if especialista.perfil.habilidad_3 %}
+                                <li><i class="fas fa-database"></i> {{ especialista.perfil.habilidad_3 }}</li>
+                            {% endif %}
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
 
-<div class="pagination">
-    <ul class="pagination">
-        {% if page_obj.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?{% if habilidad %}habilidad={{ habilidad }}&{% endif %}page=1">Primero</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?{% if habilidad %}habilidad={{ habilidad }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
-            </li>
-        {% else %}
-            <li class="page-item disabled">
-                <a class="page-link">Primero</a>
-            </li>
-            <li class="page-item disabled">
-                <a class="page-link">Anterior</a>
-            </li>
-        {% endif %}
+    <div class="pagination justify-content-center"> <!-- Centrando la paginación -->
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% if habilidad %}habilidad={{ habilidad }}&{% endif %}page=1">Primero</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?{% if habilidad %}habilidad={{ habilidad }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link">Primero</a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link">Anterior</a>
+                </li>
+            {% endif %}
 
-        <li class="page-item disabled">
-            <a class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</a>
-        </li>
+            <li class="page-item disabled">
+                <a class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</a>
+            </li>
 
-        {% if page_obj.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?{% if habilidad %}habilidad={{ habilidad }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?{% if habilidad %}habilidad={{ habilidad }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Último</a>
-            </li>
-        {% else %}
-            <li class="page-item disabled">
-                <a class="page-link">Siguiente</a>
-            </li>
-            <li class="page-item disabled">
-                <a class="page-link">Último</a>
-            </li>
-        {% endif %}
-    </ul>
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% if habilidad %}habilidad={{ habilidad }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?{% if habilidad %}habilidad={{ habilidad }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Último</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link">Siguiente</a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link">Último</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
 </div>
 {% endblock %}

@@ -1,66 +1,124 @@
-.especialistas-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
+body {
+    background-color: #000000; /* Fondo de la página */
 }
 
-.card {
+.specialist-card {
+    background-color: #000000;
+    border-radius: 15px;
+    padding: 20px;
+    color: #fffb00;
+    text-align: center;
     width: 100%;
     max-width: 300px;
-    margin: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
+    margin: 20px auto;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5); /* Sombra más pronunciada */
+    transition: transform 0.3s ease-in-out; /* Efecto de transición suave */
+    border: 3px solid;
+    border-image: linear-gradient(45deg, #ffcc00, #fffb00) 1;
 }
 
-.card:hover {
-    transform: scale(1.02);
+.specialist-card:hover {
+    transform: scale(1.05); /* Efecto de agrandamiento al pasar el ratón */
 }
 
-.card-img-top {
-    height: 200px;
+.specialist-card .card-header {
+    margin-bottom: 15px;
+    background-color: #000000; /* Fondo negro detrás de la imagen */
+}
+
+.specialist-card .card-body {
+    background-color: #000000; /* Fondo negro para el cuerpo de la tarjeta */
+    color: #fffb00; /* Texto en amarillo */
+}
+
+.specialist-card .card-img-top {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
     object-fit: cover;
+    margin: 0 auto;
+    border: 3px solid #ffcc00;
 }
 
-.card-body {
-    text-align: center;
-}
-
-.card-title {
-    font-size: 1.25rem;
+.specialist-card .pro-badge {
+    background-color: #ffcc00;
+    color: #000000;
+    padding: 5px 10px;
+    border-radius: 20px;
     font-weight: bold;
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: bounce 2s infinite;
 }
 
-.card-text {
-    color: #555;
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateX(-50%) translateY(0);
+    }
+    40% {
+        transform: translateX(-50%) translateY(-10px);
+    }
+    60% {
+        transform: translateX(-50%) translateY(-5px);
+    }
 }
 
-
-.pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.pagination .page-item {
-    margin: 0 5px;
-}
-
-.pagination .page-link {
-    border: 1px solid #ddd;
-    padding: 10px 15px;
-    border-radius: 5px;
-    color: #007bff;
+.specialist-card .card-title a {
+    color: #fffb00;
     text-decoration: none;
+    font-size: 1.5em;
 }
 
-.pagination .page-link:hover {
-    background-color: #f8f9fa;
-    border-color: #007bff;
+.specialist-card .card-title a:hover {
+    color: #ffcc00;
 }
 
-.pagination .disabled .page-link {
-    color: #6c757d;
-    pointer-events: none;
-    background-color: #fff;
-    border-color: #ddd;
+.specialist-card .action-buttons .btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    border-radius: 30px;
+    background-color: #ffcc00;
+    border: 2px solid #fffb00; /* Borde más grueso */
+    color: #000000;
+    font-size: 1em;
+    box-shadow: 0 4px 8px rgba(255, 255, 0, 0.4); /* Sombra en los botones */
+    transition: background-color 0.3s, transform 0.3s ease-in-out;
+}
+
+.specialist-card .btn:hover {
+    background-color: #e6b800;
+    border-color: #e6b800;
+    transform: translateY(-3px); /* Efecto de levantar al hacer hover */
+}
+
+.specialist-card .skills {
+    margin-top: 15px;
+}
+
+.specialist-card .skills h6 {
+    color: #ffcc00;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}
+
+.specialist-card .skills ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.specialist-card .skills ul li {
+    display: inline-block;
+    background-color: #ffcc00;
+    padding: 5px 10px;
+    border-radius: 20px;
+    margin: 5px 3px;
+    font-size: 0.9em;
+    color: #000000;
+    transition: transform 0.3s ease-in-out;
+}
+
+.specialist-card .skills ul li:hover {
+    transform: scale(1.1); /* Aumenta ligeramente el tamaño al pasar el ratón */
 }
