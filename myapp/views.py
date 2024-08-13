@@ -898,6 +898,7 @@ def enviar_mensaje(request):
 
 def eliminar_mensaje(request, mensaje_id):
     if request.method == 'POST':
+           
         try:
             mensaje = Mensaje.objects.get(id=mensaje_id, emisor=request.user)
             mensaje.delete()
