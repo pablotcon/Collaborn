@@ -10,8 +10,7 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="text-center">Mensajes</h1>
-
+    
     <div class="row">
         <div class="col-md-3">
             <div class="user-list">
@@ -241,7 +240,6 @@
                                             event.preventDefault();
                                             var form = $(this).closest('form')[0];
                                             var formData = new FormData(form);
-                                            var chatWindowId = $(this).closest('.chat-window').attr('id');
                                             var chatWindowMessages = $(this).closest('.chat-window').find('.messages');
 
                                             $.ajax({
@@ -251,25 +249,57 @@
                                                 processData: false,
                                                 contentType: false,
                                                 success: function(response) {
-                                                    var messageHtml = '<div class="chat-message sent">' +
-                                                        '<div>' +
-                                                        '<strong>Tú</strong>: ' + (response.contenido ? response.contenido : '') + '<br>' +
-                                                        '<small>' + response.fecha_envio + '</small>' +
-                                                        '</div>';
-                                                    if (response.imagen_url) {
-                                                        messageHtml += '<div><img src="' + response.imagen_url + '" alt="Imagen del mensaje"></div>';
+                                                    if (response.id) {
+                                                        var messageHtml = '<div class="chat-message sent" data-mensaje-id="' + response.id + '">' +
+                                                            '<div>' +
+                                                            '<strong>Tú</strong>: ' + response.contenido + '<br>' +
+                                                            '<small>' + response.fecha_envio + '</small>' +
+                                                            '</div>';
+                                                        if (response.imagen_url) {
+                                                            messageHtml += '<div><img src="' + response.imagen_url + '" alt="Imagen del mensaje"></div>';
+                                                        }
+                                                        messageHtml += '<div class="mt-2">' +
+                                                            '<button type="button" class="btn btn-sm btn-danger" data-mensaje-id="' + response.id + '"><i class="fas fa-trash"></i> Eliminar</button>' +
+                                                            '</div>' +
+                                                            '</div>';
+
+                                                        chatWindowMessages.append(messageHtml);
+                                                        $(form).find('textarea').val('');
+                                                        $(form).find('input[type="file"]').val('');
+                                                        chatWindowMessages.scrollTop(chatWindowMessages[0].scrollHeight);
+
+                                                        // Reasigna el evento de eliminación
+                                                        $('button[data-mensaje-id="' + response.id + '"]').on('click', function() {
+                                                            var mensajeId = $(this).data('mensaje-id');
+                                                            console.log("Eliminando mensaje con ID: " + mensajeId); // Coloca esto aquí
+                                                            if (mensajeId) {
+                                                                $.ajax({
+                                                                    type: 'POST',
+                                                                    url: "{% url 'eliminar_mensaje' mensaje_id=0 %}".replace('0', mensajeId),
+                                                                    data: {
+                                                                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                                                    },
+                                                                    success: function(response) {
+                                                                        if (response.success) {
+                                                                            $('div[data-id="' + mensajeId + '"]').remove();
+                                                                        } else {
+                                                                            alert(response.error);
+                                                                        }
+                                                                    },
+                                                                    error: function() {
+                                                                        alert('Error al eliminar el mensaje.');
+                                                                    }
+                                                                });
+                                                            } else {
+                                                                alert('ID de mensaje no encontrado.');
+                                                            }
+                                                        });
+                                                    } else {
+                                                        alert('Error al enviar el mensaje.');
                                                     }
-                                                    messageHtml += '<div class="mt-2">' +
-                                                        '<button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="' + response.id + '"><i class="fas fa-trash"></i> Eliminar</button>' +
-                                                        '</div>';
-                                                    chatWindowMessages.append(messageHtml);
-                                                    $(form).find('textarea').val('');
-                                                    $(form).find('input[type="file"]').val('');
-                                                    chatWindowMessages.scrollTop(chatWindowMessages[0].scrollHeight);
                                                 },
                                                 error: function(response) {
-                                                    var errorMessage = $(form).closest('.chat-input').find('.error-message');
-                                                    errorMessage.text('Error al enviar el mensaje.');
+                                                    alert('Error al enviar el mensaje.');
                                                 }
                                             });
                                         });
@@ -320,12 +350,10 @@
                 }
             });
 
-            $('.send-message-button').on('click', function(event) {
+            $(document).on('click', '.send-message-button', function(event) {
                 event.preventDefault();
                 var form = $(this).closest('form')[0];
                 var formData = new FormData(form);
-                var chatWindowId = $(this).closest('.chat-window').attr('id');
-                var chatWindowMessages = $(this).closest('.chat-window').find('.messages');
 
                 $.ajax({
                     type: 'POST',
@@ -334,93 +362,78 @@
                     processData: false,
                     contentType: false,
                     success: function(response) {
-                        var messageHtml = '<div class="chat-message sent">' +
-                            '<div>' +
-                            '<strong>Tú</strong>: ' + (response.contenido ? response.contenido : '') + '<br>' +
-                            '<small>' + response.fecha_envio + '</small>' +
-                            '</div>';
-                        if (response.imagen_url) {
-                            messageHtml += '<div><img src="' + response.imagen_url + '" alt="Imagen del mensaje"></div>';
+                        if (response.id) {
+                            var messageHtml = `
+                                <div class="chat-message sent" data-mensaje-id="${response.id}">
+                                    <div>
+                                        <strong>Tú</strong>: ${response.contenido}<br>
+                                        <small>${response.fecha_envio}</small>
+                                    </div>
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-sm btn-danger delete-message" data-mensaje-id="${response.id}">
+                                            <i class="fas fa-trash"></i> Eliminar
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+
+                            $('.chat-window .messages').append(messageHtml);
+                            $(form).find('textarea').val('');
+                            $(form).find('input[type="file"]').val('');
+                            $('.chat-window .messages').scrollTop($('.chat-window .messages')[0].scrollHeight);
+                        } else {
+                            alert('Error al enviar el mensaje.');
                         }
-                        messageHtml += '<div class="mt-2">' +
-                            '<button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#confirmDeleteModal" data-mensaje-id="' + response.id + '"><i class="fas fa-trash"></i> Eliminar</button>' +
-                            '</div>';
-                        chatWindowMessages.append(messageHtml);
-                        $(form).find('textarea').val('');
-                        $(form).find('input[type="file"]').val('');
-                        chatWindowMessages.scrollTop(chatWindowMessages[0].scrollHeight);
                     },
-                    error: function(response) {
-                        var errorMessage = $(form).closest('.chat-input').find('.error-message');
-                        errorMessage.text('Error al enviar el mensaje.');
+                    error: function() {
+                        alert('Error al enviar el mensaje.');
                     }
                 });
             });
 
-            $('.ocultar-conversation-button').on('click', function(event) {
-                event.preventDefault();
-                var username = $(this).data('username');
-                if (confirm('¿Estás seguro de que deseas ocultar esta conversación?')) {
+            $(document).on('click', '.delete-message', function() {
+                var mensajeId = $(this).data('mensaje-id');
+                if (mensajeId) {
                     $.ajax({
                         type: 'POST',
-                        url: '{% url "ocultar_conversacion" %}',
+                        url: `/mensajes/eliminar/${mensajeId}/`,
                         data: {
-                            'username': username,
                             'csrfmiddlewaretoken': '{{ csrf_token }}'
                         },
                         success: function(response) {
                             if (response.success) {
-                                $('a[data-username="' + username + '"]').closest('li').remove();
-                                $('#chat-' + response.user_id).remove();
+                                $(`div[data-mensaje-id="${mensajeId}"]`).remove();
                             } else {
-                                alert(response.error);
+                                alert('Error al eliminar el mensaje: ' + response.error);
                             }
                         },
-                        error: function(response) {
-                            alert('Error al ocultar la conversación.');
+                        error: function() {
+                            alert('Error al eliminar el mensaje.');
                         }
                     });
+                } else {
+                    alert('ID de mensaje no encontrado.');
                 }
             });
 
-            $('#confirmDeleteModal').on('show.bs.modal', function (event) {
-                    var button = $(event.relatedTarget);
-                     mensajeIdParaEliminar = button.data('mensaje-id');
-                     console.log("Mensaje ID para eliminar: ", mensajeIdParaEliminar);
-});
-
-            $('#deleteForm').on('submit', function(event) {
+            $('.chat-user-link').on('click', function(event) {
                 event.preventDefault();
-                var action = "{% url 'eliminar_mensaje' mensaje_id=0 %}".replace('0', mensajeIdParaEliminar);
-                $.ajax({
-                    type: 'POST',
-                    url: action,
-                    data: {
-                        'csrfmiddlewaretoken': '{{ csrf_token }}'
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            $('#chat-' + response.mensaje_receptor_id + ' .messages .chat-message[data-mensaje-id="' + mensajeIdParaEliminar + '"]').remove();
-                            $('#confirmDeleteModal').modal('hide');
-                        } else {
-                            alert(response.error);
-                        }
-                    },
-                    error: function(response) {
-                        alert('Error al eliminar el mensaje.');
-                    }
-                });
+                var username = $(this).data('username');
+                $('.receptor-username').val(username);
+                $('.chat-window').hide();
+                var chatWindow = $($(this).attr('href')).show();
+                loadMessages(username);
             });
 
-            // Mostrar el chat seleccionado automáticamente
-            var selectedUserId = "{{ selected_user_id }}";
+
+             // Mostrar el chat seleccionado automáticamente
+             var selectedUserId = "{{ selected_user_id }}";
             if (selectedUserId) {
                 var chatWindow = $('#chat-' + selectedUserId);
                 chatWindow.show();
                 $('a[data-username="' + chatWindow.find('.receptor-username').val() + '"]').closest('li').addClass('active');
                 $('.receptor-username').val(chatWindow.find('.receptor-username').val());
             } else {
-                // Si no hay un chat seleccionado, mostrar el primer chat por defecto
                 if ($('.chat-window').length) {
                     var firstChatWindow = $('.chat-window').first();
                     firstChatWindow.show();
