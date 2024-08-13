@@ -896,19 +896,16 @@ def enviar_mensaje(request):
             return JsonResponse({'error': 'Error al enviar el mensaje.', 'form_errors': form.errors}, status=400)
     return JsonResponse({'error': 'Método no permitido.'}, status=405)
 
-def eliminar_mensaje(request):
+def eliminar_mensaje(request, mensaje_id):
     if request.method == 'POST':
-        mensaje_id = request.POST.get('id')
-        if mensaje_id:
-            try:
-                mensaje = Mensaje.objects.get(id=mensaje_id, emisor=request.user)
-                mensaje.delete()
-                return JsonResponse({'success': True})
-            except Mensaje.DoesNotExist:
-                return JsonResponse({'success': False, 'error': 'Mensaje no encontrado.'})
-        else:
-            return JsonResponse({'success': False, 'error': 'ID de mensaje no proporcionado.'})
+        try:
+            mensaje = Mensaje.objects.get(id=mensaje_id, emisor=request.user)
+            mensaje.delete()
+            return redirect('listar_mensajes')  # Nombre correcto de la vista de redirección
+        except Mensaje.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Mensaje no encontrado.'})
     return JsonResponse({'success': False, 'error': 'Método no permitido.'})
+
 def detalle_mensaje(request, mensaje_id):
     mensaje = get_object_or_404(Mensaje, id=mensaje_id)
 
