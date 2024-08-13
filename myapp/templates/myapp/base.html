@@ -16,77 +16,107 @@
     <link rel="stylesheet" href="{% static 'css/register.css' %}"> <!-- CSS personalizado para registro -->
     {% block extra_css %}{% endblock %}
     <style>
-        body {
-            background-color: #f5f378; /* Color de fondo del cuerpo */
-        }
-        .dropdown-menu-notifications {
-            max-height: 400px;
-            overflow-y: auto; /* Habilita el desplazamiento vertical para las notificaciones */
-        }
-        .navbar.custom-navbar {
-            background-color: #000000;
-            z-index: 1000; /* Asegura que la barra de navegación esté por encima de otros elementos */
-        }
-        .navbar.custom-navbar .navbar-nav .nav-link {
-            color: #f5f378;
-        }
-        .navbar.custom-navbar .navbar-nav .nav-link:hover {
-            color: #000000;
-        }
-        .navbar.custom-navbar .navbar-brand {
-            color: #f5f378;
-        }
-        .navbar.custom-navbar .navbar-brand:hover {
-            color: #000000;
-        }
-        .dropdown-menu {
-            background-color: #000000;
-            z-index: 1001; /* Asegura que el menú desplegable esté por encima de otros elementos */
-        }
-        .dropdown-menu .dropdown-item {
-            color: #f5f378;
-        }
-        .dropdown-menu .dropdown-item:hover {
-            color: #000000;
-        }
-        .navbar-toggler {
-            border-color: rgba(245, 243, 120, 0.5); /* Color del borde del botón de la barra de navegación */
-        }
-        .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(245,243,120, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"); /* Imagen del icono del botón de la barra de navegación */
-        }
-        .navbar .nav-item {
-            margin-left: 1rem; /* Margen izquierdo de los elementos de la navegación */
-        }
+body {
+    background-color: #f5f378; /* Color de fondo del cuerpo */
+}
 
-        @media (max-width: 1200px) {
-            /* Estilos para dispositivos con un ancho máximo de 1200px */
-            .navbar.custom-navbar .navbar-nav {
-                flex-wrap: wrap; /* Permite que los elementos se envuelvan en múltiples líneas */
-                justify-content: center;
-            }
-            .navbar.custom-navbar .navbar-nav .nav-item {
-                flex: 0 0 45%; /* Cada elemento ocupará el 45% del ancho disponible */
-                text-align: center;
-            }
-        }
+.dropdown-menu-notifications {
+    max-height: 400px;
+    overflow-y: auto; /* Habilita el desplazamiento vertical para las notificaciones */
+    right: auto; /* Desactiva la alineación automática a la derecha */
+    left: 50%; /* Alinea el menú al centro horizontal del botón */
+    transform: translateX(-50%); /* Desplaza el menú hacia la izquierda para centrarlo */
+    width: 350px; /* Ancho adecuado para el menú */
+    min-width: 300px; /* Asegura un ancho mínimo */
+    word-wrap: break-word; /* Permite que las palabras largas se dividan en varias líneas */
+}
 
-        @media (max-width: 768px) {
-            /* Estilos para dispositivos con un ancho máximo de 768px */
-            .navbar.custom-navbar .navbar-brand {
-                margin-bottom: 10px;
-            }
-            .navbar.custom-navbar .navbar-nav .nav-item {
-                margin-bottom: 10px;
-                margin-left: 0;
-            }
-            .navbar-nav {
-                flex-direction: column; /* Organiza los elementos de la navegación en columna en pantallas pequeñas */
-            }
-            .navbar-collapse {
-                text-align: center;
-            }
-        }
+.dropdown-menu-notifications .dropdown-item {
+    color: #f5f378; /* Color de texto */
+    background-color: #000000; /* Fondo negro */
+    white-space: normal; /* Permite que el texto se ajuste a múltiples líneas */
+}
+
+.dropdown-menu-notifications .dropdown-item:hover {
+    background-color: #f5f378; /* Fondo al pasar el mouse */
+    color: #000000; /* Texto al pasar el mouse */
+}
+
+.dropdown-menu {
+    background-color: #000000;
+    z-index: 1001; /* Asegura que el menú desplegable esté por encima de otros elementos */
+}
+
+.dropdown-menu .dropdown-item {
+    color: #f5f378;
+}
+
+.dropdown-menu .dropdown-item:hover {
+    color: #000000;
+}
+
+.navbar.custom-navbar {
+    background-color: #000000;
+    z-index: 1000; /* Asegura que la barra de navegación esté por encima de otros elementos */
+}
+
+.navbar.custom-navbar .navbar-nav .nav-link {
+    color: #f5f378;
+}
+
+.navbar.custom-navbar .navbar-nav .nav-link:hover {
+    color: #000000;
+}
+
+.navbar.custom-navbar .navbar-brand {
+    color: #f5f378;
+}
+
+.navbar.custom-navbar .navbar-brand:hover {
+    color: #000000;
+}
+
+.navbar-toggler {
+    border-color: rgba(245, 243, 120, 0.5); /* Color del borde del botón de la barra de navegación */
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(245,243,120, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"); /* Imagen del icono del botón de la barra de navegación */
+}
+
+.navbar .nav-item {
+    margin-left: 1rem; /* Margen izquierdo de los elementos de la navegación */
+}
+
+@media (max-width: 1200px) {
+    /* Estilos para dispositivos con un ancho máximo de 1200px */
+    .navbar.custom-navbar .navbar-nav {
+        flex-wrap: wrap; /* Permite que los elementos se envuelvan en múltiples líneas */
+        justify-content: center;
+    }
+    .navbar.custom-navbar .navbar-nav .nav-item {
+        flex: 0 0 45%; /* Cada elemento ocupará el 45% del ancho disponible */
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Estilos para dispositivos con un ancho máximo de 768px */
+    .navbar.custom-navbar .navbar-brand {
+        margin-bottom: 10px;
+    }
+    .navbar.custom-navbar .navbar-nav .nav-item {
+        margin-bottom: 10px;
+        margin-left: 0;
+    }
+    .navbar-nav {
+        flex-direction: column; /* Organiza los elementos de la navegación en columna en pantallas pequeñas */
+    }
+    .navbar-collapse {
+        text-align: center;
+    }
+}
+
     </style>
 </head>
 <body>

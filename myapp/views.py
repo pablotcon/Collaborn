@@ -878,7 +878,7 @@ def enviar_mensaje(request):
                 chat_url = reverse('listar_mensajes') + f'?usuario_id={mensaje.emisor.id}'  # URL del chat con el emisor
                 Notificacion.objects.create(
                     receptor=receptor,
-                    mensaje=f"Tienes un nuevo mensaje de {request.user.username}",
+                    mensaje=f"Mensaje de {request.user.username}",
                     url=chat_url
                 )
                 response_data = {
