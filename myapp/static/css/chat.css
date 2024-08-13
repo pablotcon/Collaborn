@@ -65,7 +65,7 @@ body {
 
 .chat-message.sent {
     background-color: #007bff;
-    color: #ffffff;
+    color: #000000;
     text-align: right;
 }
 

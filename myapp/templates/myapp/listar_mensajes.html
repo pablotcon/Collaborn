@@ -13,17 +13,25 @@
     <h1 class="text-center">Mensajes</h1>
 
     <div class="row">
+        <!-- Lista de usuarios -->
         <div class="col-md-3">
             <div class="user-list">
                 <h3><i class="fas fa-comments"></i> Conversaciones</h3>
                 <ul class="list-group" id="conversaciones-list">
-                    {% for usuario in usuarios.keys %}
+                    {% for usuario in usuarios %}
                     <li class="list-group-item d-flex justify-content-between align-items-center {% if usuario.id == selected_user_id %}active{% endif %}">
-                        <a href="#chat-{{ usuario.id }}" class="chat-user-link" data-username="{{ usuario.username }}">
-                            <i class="fas fa-user"></i> {{ usuario.username }}
+                        <a href="#chat-{{ usuario.id }}" class="chat-user-link d-flex align-items-center" data-username="{{ usuario.username }}">
+                            {% if usuario.perfil.avatar %}
+                                <img src="{{ usuario.perfil.avatar.url }}" alt="Avatar" class="rounded-circle mr-2" style="width: 30px; height: 30px;">
+                            {% else %}
+                                <img src="{% static 'images/default_avatar.png' %}" alt="Avatar" class="rounded-circle mr-2" style="width: 30px; height: 30px;">
+                            {% endif %}
+                            {{ usuario.username }}
                         </a>
                         <button type="button" class="btn btn-sm btn-danger ocultar-conversation-button" data-username="{{ usuario.username }}">
-                            <i class="fas fa-eye-slash"></i></button></li>
+                            <i class="fas fa-eye-slash"></i>
+                        </button>
+                    </li>
                     {% endfor %}
                 </ul>
                 <h3><i class="fas fa-plus-circle"></i> Iniciar nuevo chat</h3>
@@ -35,36 +43,49 @@
             </div>
         </div>
 
+        <!-- Ventana de chat -->
         <div class="col-md-9">
             <div class="tab-content" id="chat-content">
                 {% for usuario, mensajes in usuarios.items %}
                 <div class="tab-pane chat-window {% if usuario.id == selected_user_id %}active{% endif %}" id="chat-{{ usuario.id }}">
                     <div class="chat-box">
-                        <h4><i class="fas fa-user-circle"></i> Conversación con {{ usuario.username }}</h4>
+                        <h4>
+                            {% if usuario.perfil.avatar %}
+                                <img src="{{ usuario.perfil.avatar.url }}" alt="Avatar" class="rounded-circle mr-2" style="width: 40px; height: 40px;">
+                            {% else %}
+                                <img src="{% static 'images/default_avatar.png' %}" alt="Avatar" class="rounded-circle mr-2" style="width: 40px; height: 40px;">
+                            {% endif %}
+                            Conversación con {{ usuario.username }}
+                        </h4>
                         <div class="messages">
                             {% for mensaje in mensajes %}
                             <div class="chat-message {% if mensaje.emisor == request.user %}sent{% else %}received{% endif %}">
-                                <div>
-                                    <strong>{% if mensaje.emisor == request.user %}<i class="fas fa-user"></i> Tú{% else %}<i class="fas fa-user"></i> {{ mensaje.emisor.username }}{% endif %}</strong>: 
-                                    {% if mensaje.contenido %}{{ mensaje.contenido }}{% endif %}<br>
-                                    <small>{{ mensaje.fecha_envio|date:"d-m-Y H:i" }}</small>
+                                <div class="d-flex align-items-center">
+                                    {% if mensaje.emisor.perfil.avatar %}
+                                        <img src="{{ mensaje.emisor.perfil.avatar.url }}" alt="Avatar" class="rounded-circle mr-2" style="width: 25px; height: 25px;">
+                                    {% else %}
+                                        <img src="{% static 'images/default_avatar.png' %}" alt="Avatar" class="rounded-circle mr-2" style="width: 25px; height: 25px;">
+                                    {% endif %}
+                                    <strong>{% if mensaje.emisor == request.user %} Tú {% else %} {{ mensaje.emisor.username }} {% endif %}</strong>
+                                </div>
+                                <div class="message-content bg-light p-2 rounded mt-2">
+                                    <p class="mb-1">{{ mensaje.contenido }}</p>
+                                    <small class="text-muted">{{ mensaje.fecha_envio|date:"d-m-Y H:i" }}</small>
                                 </div>
                                 {% if mensaje.imagen %}
                                 <div>
-                                    <img src="{{ mensaje.imagen.url }}" alt="Imagen del mensaje">
+                                    <img src="{{ mensaje.imagen.url }}" alt="Imagen del mensaje" class="img-fluid mt-2 rounded">
                                 </div>
                                 {% endif %}
                                 {% if mensaje.emisor == request.user %}
                                 <div class="mt-2">
-                                    
-                                </div>
                                     <form action="{% url 'eliminar_mensaje' mensaje.id %}" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este mensaje?');">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-sm btn-danger">
                                             <i class="fas fa-trash"></i> Eliminar
                                         </button>
                                     </form>
-                    
+                                </div>
                                 {% endif %}
                             </div>
                             {% endfor %}
@@ -129,7 +150,7 @@
                                 var messageClass = (mensaje.emisor == '{{ request.user.username }}') ? 'sent' : 'received';
                                 var messageHtml = '<div class="chat-message ' + messageClass + '">' +
                                     '<div>' +
-                                    '<strong>' + (messageClass == 'sent' ? 'Tú' : mensaje.emisor) + '</strong>: ' +
+                                    '<strong>' + (messageClass == 'sent' ? 'Tú' : mensaje.emisor.username) + '</strong>: ' +
                                     mensaje.contenido + '<br>' +
                                     '<small>' + mensaje.fecha_envio + '</small>' +
                                     '</div>';
@@ -180,8 +201,13 @@
                             if (response.success) {
                                 var newUser = response.user;
                                 var newUserHtml = '<li class="list-group-item d-flex justify-content-between align-items-center">' +
-                                    '<a href="#chat-' + newUser.id + '" class="chat-user-link" data-username="' + newUser.username + '">' +
-                                    '<i class="fas fa-user"></i> ' + newUser.username +
+                                    '<a href="#chat-' + newUser.id + '" class="chat-user-link d-flex align-items-center" data-username="' + newUser.username + '">' +
+                                    '{% if newUser.perfil.avatar %}' +
+                                    '<img src="' + newUser.perfil.avatar.url + '" alt="Avatar" class="rounded-circle mr-2" style="width: 30px; height: 30px;">' +
+                                    '{% else %}' +
+                                    '<img src="{% static "images/default_avatar.png" %}" alt="Avatar" class="rounded-circle mr-2" style="width: 30px; height: 30px;">' +
+                                    '{% endif %}' +
+                                    newUser.username +
                                     '</a>' +
                                     '<button type="button" class="btn btn-sm btn-danger ocultar-conversation-button" data-username="' + newUser.username + '">' +
                                     '<i class="fas fa-eye-slash"></i></button></li>';
@@ -194,13 +220,13 @@
                                     success: function(response) {
                                         var newChatHtml = '<div class="tab-pane chat-window" id="chat-' + newUser.id + '">' +
                                             '<div class="chat-box">' +
-                                            '<h4><i class="fas fa-user-circle"></i> Conversación con ' + newUser.username + '</h4>' +
+                                            '<h4><img src="' + newUser.perfil.avatar.url + '" alt="Avatar" class="rounded-circle mr-2" style="width: 40px; height: 40px;"> Conversación con ' + newUser.username + '</h4>' +
                                             '<div class="messages">';
                                         response.mensajes.forEach(function(mensaje) {
                                             var messageClass = (mensaje.emisor == '{{ request.user.username }}') ? 'sent' : 'received';
                                             var messageHtml = '<div class="chat-message ' + messageClass + '">' +
                                                 '<div>' +
-                                                '<strong>' + (messageClass == 'sent' ? 'Tú' : mensaje.emisor) + '</strong>: ' +
+                                                '<strong>' + (messageClass == 'sent' ? 'Tú' : mensaje.emisor.username) + '</strong>: ' +
                                                 mensaje.contenido + '<br>' +
                                                 '<small>' + mensaje.fecha_envio + '</small>' +
                                                 '</div>';
@@ -389,15 +415,10 @@
                 var button = $(event.relatedTarget);
                 mensajeIdParaEliminar = button.data('mensaje-id');
             });
-                    var button = $(event.relatedTarget);
-                     mensajeIdParaEliminar = button.data('mensaje-id');
-                     console.log("Mensaje ID para eliminar: ", mensajeIdParaEliminar);
-});
 
             $('#deleteForm').on('submit', function(event) {
                 event.preventDefault();
                 var action = "{% url 'eliminar_mensaje' 0 %}".slice(0, -2) + mensajeIdParaEliminar + "/";
-                var action = "{% url 'eliminar_mensaje' mensaje_id=0 %}".replace('0', mensajeIdParaEliminar);
                 $.ajax({
                     type: 'POST',
                     url: action,
@@ -434,7 +455,7 @@
                     $('.receptor-username').val(firstUsername);
                 }
             }
-        ;
+        });
     </script>
 </div>
 {% endblock %}
