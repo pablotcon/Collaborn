@@ -11,7 +11,12 @@ class Categoria(models.Model):
 
     def __str__(self):
         return self.nombre
+class Chat(models.Model):
+    participantes = models.ManyToManyField(User)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"Chat entre {', '.join(participante.username for participante in self.participantes.all())}"
 class Proyecto(models.Model):
     nombre = models.CharField(max_length=200)
     descripcion = models.TextField()

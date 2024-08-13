@@ -1,7 +1,8 @@
 from django.urls import path
 from . import views
 from django.conf import settings 
-from django.conf.urls.static import static
+from django.conf.urls.static import static 
+from .views import iniciar_chat
 
 urlpatterns = [
     # Autenticación
@@ -78,7 +79,8 @@ urlpatterns = [
     path('mensajes/ocultar_conversacion/', views.ocultar_conversacion, name='ocultar_conversacion'),
     path('mensajes/cargar_mensajes/', views.cargar_mensajes, name='cargar_mensajes'),
     path('mensajes/<int:user_id>/', views.ver_chat, name='ver_chat'),
-
+    path('iniciar_chat/<int:user_id>/', iniciar_chat, name='iniciar_chat'),
+    path('mensajes/<int:chat_id>/', views.listar_mensajes, name='listar_mensajes'),
     # Actividades
     path('actividades/historial/<int:user_id>/', views.historial_actividades, name='historial_actividades'),
     path('test/proyectos_colaborados/<int:user_id>/', views.test_proyectos_colaborados, name='test_proyectos_colaborados'),

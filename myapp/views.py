@@ -816,11 +816,25 @@ def listar_mensajes(request):
     all_messages = mensajes_recibidos.union(mensajes_enviados).order_by('fecha_envio')
 
     usuarios = {}
-    for mensaje in all_messages:
-        user = mensaje.emisor if mensaje.receptor == request.user else mensaje.receptor
-        if user not in usuarios:
-            usuarios[user] = []
-        usuarios[user].append(mensaje)
+    selected_user = None
+
+    # Si se ha seleccionado un usuario (es decir, `usuario_id` está presente)
+    if usuario_id:
+        selected_user = get_object_or_404(User, id=usuario_id)
+        mensajes = Mensaje.objects.filter(
+            (Q(receptor=request.user) & Q(emisor=selected_user)) |
+            (Q(emisor=request.user) & Q(receptor=selected_user))
+        ).order_by('fecha_envio')
+
+        usuarios[selected_user] = mensajes
+
+    # Si no hay usuario seleccionado, manejar todos los mensajes
+    else:
+        for mensaje in all_messages:
+            user = mensaje.emisor if mensaje.receptor == request.user else mensaje.receptor
+            if user not in usuarios:
+                usuarios[user] = []
+            usuarios[user].append(mensaje)
 
     all_users = User.objects.exclude(id=request.user.id)
 
@@ -829,6 +843,7 @@ def listar_mensajes(request):
         'all_users': all_users,
         'query': query,
         'selected_user_id': int(usuario_id) if usuario_id else None,
+        'selected_user': selected_user,
     })
 @login_required
 def cargar_mensajes(request):
@@ -1206,3 +1221,20 @@ def verificar_relaciones(request):
         response += f"- {row[0]}<br>"
 
     return HttpResponse(response)
+
+from django.shortcuts import redirect, get_object_or_404
+from .models import Chat, User
+def iniciar_chat(request, user_id):
+    receptor = get_object_or_404(User, pk=user_id)
+    
+    # Verifica si ya existe un chat entre estos dos usuarios
+    chat = Chat.objects.filter(participantes__in=[request.user, receptor]).distinct()
+
+    if not chat.exists():
+        # Si no existe un chat, lo crea
+        chat = Chat.objects.create()
+        chat.participantes.add(request.user, receptor)
+        chat.save()
+
+    # Redirige a la vista listar_mensajes con el usuario_id del receptor
+    return redirect(f"{reverse('listar_mensajes')}?usuario_id={receptor.id}")
